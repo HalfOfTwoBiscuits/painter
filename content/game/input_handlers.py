@@ -39,4 +39,5 @@ class PainterControl(InputHandler):
         if new_pos is None:
             PainterVisual.shake()
         else:
-            PainterVisual.go_to(new_pos)
+            # Face up after undoing, same as initial
+            PainterVisual.go_to(new_pos, -2)
