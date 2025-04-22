@@ -60,6 +60,17 @@ class CellGrid:
         new_cell = Cell()
         self.__cells[pos] = new_cell
         return new_cell
+    
+    def get_dimensions(self):
+        '''Return the dimensions of this grid.
+        Called when loading a level, to set up visuals'''
+        return self.__w, self.__h
+    
+    def get_full_cells(self):
+        return (c for c in self.__cells if c.get_full())
+    
+    def level_is_finished(self):
+        return self.__w * self.__height == len(self.get_full_cells()) - 1
 
 class Cell:
     '''Class representing a cell that can be blank or coloured in.
@@ -83,5 +94,8 @@ class Cell:
 
     def start_filled(self):
         '''Set cell to start filled in.
-        Called during level setup.'''
+        Called during level creation.'''
         self.__filled = True
+
+    def get_full(self):
+        return self.__filled
