@@ -5,15 +5,13 @@ class LevelPlayInterface:
         self.__grid = level_obj.get_cell_grid()
         self.__position_history = [self.__painter_pos] # Series of positions occupied
 
-    def move_painter(self, direction: int):
-        '''Move the painter one cell.
-
-        The direction argument indicates a direction to move.
+    def painter_position_after_move(self, direction: int):
+        '''The direction argument indicates a direction to move.
         1 : Right, -1 : Left
         2 : Down, -2 : Up
         
-        Returns a boolean for whether the move worked.
-        True : moved, False : blocked by wet paint'''
+        Return the position the painter would be in after
+        moving in that direction once.'''
 
         # Calculate new position of the painter after moving
         x, y = self.__painter_pos
@@ -21,7 +19,13 @@ class LevelPlayInterface:
         if abs(direction) == 1: x += direction
         else: y += direction // 2
 
-        new_pos = (x,y)
+        return (x,y)
+
+    def move_painter(self, new_pos: tuple):
+        '''Move the painter to the new position.
+
+        Returns a boolean for whether the move worked.
+        True : moved, False : blocked by wet paint.'''
 
         try:
             # Paint the new position.
@@ -30,7 +34,6 @@ class LevelPlayInterface:
             # Options:
             # - show painter over square contents
             # - paint the old position, not the new one
-            # I prefer the first option.
             cell = self.__grid[new_pos]
             cell.paint()
         except ValueError:
@@ -46,9 +49,9 @@ class LevelPlayInterface:
     def undo(self):
         '''Undo the painter's last move.
 
-        Returns a boolean for whether the undo worked.
-        True : Move was undone, False : No moves to undo'''
-        if len(self.__position_history) == 1: return False
+        If the undo worked, return the painter's new position.
+        Tuple : Move was undone, None : No moves to undo'''
+        if len(self.__position_history) == 1: return None
 
         cur_pos = self.__position_history.pop()
         prev_pos = self.__position_history[-1]
@@ -57,13 +60,13 @@ class LevelPlayInterface:
         cur_cell.revert()
         self.__painter_pos = prev_pos
 
-        return True
+        return prev_pos
 
     def undo_all(self):
         '''Undo all the painter's moves.
         
-        Returns a boolean for whether the undo worked.
-        True : All moves undone, False : No moves to undo
+        If the undo worked, return the painter's initial position.
+        Tuple : All moves undone, False : No moves to undo
 
         May not be used.
         '''
@@ -75,6 +78,6 @@ class LevelPlayInterface:
             # If the painter moved, repeatedly call undo()
             # until all moves are undone. 
             while self.undo(): pass
-            return True
+            return self.__painter_pos
         else:
-            return False
+            return None

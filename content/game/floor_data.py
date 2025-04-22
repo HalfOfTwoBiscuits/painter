@@ -13,8 +13,7 @@ class FloorData:
         self.__grid.ensure_valid_position(new_pos)
         # Painter position doesn't start filled.
         # If this could be called more than once, also need to unfill previous
-        cell = self.__grid[new_pos]
-        cell.want_fill()
+        #cell = self.__grid[new_pos]
         self.__initial_painter_position = new_pos
 
     def get_cell_grid(self):
@@ -53,7 +52,7 @@ class CellGrid:
         the cell object will be created before returning it.
         Raise an exception if the position is not within the level.'''
 
-        self.__ensure_valid_position(pos)
+        self.ensure_valid_position(pos)
 
         if pos in self.__cells:
             return self.__cells[pos]
