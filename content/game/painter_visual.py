@@ -14,7 +14,7 @@ class PainterVisual(VisualHandler):
     )
 
     @classmethod
-    def go_to(cls, pos: tuple, dir: int, sfx_name: str=None):
+    def go_to(cls, pos: tuple, dir: int=-2, sfx_name: str=None):
         cls.__position = pos
         cls.__direction = dir
         SFXPlayer.play_sfx(sfx_name)

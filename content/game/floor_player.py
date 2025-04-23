@@ -1,11 +1,14 @@
-class LevelPlayInterface:
+class FloorPlayer:
     '''Interface for the Painter's interactions with the level.'''
-    def __init__(self, level_obj):
-        self.__painter_pos = level_obj.get_initial_painter_position()
-        self.__grid = level_obj.get_cell_grid()
-        self.__position_history = [self.__painter_pos] # Series of positions occupied
 
-    def painter_position_after_move(self, direction: int):
+    @classmethod
+    def setup(cls, level_obj):
+        cls.__painter_pos = level_obj.get_initial_painter_position()
+        cls.__grid = level_obj.get_cell_grid()
+        cls.__position_history = [cls.__painter_pos] # Series of positions occupied
+
+    @classmethod
+    def painter_position_after_move(cls, direction: int):
         '''The direction argument indicates a direction to move.
         1 : Right, -1 : Left
         2 : Down, -2 : Up
@@ -14,14 +17,15 @@ class LevelPlayInterface:
         moving in that direction once.'''
 
         # Calculate new position of the painter after moving
-        x, y = self.__painter_pos
+        x, y = cls.__painter_pos
 
         if abs(direction) == 1: x += direction
         else: y += direction // 2
 
         return (x,y)
-
-    def move_painter(self, new_pos: tuple):
+    
+    @classmethod
+    def move_painter(cls, new_pos: tuple):
         '''Move the painter to the new position.
 
         Returns a boolean for whether the move worked.
@@ -29,7 +33,7 @@ class LevelPlayInterface:
 
         try:
             # Paint the old position.
-            cell = self.__grid[self.__painter_pos]
+            cell = cls.__grid[cls.__painter_pos]
             cell.paint()
         except ValueError:
             # The move is not possible.
@@ -37,27 +41,29 @@ class LevelPlayInterface:
             return False
         else:
             # Move painter, add to position history, and end.
-            self.__painter_pos = new_pos
-            self.__position_history.append(new_pos)
+            cls.__painter_pos = new_pos
+            cls.__position_history.append(new_pos)
             return True
-
-    def undo(self):
+        
+    @classmethod
+    def undo(cls):
         '''Undo the painter's last move.
 
         If the undo worked, return the painter's new position.
         Tuple : Move was undone, None : No moves to undo'''
-        if len(self.__position_history) == 1: return None
+        if len(cls.__position_history) == 1: return None
 
-        cur_pos = self.__position_history.pop()
-        prev_pos = self.__position_history[-1]
+        cur_pos = cls.__position_history.pop()
+        prev_pos = cls.__position_history[-1]
 
-        cur_cell = self.__grid[cur_pos]
+        cur_cell = cls.__grid[cur_pos]
         cur_cell.revert()
-        self.__painter_pos = prev_pos
+        cls.__painter_pos = prev_pos
 
         return prev_pos
-
-    def undo_all(self):
+    
+    @classmethod
+    def undo_all(cls):
         '''Undo all the painter's moves.
         
         If the undo worked, return the painter's initial position.
@@ -67,12 +73,12 @@ class LevelPlayInterface:
         '''
         
         # Attempt to undo once.
-        has_moved = self.undo()
+        has_moved = cls.undo()
 
         if has_moved:
             # If the painter moved, repeatedly call undo()
             # until all moves are undone. 
-            while self.undo(): pass
-            return self.__painter_pos
+            while cls.undo(): pass
+            return cls.__painter_pos
         else:
             return None

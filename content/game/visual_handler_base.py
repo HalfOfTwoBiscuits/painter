@@ -1,6 +1,6 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
-class VisualHandler(ABC):
+class VisualHandler:
     '''Has access to the window surface to draw graphics onto,
     and implements a draw() method.
     Visual handlers inherit from it.'''
