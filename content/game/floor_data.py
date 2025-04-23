@@ -61,16 +61,21 @@ class CellGrid:
         self.__cells[pos] = new_cell
         return new_cell
     
-    def get_dimensions(self):
+    def get_size(self):
         '''Return the dimensions of this grid.
         Called when loading a level, to set up visuals'''
         return self.__w, self.__h
     
-    def get_full_cells(self):
-        return (c for c in self.__cells if c.get_full())
+    def get_full_cell_positions(self):
+        '''Return a list of positions where cells have been filled.
+        Called when drawing level visuals and in the is_painted() method'''
+        return [pos for pos, cell in self.__cells.items() if cell.get_full()]
     
-    def level_is_finished(self):
-        return self.__w * self.__height == len(self.get_full_cells()) - 1
+    def is_painted(self):
+        '''Return a boolean indicating whether the level is complete.
+        True : All cells are full (except the one the painter ended on)
+        False : There are still cells to paint'''
+        return self.__w * self.__h == len(self.get_full_cell_positions()) - 1
 
 class Cell:
     '''Class representing a cell that can be blank or coloured in.

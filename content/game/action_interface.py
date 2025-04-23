@@ -28,17 +28,12 @@ class LevelPlayInterface:
         True : moved, False : blocked by wet paint.'''
 
         try:
-            # Paint the new position.
-            # This means a cell will be full when you stand on it.
-            # In-story, the painter doesn't stand on the wet paint.
-            # Options:
-            # - show painter over square contents
-            # - paint the old position, not the new one
-            cell = self.__grid[new_pos]
+            # Paint the old position.
+            cell = self.__grid[self.__painter_pos]
             cell.paint()
         except ValueError:
             # The move is not possible.
-            # The PainterCharacter class does a SFX/animation/effect.
+            # The PainterVisual class does a SFX/animation/effect.
             return False
         else:
             # Move painter, add to position history, and end.
