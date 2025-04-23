@@ -5,9 +5,9 @@ from floor_visual import FloorVisual
 from pause_visual import PauseMenuVisual
 
 class GameplayState:
-    _INPUT_HANDLER = PainterControl
-    _VISUAL_HANDLERS = (PainterVisual, FloorVisual)
+    INPUT_HANDLER = PainterControl
+    VISUAL_HANDLERS = (PainterVisual, FloorVisual)
 
 class PauseMenuState:
-    _INPUT_HANDLER = PauseMenuControl
-    _VISUAL_HANDLERS = (PainterVisual, FloorVisual, PauseMenuVisual)
+    INPUT_HANDLER = PauseMenuControl
+    VISUAL_HANDLERS = (PainterVisual, FloorVisual, PauseMenuVisual)
