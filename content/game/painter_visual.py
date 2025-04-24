@@ -13,10 +13,6 @@ class PainterVisual(VisualHandler):
         pg.math.Vector2(1,-3)
     )
 
-    __shake_increment = 0
-    __current_shake_amount = 0
-    __stopping_shake = False
-
     @classmethod
     def go_to(cls, pos: tuple, dir: int=-2):
         '''Change the cell the painter graphic is shown in
@@ -32,15 +28,23 @@ class PainterVisual(VisualHandler):
             cls.__shake_increment = 1
 
     @classmethod
-    def __update_shake_effect(cls, padding: int):
+    def initialise_shakevfx_state(cls):
+        '''Set the attributes that track the shaking vfx
+        to their initial values. Called when starting a floor.'''
+        cls.__shake_increment = 0
+        cls.__current_shake_amount = 0
+        cls.__stopping_shake = False
+
+    @classmethod
+    def __update_shake_effect(cls):
         '''Update the stored values used for the shaking effect
         to respond to the passing of a frame.'''
         cls.__current_shake_amount += cls.__shake_increment
 
-        if cls.__current_shake_amount == padding:
+        if cls.__current_shake_amount == cls.__padding:
             # Reached maximum positive offset, so go the other way
             cls.__shake_increment = -1
-        elif cls.__current_shake_amount == -padding:
+        elif cls.__current_shake_amount == -cls.__padding:
             # Reached maximum negative offset, so back to the centre
             cls.__shake_increment = 1
             cls.__stopping_shake = True
@@ -58,39 +62,50 @@ class PainterVisual(VisualHandler):
         # Get the pixel position of the cell,
         # and dimension of a cell to use for scaling.
         topleft_x, topleft_y = FloorVisual.topleft_for(cls.__position)
-        cell_dimens = FloorVisual.get_cell_dimens()
 
         # Find centre of the cell
-        centre_x = topleft_x + cell_dimens // 2
-        centre_y = topleft_y + cell_dimens // 2
+        centre_x = topleft_x + cls.__offset
+        centre_y = topleft_y + cls.__offset
 
-        # Use a fraction of the space available as padding:
-        # subtract the space used on padding from the cell dimension.
-        padding = cell_dimens // cls.__PADDING_FRACTION
-        dimens = cell_dimens - padding * 2
-
-        cls.__update_shake_effect(padding)
+        cls.__update_shake_effect()
         
         # If the shake effect is in progress, offset from the centre.
-        if abs(cls.__direction) == 1:
-            # Facing horizontal, so vertical offset
-            centre_y += cls.__current_shake_amount
-        else:
-            # Facing vertical, so horizontal offset
-            centre_x += cls.__current_shake_amount
+        if cls.__shake_increment != 0:
+            if abs(cls.__direction) == 1:
+                # Facing horizontal, so vertical offset
+                centre_y += cls.__current_shake_amount
+            else:
+                # Facing vertical, so horizontal offset
+                centre_x += cls.__current_shake_amount
 
         # Find the vertices of the arrowhead shape,
         # accounting for the direction the painter is facing.
-        vertices = cls.__find_vertices(centre_x, centre_y, dimens)
+        vertices = cls.__find_vertices(centre_x, centre_y)
 
         # Draw
         pg.draw.polygon(cls._window, cls.__COL, vertices)
 
-    # TODO: When LevelSelectState transitions to GameplayState,
-    # calculate the __offset once, set shake data, and go_to initial_painter_position
+    @classmethod
+    def new_cell_dimens(cls, cell_dimens: int):
+        '''Set up visual parameters
+        based on the dimension of a cell on the new floor.'''
+
+        # Calculate x/y offset from topleft to the centre of a cell.
+        cls.__offset = cell_dimens // 2
+
+        # Use a fraction of the space available as padding.
+        cls.__padding = cell_dimens // cls.__PADDING_FRACTION
+        # Subtract padding to find the space available.
+        graphic_dimens = cell_dimens - cls.__padding * 2
+
+        # Divide the space available by the greatest magnitude
+        # used in the scaled-down arrowhead shape, to calculate
+        # a scale multiplier that makes the vectors fill the space.
+        cls.__scale = graphic_dimens / max(
+            [vector.magnitude() for vector in cls.__ARROWHEAD])
     
     @classmethod
-    def __find_vertices(cls, x: int, y: int, space: int):
+    def __find_vertices(cls, x: int, y: int):
         '''Return position vectors for the vertices of an
         arrowhead shape centred at the given x,y position
         using the given space, facing in the stored direction.
@@ -109,12 +124,6 @@ class PainterVisual(VisualHandler):
 
             # Multiply by 90 degrees for quarter rotations
             degrees_to_rotate = 90 * rotations
-
-        # Divide the space available by the greatest
-        # magnitude used in the scaled-down arrowhead shape,
-        # to calculate a scale multiplier that will fill the space.
-        scale = space / max(
-            [vector.magnitude() for vector in cls.__ARROWHEAD])
         
         # Create a vector used to offset the shape to the centre (of the cell)
         offset_vector = pg.Vector2(x,y)
@@ -123,7 +132,7 @@ class PainterVisual(VisualHandler):
         vertices = []
         for vector in cls.__ARROWHEAD:
             vector.rotate(degrees_to_rotate)
-            vector.scale_to_length(vector.magnitude() * scale)
+            vector.scale_to_length(vector.magnitude() * cls.__scale)
             vector += offset_vector
             vertices.append(vector)
 

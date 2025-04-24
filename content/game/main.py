@@ -1,9 +1,8 @@
 import asyncio
 import pygame as pg
 import states
-from floor_visual import FloorVisual
-from floor_player import FloorPlayer
 from visual_handler_base import VisualHandler
+from floor_manager import FloorManager
 
 class Game:
     __TITLE = "Painter"
@@ -45,4 +44,5 @@ class Game:
         
 
 if __name__ == '__main__':
+    FloorManager.load_floors()
     asyncio.run(Game.main())

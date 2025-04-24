@@ -7,13 +7,13 @@ class FloorVisual(VisualHandler):
     __PAINT_COL = pg.Color(150,30,30)
 
     @classmethod
-    def setup(cls, level_obj):
-        '''Set up graphical parameters used to draw the grid for a level.
-        Called once when the level starts.'''
+    def new_floor(cls, floor_obj):
+        '''Set up graphical parameters used to draw the grid for a floor.
+        Called once when the floor starts.'''
 
         # Retrieve size of grid (in cells)
         # and dimensions of the game window (in pixels)
-        cls.__grid = level_obj.get_cell_grid()
+        cls.__grid = floor_obj.get_cell_grid()
         grid_w, grid_h = cls.__grid.get_size()
         win_w, win_h = cls._window_dimensions
 
@@ -75,5 +75,5 @@ class FloorVisual(VisualHandler):
     @classmethod
     def get_cell_dimens(cls):
         '''Return the dimension of a cell.
-        Called in PainterVisual.draw()'''
+        Called in FloorFactory.__start_floor'''
         return cls.__cell_dimens

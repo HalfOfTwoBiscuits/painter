@@ -1,10 +1,12 @@
 class FloorPlayer:
-    '''Interface for the Painter's interactions with the level.'''
+    '''Interface for the Painter's interactions with the floor.'''
 
     @classmethod
-    def setup(cls, level_obj):
-        cls.__painter_pos = level_obj.get_initial_painter_position()
-        cls.__grid = level_obj.get_cell_grid()
+    def new_floor(cls, floor_obj):
+        '''Initialise the position of the painter, the cell grid to move on,
+        and undo history.'''
+        cls.__painter_pos = floor_obj.get_initial_painter_position()
+        cls.__grid = floor_obj.get_cell_grid()
         cls.__position_history = [cls.__painter_pos] # Series of positions occupied
 
     @classmethod
@@ -68,8 +70,6 @@ class FloorPlayer:
         
         If the undo worked, return the painter's initial position.
         Tuple : All moves undone, False : No moves to undo
-
-        May not be used.
         '''
         
         # Attempt to undo once.
@@ -82,3 +82,10 @@ class FloorPlayer:
             return cls.__painter_pos
         else:
             return None
+        
+    @classmethod
+    def floor_is_over(cls):
+        '''Return a boolean for whether the floor is clear.
+        True : Well done, move on, False : More to paint
+        Delegates to CellGrid.is_painted()'''
+        return cls.__grid.is_painted()

@@ -9,7 +9,7 @@ class FloorData:
     def get_initial_painter_position(self):
         return self.__initial_painter_position
 
-    def set_initial_painter_position(self, new_pos):
+    def set_initial_painter_position(self, new_pos: tuple):
         self.__grid.ensure_valid_position(new_pos)
         # Painter position doesn't start filled.
         # If this could be called more than once, also need to unfill previous

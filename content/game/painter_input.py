@@ -2,6 +2,7 @@ import pygame as pg
 from input_handler_base import InputHandler
 from painter_visual import PainterVisual
 from floor_player import FloorPlayer
+from floor_manager import FloorManager
 from sound import SFXPlayer
 
 class PainterControl(InputHandler):
@@ -20,7 +21,9 @@ class PainterControl(InputHandler):
 
     @staticmethod
     def move(direction: int):
-        '''Hook that responds to pressing the arrow keys by moving the painter.'''
+        '''Hook that responds to pressing the arrow keys by moving the painter.
+        If the painter moved, it checks if the player won the floor,
+        and if so, proceeds to the next one.'''
         new_pos = FloorPlayer.painter_position_after_move(direction)
         could_move = FloorPlayer.move_painter(new_pos)
 
@@ -30,6 +33,14 @@ class PainterControl(InputHandler):
         else:
             PainterVisual.shake()
             SFXPlayer.play_sfx('invalid')
+        
+        if FloorPlayer.floor_is_over():
+            # TODO: Potentially, return FloorClearState instead
+            # to display 'well done' and require button press.
+            if FloorManager.floorpack_is_over():
+                return 'LevelSelectState'
+            else:
+                FloorManager.next_floor()
 
     @staticmethod
     def undo():
