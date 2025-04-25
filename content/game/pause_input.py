@@ -10,7 +10,7 @@ class PauseMenuControl(InputHandler):
         pg.K_LCTRL : ('resume',),
         pg.K_RCTRL : ('resume',),
         pg.K_2 : ('undo_all',),
-        pg.K_3 : ('exit',)
+        #pg.K_3 : ('exit',)
     }
 
     @staticmethod
