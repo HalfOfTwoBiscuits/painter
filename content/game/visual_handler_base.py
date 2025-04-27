@@ -10,7 +10,7 @@ class VisualHandler:
         cls._window = window_surf
         cls._window_dimensions = window_surf.get_size()
 
-    @abstractmethod
     @classmethod
+    @abstractmethod
     def draw(cls):
         ...

@@ -19,7 +19,7 @@ class SFXPlayer:
 
     @classmethod
     def __load_sfx(cls, sfx_name: str):
-        '''Method used to load SFX files with the given filename.'''
+        '''Method used to load SFX files with the given filename (without extention).'''
 
         # Create path to the file
         sfx_path = path.join(cls.__SFX_DIR_RELATIVE_PATH, sfx_name + cls.__FILE_TYPE)

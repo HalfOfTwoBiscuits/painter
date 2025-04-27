@@ -44,6 +44,7 @@ class FloorManager:
         '''Go on to the next floor in the floorpack.
         Called for the first floor at the start, as well.
         Assumes the floorpack is not over.'''
+        # TODO: This should just return the floor
         
         # Get next floor
         floorpack = cls.__floor_packs[cls.__current_pack_id]
