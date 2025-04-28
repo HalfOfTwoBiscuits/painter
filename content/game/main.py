@@ -4,6 +4,18 @@ import states
 from visual_handler_base import VisualHandler
 from floor_manager import FloorManager
 
+def setup():
+    '''Set up the game and return the initial state.
+    For now it is LevelSelect and not FloorPackSelect because load_floors()
+    only creates one floorpack (and floor) : there are no level files so the
+    concept of a floorpack is not useful.'''
+
+    INITIAL_STATE = states.LevelSelectState
+
+    FloorManager.load_floors()
+    INITIAL_STATE.enter()
+    return INITIAL_STATE
+
 class Game:
     __TITLE = "Painter"
     __WINDOW_SIZE = (960, 680)
@@ -19,8 +31,7 @@ class Game:
     # For frame rate limiting
     __clock = pg.time.Clock()
     # Determines visuals shown and inputs possible
-    __state = states.GameplayState
-    __state.enter()
+    __state = setup()
 
     @classmethod
     async def main(cls):
@@ -46,5 +57,4 @@ class Game:
         
 
 if __name__ == '__main__':
-    FloorManager.load_floors()
     asyncio.run(Game.main())
