@@ -1,7 +1,4 @@
-from floor_data import FloorData
-from floor_visual import FloorVisual
-from floor_player import FloorPlayer
-from painter_visual import PainterVisual
+from floor_data import FloorData # Temporary, this will actually be imported by the level editor
 
 class FloorManager:
     '''Class responsible for creating and storing floor data.'''
@@ -41,54 +38,39 @@ class FloorManager:
     
     @classmethod
     def next_floor(cls):
-        '''Go on to the next floor in the floorpack.
-        Called for the first floor at the start, as well.
+        '''Return the next floor in the floorpack.
+        Called after completing a floor.
         Assumes the floorpack is not over.'''
-        # TODO: This should just return the floor
         
         # Get next floor
         floorpack = cls.__floor_packs[cls.__current_pack_id]
         floor = floorpack[cls.__next_floor_index]
-
-        # Start
-        cls.__start_floor(floor)
         
         # Increment progression index
         cls.__next_floor_index += 1
-        
+        return floor
+    
     @classmethod
-    def __start_floor(cls, floor_obj):
-        '''Update program state to account for the new floor.'''
-
-        # Set up the new floor graphic.
-        FloorVisual.new_floor(floor_obj)
-        # Set up painter control logic to interact with the new floor.
-        FloorPlayer.new_floor(floor_obj)
-
-        # Set visual parameters of the painter graphic based on
-        # the dimension of a cell on the new floor.
-        cell_dimens = FloorVisual.get_cell_dimens()
-        PainterVisual.new_cell_dimens(cell_dimens)
-
-        # Put the painter graphic at the initial position.
-        painter_pos = floor_obj.get_initial_painter_position()
-        PainterVisual.go_to(painter_pos)
-
-        # Initialise the shaking vfx
-        # (if the painter was shaking when the last floor ended, this will stop it)
-        PainterVisual.initialise_shakevfx_state()
-
+    def get_floorpack_names(cls):
+        '''Return a list of the names of floorpacks.
+        They can then be options in floorpack selection.'''
+        return [name for name in cls.__floor_packs.keys()]
+    
     @classmethod
     def select_floorpack(cls, pack_name: str):
-        '''Floors will be chosen from this floorpack.
-        Sets up behaviour for next_floor()'''
+        '''Floors will be chosen from the floorpack with this name.'''
         cls.__current_pack_id = pack_name
-
+    
     @classmethod
-    def select_floor(cls, floor_index: int):
-        '''Set up the program to start playing the current floor pack
-        starting from the floor with the given index.
-        Not used yet.'''
-
+    def get_floor_names(cls):
+        '''Return a list of the names of levels in the current floorpack:
+        'Floor 1', 'Floor 2', and so on, to be picked from in the level select menu.'''
+        floorpack = cls.__floor_packs[cls.__current_pack_id]
+        return [f'Floor {index + 1}' for index in range(len(floorpack))]
+    
+    @classmethod
+    def get_floor(cls, floor_index: int):
+        '''Return the floor with the given index in the current floorpack,
+        setting progression to start from that floor for future next_floor() calls.'''
         cls.__next_floor_index = floor_index
-        cls.next_floor()
+        return cls.next_floor()

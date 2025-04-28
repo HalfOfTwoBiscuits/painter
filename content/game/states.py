@@ -1,13 +1,94 @@
 from painter_input import PainterControl
 from pause_input import PauseMenuControl
+from lselect_input import LevelSelectControl
 from painter_visual import PainterVisual
 from floor_visual import FloorVisual
-from pause_visual import PauseMenuVisual
+from menu_visual import MenuVisual
+from floor_player import FloorPlayer
+from floor_manager import FloorManager
 
-class GameplayState:
-    INPUT_HANDLER = PainterControl
-    VISUAL_HANDLERS = (PainterVisual, FloorVisual)
+class State:
+    _INPUT_HANDLER = None
+    _VISUAL_HANDLER = None
 
-class PauseMenuState:
-    INPUT_HANDLER = PauseMenuControl
-    VISUAL_HANDLERS = (PainterVisual, FloorVisual, PauseMenuVisual)
+    @classmethod
+    def enter(cls):
+        '''Method called when the program enters this state.
+        Optional to implement.'''
+        ...
+
+    @classmethod
+    def get_input_handler(cls):
+        '''Method that returns the input handler used.
+        Defaults to the value of the _INPUT_HANDLER attribute.'''
+        return cls._INPUT_HANDLER
+    
+    @classmethod
+    def get_visual_handlers(cls):
+        '''Method that returns the visual handlers used.
+        Defaults to the value of the _VISUAL_HANDLERS attribute.'''
+        return cls._VISUAL_HANDLER
+
+
+class GameplayState(State):
+    '''The player is painting the floor in gameplay.'''
+
+    _INPUT_HANDLER = PainterControl
+    _VISUAL_HANDLERS = (PainterVisual, FloorVisual)
+
+    @classmethod
+    def enter(cls):
+        '''Get the next floor object and use the program to set it up.'''
+        floor_obj = FloorManager.next_floor()
+        cls.__start_floor(floor_obj)
+
+    @classmethod
+    def __start_floor(cls, floor_obj):
+        '''Update program state to account for the new floor.'''
+
+        # Set up the new floor graphic.
+        FloorVisual.new_floor(floor_obj)
+        # Set up painter control logic to interact with the new floor.
+        FloorPlayer.new_floor(floor_obj)
+
+        # Set visual parameters of the painter graphic based on
+        # the dimension of a cell on the new floor.
+        cell_dimens = FloorVisual.get_cell_dimens()
+        PainterVisual.new_cell_dimens(cell_dimens)
+
+        # Put the painter graphic at the initial position.
+        painter_pos = floor_obj.get_initial_painter_position()
+        PainterVisual.go_to(painter_pos)
+
+        # Initialise the shaking vfx
+        # (if the painter was shaking when the last floor ended, this will stop it)
+        PainterVisual.initialise_shakevfx_state()
+
+class PauseMenuState(State):
+    '''The player is playing a floor and has pressed CTRL to pause.
+    They can choose to continue, restart the floor, or return to the level select.'''
+
+    __TITLE = 'Pause'
+    __OPTION_NAMES = ['Continue', 'Restart', 'Exit']
+    _INPUT_HANDLER = PauseMenuControl
+    _VISUAL_HANDLERS = (PainterVisual, FloorVisual, MenuVisual(__TITLE, __OPTION_NAMES))
+
+class LevelSelectState(State):
+    '''The player is choosing a floor to play from a floorpack.
+    Any floor can be chosen regardless of which have been finished already.'''
+
+    __TITLE = 'Level Select'
+    _INPUT_HANDLER = LevelSelectControl
+    __menu_visual = None
+
+    @classmethod
+    def enter(cls):
+        '''Create a MenuVisual instance with the levels from the pack.'''
+        floornames = FloorManager.get_floor_names()
+        cls.__menu_visual = MenuVisual(cls.__TITLE, floornames)
+
+    @classmethod
+    def get_visual_handlers(cls):
+        '''Return a MenuVisual instance with the levels as options,
+        as created when entering this state.'''
+        return (cls.__menu_visual,)

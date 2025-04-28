@@ -20,6 +20,7 @@ class Game:
     __clock = pg.time.Clock()
     # Determines visuals shown and inputs possible
     __state = states.GameplayState
+    __state.enter()
 
     @classmethod
     async def main(cls):
@@ -32,6 +33,7 @@ class Game:
                     new_state = cls.__state.INPUT_HANDLER.process_input(e.key)
                     if new_state is not None:
                         cls.__state = getattr(states, new_state)
+                        cls.__state.enter()
             
             # Draw graphics
             for visual_handler in cls.__state.VISUAL_HANDLERS:
