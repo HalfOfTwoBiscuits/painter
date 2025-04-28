@@ -33,13 +33,15 @@ class MenuVisual(VisualHandler):
 
         # Find the width required for the longest line in the menu
         # and height required for the tallest.
-        # Use the width and height of the title as a starting point
-        option_width, option_height = self.__class__.__TITLE_FONT.size(title)
+
+        # Use the width and height of the title as a starting point.
+        title_w_highest_page_num = self.__append_page_num(title)
+        option_width, option_height = self.__class__.__TITLE_FONT.size(title_w_highest_page_num)
 
         # Iterate over options to check if any are wider or taller
         for index, o in enumerate(options):
-            # Prepend with the key used to select it
-            full_o = self.__prepend(o, index)
+            # Prepend with the number key used to select it
+            full_o = self.__prepend_key(o, index)
 
             # If an option is the widest or tallest so far, update width/height
             w, h = self.__class__.__FONT.size(full_o)
@@ -51,7 +53,7 @@ class MenuVisual(VisualHandler):
 
         # Add padding and the size of a dividing line to height
         # to find height of a row in the menu.
-        self.__row_height = option_height + self.__class__.__PADDING_PX * 2 + self.__class__.LINE_SIZE
+        self.__row_height = option_height + self.__class__.__PADDING_PX * 2 + self.__class__.__LINE_SIZE
 
         # Find total height: height of all options plus one for the title
         self.__height = self.__row_height * (len(options) + 1)
@@ -63,12 +65,22 @@ class MenuVisual(VisualHandler):
         self.__top_edge = (win_height - self.__height) // 2
         self.__bottom_edge = self.__height - self.__top_edge
 
-    def __prepend(self, option: str, index: int):
+    def __prepend_key(self, option: str, index: int):
         '''Add the key pressed to select the option to the front of it.
         Returns the text displayed on the menu for the option.'''
         index_of_page = index // self.__class__.__OPTIONS_PER_PAGE
         key_for_option = index - index_of_page * self.__class__.__OPTIONS_PER_PAGE
-        return f'{key_for_option}) {option}' 
+        return f'{key_for_option}) {option}'
+    
+    def __append_page_num(self, title: str, use_highest: bool=False):
+        '''Add the page number to the end of the title, unless on page 1.
+        If use_highest is true, use the highest page number instead of the current one.'''
+
+        if self.__page_index == 0:
+            return title
+        else:
+            page_num = use_highest and self.__num_pages or self.__page_index + 1
+            return f'{title} (Page {page_num})'
 
     def draw(self):
         # Draw background rect
@@ -77,7 +89,8 @@ class MenuVisual(VisualHandler):
                      border_radius = self.__class__.__PADDING_PX)
         
         # Draw title
-        self.__draw_menu_row(self.__title, self.__top_edge, is_title=True)
+        full_title = self.__append_page_num(self.__title)
+        self.__draw_menu_row(full_title, self.__top_edge, is_title=True)
 
         # Find the options being shown on the current page
         cur_options = self.__options[self.__page_index * self.__class__.__OPTIONS_PER_PAGE - 1:]
@@ -87,7 +100,7 @@ class MenuVisual(VisualHandler):
         # then zip() will truncate the range of y positions.
         for o, top_y in zip(cur_options,
             range(self.__top_edge + self.__row_height, self.__bottom_edge, self.__row_height)):
-            full_o = self.__prepend(o)
+            full_o = self.__prepend_key(o)
             self.__draw_menu_row(full_o, top_y)
 
     def __draw_menu_row(self, content: str, top: int, is_title: bool=False):
@@ -109,7 +122,7 @@ class MenuVisual(VisualHandler):
     def option_chosen(self, number_pressed: int):
         '''Return a string indicating the option chosen when the given number key was pressed.
         Only has a point when options may or will use more than one page,
-        so the response to a key might change depending on visual state.'''
+        so the response to a keypress might change depending on visual state.'''
 
         # If the 0 key was pressed, select the 10th shown option
         if number_pressed == 0: index_to_add = self.__class__.__OPTIONS_PER_PAGE
