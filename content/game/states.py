@@ -20,7 +20,9 @@ class State:
     @classmethod
     def get_input_handler(cls):
         '''Method that returns the input handler used.
-        Defaults to the value of the _INPUT_HANDLER attribute.'''
+        Defaults to the value of the _INPUT_HANDLER attribute.
+        Called only when entering the state, because in this project
+        the input handler is always constant, but that's dealt with in main.py'''
         return cls._INPUT_HANDLER
     
     @classmethod
@@ -77,18 +79,37 @@ class LevelSelectState(State):
     '''The player is choosing a floor to play from a floorpack.
     Any floor can be chosen regardless of which have been finished already.'''
 
-    __TITLE = 'Level Select'
+    __TITLE = 'Select Level'
     _INPUT_HANDLER = LevelSelectControl
     __menu_visual = None
 
     @classmethod
     def enter(cls):
-        '''Create a MenuVisual instance with the levels from the pack.'''
+        '''Create a MenuVisual instance with the floors from the pack.'''
         floornames = FloorManager.get_floor_names()
         cls.__menu_visual = MenuVisual(cls.__TITLE, floornames)
 
     @classmethod
     def get_visual_handlers(cls):
         '''Return a MenuVisual instance with the levels as options,
+        as created when entering this state.'''
+        return (cls.__menu_visual,)
+    
+class FloorPackSelect(State):
+    '''The player is choosing a floorpack to play.'''
+
+    __TITLE = 'Select Level Pack'
+    _INPUT_HANDLER = LevelSelectControl
+    __menu_visual = None
+
+    @classmethod
+    def enter(cls):
+        '''Create a MenuVisual instance with floor packs.'''
+        packnames = FloorManager.get_floorpack_names()
+        cls.__menu_visual = MenuVisual(cls.__TITLE, packnames)
+
+    @classmethod
+    def get_visual_handlers(cls):
+        '''Return a MenuVisual instance with the floorpacks as options,
         as created when entering this state.'''
         return (cls.__menu_visual,)
