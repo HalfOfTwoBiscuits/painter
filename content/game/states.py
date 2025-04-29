@@ -1,6 +1,6 @@
 from painter_input import PainterControl
 from pause_input import PauseMenuControl
-from lselect_input import LevelSelectControl
+from floorselect_input import SelectMenuControl
 from painter_visual import PainterVisual
 from floor_visual import FloorVisual
 from menu_visual import MenuVisual
@@ -20,9 +20,7 @@ class State:
     @classmethod
     def get_input_handler(cls):
         '''Method that returns the input handler used.
-        Defaults to the value of the _INPUT_HANDLER attribute.
-        Called only when entering the state, because in this project
-        the input handler is always constant, but that's dealt with in main.py'''
+        Defaults to the value of the _INPUT_HANDLER attribute.'''
         return cls._INPUT_HANDLER
     
     @classmethod
@@ -80,7 +78,7 @@ class LevelSelectState(State):
     Any floor can be chosen regardless of which have been finished already.'''
 
     __TITLE = 'Select Level'
-    _INPUT_HANDLER = LevelSelectControl
+    __input_handler = None
     __menu_visual = None
 
     @classmethod
@@ -88,12 +86,17 @@ class LevelSelectState(State):
         '''Create a MenuVisual instance with the floors from the pack.'''
         floornames = FloorManager.get_floor_names()
         cls.__menu_visual = MenuVisual(cls.__TITLE, floornames)
+        cls.__input_handler = SelectMenuControl(cls.__menu_visual)
 
     @classmethod
     def get_visual_handlers(cls):
         '''Return a MenuVisual instance with the levels as options,
         as created when entering this state.'''
         return (cls.__menu_visual,)
+    
+    @classmethod
+    def get_input_handler(cls):
+        return (cls.__input_handler)
     
 class FloorPackSelect(State):
     '''The player is choosing a floorpack to play.'''

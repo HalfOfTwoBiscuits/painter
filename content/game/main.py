@@ -32,7 +32,6 @@ class Game:
     __clock = pg.time.Clock()
     # Determines visuals shown and inputs possible
     __state = setup()
-    __input_handler = __state.get_input_handler()
 
     @classmethod
     async def main(cls):
@@ -43,12 +42,11 @@ class Game:
                     raise SystemExit
                 if e.type == pg.KEYDOWN:
                     # On key press, process input
-                    new_state = cls.__input_handler.process_input(e.key)
+                    new_state = cls.__state.get_input_handler().process_input(e.key)
                     # and if a string value was returned, change to the state with that name
                     if new_state is not None:
                         cls.__state = getattr(states, new_state)
                         cls.__state.enter()
-                        cls.__input_handler = cls.__state.get_input_handler()
             
             # Draw graphics
             for visual_handler in cls.__state.get_visual_handlers():

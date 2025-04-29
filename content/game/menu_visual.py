@@ -8,7 +8,7 @@ class MenuVisual(VisualHandler):
     Unlike the other visual handlers an instance is created rather than using the class:
     this is because the options can vary but the logic is the same.'''
 
-    __OPTIONS_PER_PAGE = 10 # To correspond with the number keys 0-9
+    __OPTIONS_PER_PAGE = 5 # Maximum of 9, to correspond with the number keys 1-9
     __PADDING_PX = 4 # Used for option padding and rounding of corners
     __LINE_SIZE = 1 # Size in pixels of lines separating options
 
@@ -119,17 +119,12 @@ class MenuVisual(VisualHandler):
         text_surf = font.render(content, True, self.__class__.__TEXT_COL)
         self.__class__._window.blit(text_surf, (left, top))
 
-    def option_chosen(self, index_on_page: int):
+    def option_chosen(self, number_pressed: int):
         '''Return a string indicating the option chosen when the given number key was pressed.
         Only has a point when options may or will use more than one page,
         so the response to a keypress might change depending on visual state.'''
 
-        # zzz
-
-        # If the 0 key was pressed, select the 10th shown option
-        if number_pressed == 0: index_to_add = self.__class__.__OPTIONS_PER_PAGE
-        else: index_to_add = number_pressed - 1
-
+        index_to_add = number_pressed - 1
         return self.__options[index_to_add + self.__page_index * self.__class__.__OPTIONS_PER_PAGE]
 
     def next_page(self):

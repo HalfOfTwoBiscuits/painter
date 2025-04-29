@@ -1,5 +1,6 @@
 import pygame as pg
 from input_handler_base import InputHandler
+from floor_manager import FloorManager
 
 class SelectMenuControl(InputHandler):
     _ACTIONS = {
@@ -12,5 +13,14 @@ class SelectMenuControl(InputHandler):
         pg.K_7 : ('select',7),
         pg.K_8 : ('select',8),
         pg.K_9 : ('select',9),
-        pg.K_0 : ('select',10)
     }
+
+    def ___init__(self, menu_visual_obj):
+        self.__menu = menu_visual_obj
+
+class LevelSelectControl(SelectMenuControl):
+    def select(self, number: int):
+        option_id = self.__menu.option_chosen(number)
+        floor_index = int(option_id[-1])
+        FloorManager.select_floor(floor_index)
+        return 'GameplayState'

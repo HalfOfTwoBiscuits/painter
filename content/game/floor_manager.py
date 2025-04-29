@@ -69,8 +69,7 @@ class FloorManager:
         return [f'Floor {index + 1}' for index in range(len(floorpack))]
     
     @classmethod
-    def get_floor(cls, floor_index: int):
-        '''Return the floor with the given index in the current floorpack,
+    def select_floor(cls, floor_index: int):
+        '''Start playing floors from this index in the current floorpack,
         setting progression to start from that floor for future next_floor() calls.'''
         cls.__next_floor_index = floor_index
-        return cls.next_floor()
