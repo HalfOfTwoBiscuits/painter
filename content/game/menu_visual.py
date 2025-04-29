@@ -119,10 +119,12 @@ class MenuVisual(VisualHandler):
         text_surf = font.render(content, True, self.__class__.__TEXT_COL)
         self.__class__._window.blit(text_surf, (left, top))
 
-    def option_chosen(self, number_pressed: int):
+    def option_chosen(self, index_on_page: int):
         '''Return a string indicating the option chosen when the given number key was pressed.
         Only has a point when options may or will use more than one page,
         so the response to a keypress might change depending on visual state.'''
+
+        # zzz
 
         # If the 0 key was pressed, select the 10th shown option
         if number_pressed == 0: index_to_add = self.__class__.__OPTIONS_PER_PAGE
