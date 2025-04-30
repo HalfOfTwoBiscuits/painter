@@ -1,4 +1,4 @@
-import asyncio
+#import asyncio
 import pygame as pg
 import states
 from visual_handler_base import VisualHandler
@@ -34,7 +34,7 @@ class Game:
     __state = setup()
 
     @classmethod
-    async def main(cls):
+    def main(cls):
         while True:
             # Process key press events
             for e in pg.event.get():
@@ -55,8 +55,9 @@ class Game:
             # Limit frame rate
             cls.__clock.tick(30)
             # Await asynchronous processing of pygbag needed for web hosting
-            await asyncio.sleep(0)
+            #await asyncio.sleep(0)
         
 
 if __name__ == '__main__':
-    asyncio.run(Game.main())
+    #asyncio.run(Game.main())
+    Game.main()
