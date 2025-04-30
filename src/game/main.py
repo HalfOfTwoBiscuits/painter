@@ -30,11 +30,11 @@ class Game:
 
     # For frame rate limiting
     __clock = pg.time.Clock()
-    # Determines visuals shown and inputs possible
-    __state = setup()
 
-    @classmethod
-    def main(cls):
+    def __init__(self, initial_state):
+        self.__state = initial_state
+
+    def main(self):
         while True:
             # Process key press events
             for e in pg.event.get():
@@ -42,23 +42,28 @@ class Game:
                     raise SystemExit
                 if e.type == pg.KEYDOWN:
                     # On key press, process input
-                    new_state = cls.__state.get_input_handler().process_input(e.key)
+                    new_state = self.__state.get_input_handler().process_input(e.key)
                     # and if a string value was returned, change to the state with that name
                     if new_state is not None:
-                        cls.__state = getattr(states, new_state)
-                        cls.__state.enter()
+                        # For test cases: returning a boolean value indicates success/failure.
+                        if isinstance(new_state, bool): return new_state
+                        # Change state
+                        self.__state = getattr(states, new_state)
+                        self.__state.enter()
             
             # Draw graphics
-            for visual_handler in cls.__state.get_visual_handlers():
+            for visual_handler in self.__state.get_visual_handlers():
                 visual_handler.draw()
             pg.display.update()
 
             # Limit frame rate
-            cls.__clock.tick(30)
+            self.__class__.__clock.tick(30)
             # Await asynchronous processing of pygbag needed for web hosting
             #await asyncio.sleep(0)
         
 
 if __name__ == '__main__':
+    InitialState = setup()
     #asyncio.run(Game.main())
-    Game.main()
+    g = Game(InitialState)
+    g.main()
