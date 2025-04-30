@@ -5,6 +5,7 @@ class SFXPlayer:
     __SFX_DIR_RELATIVE_PATH = 'sfx'
     __FILE_TYPE = '.ogg'
     __sfx = {}
+    pg.mixer.init()
 
     @classmethod
     def play_sfx(cls, sfx_name: str):

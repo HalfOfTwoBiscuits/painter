@@ -51,7 +51,8 @@ class Game:
             # Draw graphics
             for visual_handler in cls.__state.get_visual_handlers():
                 visual_handler.draw()
-            
+            pg.display.update()
+
             # Limit frame rate
             cls.__clock.tick(30)
             # Await asynchronous processing of pygbag needed for web hosting

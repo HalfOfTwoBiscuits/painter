@@ -9,8 +9,7 @@ class InputHandler(ABC):
     # If not None, this variable value will be used instead
     _variable_actions = None
 
-    @classmethod
-    def process_input(cls, key):
+    def process_input(self, key):
         '''Use the actions dictionary to determine
         what to do in response to a key being pressed.
         
@@ -22,11 +21,11 @@ class InputHandler(ABC):
         The return value of that method, if any, is a string
         identifier for a new state. Return it to the main loop.'''
 
-        actions = cls._variable_actions or cls._ACTIONS
+        actions = self._variable_actions or self._ACTIONS
         a = actions.get(key)
         if a is not None:
             method_name = a[0]
-            method_to_call = getattr(cls, method_name)
+            method_to_call = getattr(self, method_name)
             arguments = a[1:]
             state_change = method_to_call(*arguments)
             return state_change

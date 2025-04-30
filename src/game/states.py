@@ -9,7 +9,7 @@ from floor_manager import FloorManager
 
 class State:
     _INPUT_HANDLER = None
-    _VISUAL_HANDLER = None
+    _VISUAL_HANDLERS = None
 
     @classmethod
     def enter(cls):
@@ -27,7 +27,7 @@ class State:
     def get_visual_handlers(cls):
         '''Method that returns the visual handlers used.
         Defaults to the value of the _VISUAL_HANDLERS attribute.'''
-        return cls._VISUAL_HANDLER
+        return cls._VISUAL_HANDLERS
 
 
 class GameplayState(State):
@@ -71,7 +71,13 @@ class PauseMenuState(State):
     __TITLE = 'Pause'
     __OPTION_NAMES = ['Continue', 'Restart', 'Exit']
     _INPUT_HANDLER = PauseMenuControl
-    _VISUAL_HANDLERS = (PainterVisual, FloorVisual, MenuVisual(__TITLE, __OPTION_NAMES))
+    __visual_handlers = None
+    
+    @classmethod
+    def get_visual_handlers(cls):
+        if cls.__visual_handlers is None:
+            cls.__visual_handlers = (PainterVisual, FloorVisual, MenuVisual(cls.__TITLE, cls.__OPTION_NAMES))
+        return cls.__visual_handlers
 
 class LevelSelectState(State):
     '''The player is choosing a floor to play from a floorpack.

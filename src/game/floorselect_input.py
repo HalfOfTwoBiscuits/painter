@@ -8,7 +8,7 @@ class ArbitraryOptionsControl(InputHandler, ABC):
     '''Base class for an input handler that uses the MenuVisual
     to prompt the user to choose from an arbitrary list of options.'''
 
-    def ___init__(self, menu_visual_obj):
+    def __init__(self, menu_visual_obj):
         '''Store the MenuVisual object and set up number keys
         based on the number of options per page.'''
         self._menu = menu_visual_obj
@@ -31,6 +31,10 @@ class ArbitraryOptionsControl(InputHandler, ABC):
         ...
 
 class LevelSelectControl(ArbitraryOptionsControl):
+
+    def __init__(self, menu_visual_obj):
+        super().__init__(menu_visual_obj)
+
     def select(self, number: int):
         '''Set the floor manager to start from the selected floor,
         and switch to the gameplay state.'''

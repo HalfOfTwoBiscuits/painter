@@ -22,6 +22,7 @@ class MenuVisual(VisualHandler):
 
     __FONT_PATH = path.join(__FONT_DIR_RELATIVE_PATH, __FONT_FILENAME + __FONT_FILETYPE)
 
+    pg.font.init()
     __FONT = pg.font.Font(__FONT_PATH, 16)
     __TITLE_FONT = pg.font.Font(__FONT_PATH, 20)
 
@@ -110,8 +111,8 @@ class MenuVisual(VisualHandler):
         Underneath, draw a line.'''
 
         # Find topleft corner of the option
-        left = self.__left_edge + self.__class__.PADDING_PX
-        top += self.__class__.PADDING_PX
+        left = self.__left_edge + self.__class__.__PADDING_PX
+        top += self.__class__.__PADDING_PX
 
         # Select font to use
         font = is_title and self.__class__.__TITLE_FONT or self.__class__.__FONT        
@@ -154,4 +155,4 @@ class MenuVisual(VisualHandler):
 
     def get_options_per_page(self):
         '''Return the constant number of options per page'''
-        return self.__class__.OPTIONS_PER_PAGE
+        return self.__class__.__OPTIONS_PER_PAGE
