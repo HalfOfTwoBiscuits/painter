@@ -95,7 +95,7 @@ class MenuVisual(VisualHandler):
         # Find the options being shown on the current page
         cur_options = self.__options[self.__page_index * self.__class__.__OPTIONS_PER_PAGE - 1:]
 
-        # Iterate over options, incrementing top_y by option_height from top to bottom of the menu
+        # Iterate over options, incrementing top_y by row_height from top to bottom of the menu
         # If we are on the last page and there are fewer options left than OPTIONS_PER_PAGE
         # then zip() will truncate the range of y positions.
         for o, top_y in zip(cur_options,
@@ -119,13 +119,26 @@ class MenuVisual(VisualHandler):
         text_surf = font.render(content, True, self.__class__.__TEXT_COL)
         self.__class__._window.blit(text_surf, (left, top))
 
-    def option_chosen(self, number_pressed: int):
-        '''Return a string indicating the option chosen when the given number key was pressed.
-        Only has a point when options may or will use more than one page,
-        so the response to a keypress might change depending on visual state.'''
+    def option_for_number(self, number_pressed: int):
+        '''Given that the options on a page are numbered 1 to __OPTIONS_PER_PAGE,
+        return the option on the current page corresponding to the given number.
+        If there is no option corresponding to the number then raise ValueError.
 
-        index_to_add = number_pressed - 1
-        return self.__options[index_to_add + self.__page_index * self.__class__.__OPTIONS_PER_PAGE]
+        Only used when options may or will use more than one page,
+        since the response to a number keypress might change depending on visual state.'''
+
+        if 1 <= number_pressed <= self.__class__.__OPTIONS_PER_PAGE:
+            try:
+                index_increment = number_pressed - 1
+                # Multiply __OPTIONS_PER_PAGE by the page index to find how many along we already are,
+                # and add number_pressed - 1
+                option_index = index_increment + self.__page_index * self.__class__.__OPTIONS_PER_PAGE
+                return self.__options[option_index]
+            
+            # Raise error if the number isn't within 1 to __OPTIONS_PER_PAGE
+            # or the resulting index is past the final option
+            except IndexError: raise ValueError        
+        else: raise ValueError
 
     def next_page(self):
         '''Increment the page number to show later options.
@@ -138,3 +151,7 @@ class MenuVisual(VisualHandler):
         Does nothing if the menu is on the first page.'''
         if self.__page_index > 0:
             self.__page_index -= 1
+
+    def get_options_per_page(self):
+        '''Return the constant number of options per page'''
+        return self.__class__.OPTIONS_PER_PAGE

@@ -1,6 +1,6 @@
 from painter_input import PainterControl
 from pause_input import PauseMenuControl
-from floorselect_input import SelectMenuControl
+from floorselect_input import LevelSelectControl
 from painter_visual import PainterVisual
 from floor_visual import FloorVisual
 from menu_visual import MenuVisual
@@ -86,7 +86,7 @@ class LevelSelectState(State):
         '''Create a MenuVisual instance with the floors from the pack.'''
         floornames = FloorManager.get_floor_names()
         cls.__menu_visual = MenuVisual(cls.__TITLE, floornames)
-        cls.__input_handler = SelectMenuControl(cls.__menu_visual)
+        cls.__input_handler = LevelSelectControl(cls.__menu_visual)
 
     @classmethod
     def get_visual_handlers(cls):

@@ -2,6 +2,7 @@ import pygame as pg
 from input_handler_base import InputHandler
 from painter_visual import PainterVisual
 from floor_player import FloorPlayer
+from sound import SFXPlayer
 
 class PauseMenuControl(InputHandler):
 
@@ -22,6 +23,7 @@ class PauseMenuControl(InputHandler):
         new_pos = FloorPlayer.undo_all()
         if new_pos is not None:
             PainterVisual.go_to(new_pos)
+            SFXPlayer.play_sfx('back')
         return 'GameplayState'
 
     @staticmethod

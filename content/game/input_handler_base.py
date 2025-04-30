@@ -3,22 +3,30 @@ from abc import ABC
 class InputHandler(ABC):
     '''A base class for input handlers that specifies the
     process_input() method to respond to key presses.'''
+
+    # Constant response to keys being pressed
     _ACTIONS = {}
+    # If not None, this variable value will be used instead
+    _variable_actions = None
 
     @classmethod
     def process_input(cls, key):
-        '''Use the _ACTIONS attribute to determine what to
-        do in response to a key being pressed.
+        '''Use the actions dictionary to determine
+        what to do in response to a key being pressed.
         
-        If the key code is a key in the _ACTIONS dictionary,
+        If the key code is a key in the dictionary,
         the first element of the corresponding tuple is the
         string name of a method to call.
         All other elements in that tuple will be passed as arguments.
         
-        The return value of that method will be returned.'''
-        action = cls._ACTIONS.get(key)
-        if action is not None:
-            method_to_call = getattr(cls,action[0])
-            arguments = action[1:]
+        The return value of that method, if any, is a string
+        identifier for a new state. Return it to the main loop.'''
+
+        actions = cls._variable_actions or cls._ACTIONS
+        a = actions.get(key)
+        if a is not None:
+            method_name = a[0]
+            method_to_call = getattr(cls, method_name)
+            arguments = a[1:]
             state_change = method_to_call(*arguments)
             return state_change
