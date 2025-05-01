@@ -53,7 +53,7 @@ class GameplayState(State):
 
         # Set visual parameters of the painter graphic based on
         # the dimension of a cell on the new floor.
-        cell_dimens = FloorVisual.get_cell_dimens()
+        cell_dimens = FloorVisual.get_cell_dimens_no_line()
         PainterVisual.new_cell_dimens(cell_dimens)
 
         # Put the painter graphic at the initial position.

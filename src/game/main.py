@@ -42,7 +42,9 @@ class Game:
                     raise SystemExit
                 if e.type == pg.KEYDOWN:
                     # On key press, process input
-                    new_state = self.__state.get_input_handler().process_input(e.key)
+                    i_handler = self.__state.get_input_handler()
+                    process_method = getattr(i_handler, 'process_input')
+                    new_state = process_method(i_handler, e.key)
                     # and if a string value was returned, change to the state with that name
                     if new_state is not None:
                         # For test cases: returning a boolean value indicates success/failure.

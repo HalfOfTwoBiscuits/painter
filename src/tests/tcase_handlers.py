@@ -21,13 +21,12 @@ class FloorViewerControl(InputHandler):
         '''Floor looks right, move on to the next one
         If out of floors, test is successful'''
         try:
-            next_floor = cls.__other_floors.pop(1)
+            next_floor = cls.__other_floors.pop(0)
         except IndexError:
             # No more floors so test is successful.
             return True
         # Display the new floor
         FloorVisual.new_floor(next_floor)
-
         
     @staticmethod
     def stop():

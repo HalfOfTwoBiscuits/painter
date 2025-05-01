@@ -19,6 +19,9 @@ def list_of_floors():
     f2 = FloorData(2,5) # 2x5 level
     f2.set_initial_painter_position((1,3))
 
+    cells = f2.get_cell_grid()
+    cells[(0,0)].start_filled()
+
     return [f1, f2]
 
 class FloorViewer(State):
