@@ -1,7 +1,7 @@
 import pygame as pg
 from math import ceil
 from os import path
-from visual_handler_base import VisualHandler
+from .visual_handler_base import VisualHandler
 
 class MenuVisual(VisualHandler):
     '''A visual for menus where the player chooses a numbered option.
@@ -15,12 +15,14 @@ class MenuVisual(VisualHandler):
     __TEXT_COL = pg.Color(0,0,0)
     __BG_COL = pg.Color(200,200,200)
 
+    __THIS_DIR = path.split(path.abspath(__file__))[0]
+    
     # Font data
     __FONT_FILETYPE = '.ttf'
     __FONT_DIR_RELATIVE_PATH = 'font'
     __FONT_FILENAME = 'Gorilla_Black'
 
-    __FONT_PATH = path.join(__FONT_DIR_RELATIVE_PATH, __FONT_FILENAME + __FONT_FILETYPE)
+    __FONT_PATH = path.join(__THIS_DIR, __FONT_DIR_RELATIVE_PATH, __FONT_FILENAME + __FONT_FILETYPE)
 
     pg.font.init()
     __FONT = pg.font.Font(__FONT_PATH, 16)

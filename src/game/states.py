@@ -1,11 +1,11 @@
-from painter_input import PainterControl
-from pause_input import PauseMenuControl
-from floorselect_input import LevelSelectControl
-from painter_visual import PainterVisual
-from floor_visual import FloorVisual
-from menu_visual import MenuVisual
-from floor_player import FloorPlayer
-from floor_manager import FloorManager
+from .painter_input import PainterControl
+from .pause_input import PauseMenuControl
+from .floorselect_input import LevelSelectControl
+from .painter_visual import PainterVisual
+from .floor_visual import FloorVisual
+from .menu_visual import MenuVisual
+from .floor_player import FloorPlayer
+from .floor_manager import FloorManager
 
 class State:
     _INPUT_HANDLER = None

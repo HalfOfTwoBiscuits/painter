@@ -1,4 +1,4 @@
-from floor_data import FloorData # Temporary, this will actually be imported by the level editor
+from .floor_data import FloorData # Temporary, this will actually be imported by the level editor
 
 class FloorManager:
     '''Class responsible for creating and storing floor data.'''

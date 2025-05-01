@@ -1,8 +1,8 @@
 #import asyncio
 import pygame as pg
-import states
-from visual_handler_base import VisualHandler
-from floor_manager import FloorManager
+from . import states
+from .visual_handler_base import VisualHandler
+from .floor_manager import FloorManager
 
 def setup():
     '''Set up the game and return the initial state.

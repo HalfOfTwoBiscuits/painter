@@ -2,7 +2,7 @@ from game.states import State
 from game.floor_visual import FloorVisual
 from game.floor_data import FloorData
 
-from tcase_handlers import FloorViewerControl
+from .tcase_handlers import FloorViewerControl
 
 def list_of_floors(self):
     '''Manually a list of FloorData objects for testing.

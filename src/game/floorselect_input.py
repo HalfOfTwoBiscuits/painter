@@ -1,7 +1,7 @@
 import pygame as pg
-from input_handler_base import InputHandler
-from floor_manager import FloorManager
-from sound import SFXPlayer
+from .input_handler_base import InputHandler
+from .floor_manager import FloorManager
+from .sound import SFXPlayer
 from abc import abstractmethod, ABC
 
 class ArbitraryOptionsControl(InputHandler, ABC):

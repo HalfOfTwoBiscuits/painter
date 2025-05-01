@@ -1,6 +1,6 @@
-from visual_handler_base import VisualHandler
-from floor_visual import FloorVisual
-from sound import SFXPlayer
+from .visual_handler_base import VisualHandler
+from .floor_visual import FloorVisual
+from .sound import SFXPlayer
 import pygame as pg
 
 class PainterVisual(VisualHandler):

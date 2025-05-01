@@ -1,9 +1,9 @@
 import pygame as pg
-from input_handler_base import InputHandler
-from painter_visual import PainterVisual
-from floor_player import FloorPlayer
-from floor_manager import FloorManager
-from sound import SFXPlayer
+from .input_handler_base import InputHandler
+from .painter_visual import PainterVisual
+from .floor_player import FloorPlayer
+from .floor_manager import FloorManager
+from .sound import SFXPlayer
 
 class PainterControl(InputHandler):
     '''Input handler for when playing a level.
