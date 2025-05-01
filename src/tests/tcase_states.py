@@ -4,7 +4,7 @@ from game.floor_data import FloorData
 
 from .tcase_handlers import FloorViewerControl
 
-def list_of_floors(self):
+def list_of_floors():
     '''Manually a list of FloorData objects for testing.
     It would be better to use files but that logic isn't done yet.'''
 

@@ -4,7 +4,7 @@ from game.floor_visual import FloorVisual
 
 import pygame as pg
 
-def FloorViewerControl(InputHandler):
+class FloorViewerControl(InputHandler):
     _ACTIONS = {
         pg.K_RETURN : ('next',),
         pg.K_BACKSPACE : ('stop',),

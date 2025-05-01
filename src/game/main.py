@@ -13,7 +13,6 @@ def setup():
     INITIAL_STATE = states.LevelSelectState
 
     FloorManager.load_floors()
-    INITIAL_STATE.enter()
     return INITIAL_STATE
 
 class Game:
@@ -31,8 +30,9 @@ class Game:
     # For frame rate limiting
     __clock = pg.time.Clock()
 
-    def __init__(self, initial_state):
-        self.__state = initial_state
+    def __init__(self, InitialState):
+        InitialState.enter()
+        self.__state = InitialState
 
     def main(self):
         while True:
