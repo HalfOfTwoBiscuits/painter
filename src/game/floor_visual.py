@@ -44,6 +44,7 @@ class FloorVisual(VisualHandler):
     def draw(cls):
         '''Draw the floor on the screen,
         with lines to show the grid and painted cells filled in.'''
+        print ('I am now drawing the floor')
         # Draw vertical lines
         for x in range(cls.__left_edge, cls.__right_edge + 1,
                        cls.__cell_dimens):

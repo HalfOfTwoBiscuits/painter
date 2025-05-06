@@ -1,8 +1,10 @@
 from game.states import State
 from game.floor_visual import FloorVisual
+from game.painter_visual import PainterVisual
+from game.painter_input import PainterControl
 from game.floor_data import FloorData
 
-from .tcase_handlers import FloorViewerControl
+from .tcase_handlers import FloorViewerControl, FloorViewerWithPainterControl, ViewerControl
 
 def list_of_floors():
     '''Manually a list of FloorData objects for testing.
@@ -24,12 +26,37 @@ def list_of_floors():
 
     return [f1, f2]
 
+class PainterViewer(State):
+    _INPUT_HANDLER = ViewerControl
+    _VISUAL_HANDLERS = (PainterVisual,)
+
+    @classmethod
+    def enter(cls):
+        dummy_floor = list_of_floors()[0]
+        # Set up FloorVisual so the painter grid position can be interpreted by PainterVisual
+        FloorVisual.new_floor(dummy_floor)
+        # Give dummy parameter for size and use the start position from the floor (to ensure it's on the grid)
+        PainterVisual.new_cell_dimens(50)
+        PainterVisual.go_to(dummy_floor.get_initial_painter_position())
+        PainterVisual.initialise_shakevfx_state()
+        # Painter will be drawn at an arbitrary position onscreen
+
 class FloorViewer(State):
     _INPUT_HANDLER = FloorViewerControl
     _VISUAL_HANDLERS = (FloorVisual,)
 
     @classmethod
     def enter(cls):
-        first, *rest = list_of_floors()
-        FloorVisual.new_floor(first)
-        FloorViewerControl.use_floors(rest)
+        # Store the list of floors to use in FloorViewerControl
+        FloorViewerControl.use_floors(list_of_floors())
+        # Call next() to set up the first floor
+        # (and the painter graphic too if this is FloorViewerWithPainterControl)
+        cls._INPUT_HANDLER.next()
+
+class FloorViewerWithPainter(FloorViewer):
+    _INPUT_HANDLER = FloorViewerWithPainterControl
+    _VISUAL_HANDLERS = (FloorVisual, PainterVisual)
+
+class GameplayTester(State):
+    _INPUT_HANDLER = PainterControl
+    _VISUAL_HANDLERS = (FloorVisual, PainterVisual)

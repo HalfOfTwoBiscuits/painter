@@ -34,7 +34,7 @@ class GameplayState(State):
     '''The player is painting the floor in gameplay.'''
 
     _INPUT_HANDLER = PainterControl
-    _VISUAL_HANDLERS = (PainterVisual, FloorVisual)
+    _VISUAL_HANDLERS = (FloorVisual, PainterVisual)
 
     @classmethod
     def enter(cls):
@@ -76,7 +76,7 @@ class PauseMenuState(State):
     @classmethod
     def get_visual_handlers(cls):
         if cls.__visual_handlers is None:
-            cls.__visual_handlers = (PainterVisual, FloorVisual, MenuVisual(cls.__TITLE, cls.__OPTION_NAMES))
+            cls.__visual_handlers = (FloorVisual, PainterVisual, MenuVisual(cls.__TITLE, cls.__OPTION_NAMES))
         return cls.__visual_handlers
 
 class LevelSelectState(State):

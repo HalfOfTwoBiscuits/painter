@@ -9,6 +9,7 @@ class InputHandler(ABC):
     # If not None, this variable value will be used instead
     _variable_actions = None
 
+    @staticmethod
     def process_input(self, key):
         '''Use the actions dictionary to determine
         what to do in response to a key being pressed.
@@ -19,7 +20,10 @@ class InputHandler(ABC):
         All other elements in that tuple will be passed as arguments.
         
         The return value of that method, if any, is a string
-        identifier for a new state. Return it to the main loop.'''
+        identifier for a new state. Return it to the main loop.
+        
+        For some children an instance is created and for others the class is used,
+        so this is a staticmethod and self is passed in manually in the main loop.'''
 
         actions = self._variable_actions or self._ACTIONS
         a = actions.get(key)
