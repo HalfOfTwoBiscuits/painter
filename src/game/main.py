@@ -41,9 +41,11 @@ class Game:
         self.__window = window
 
     def main(self):
-        # Allow returning an output True for successful unit test or False for unsucessful
+        '''Run game loop.
+        Allow returning an output True for successful unit test or False for unsucessful.'''
         output = None
         while output is None: output = self.loop()
+        return output
 
     def loop(self):
         # Process key press events
