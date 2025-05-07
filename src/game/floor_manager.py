@@ -1,4 +1,5 @@
 from .floor_data import FloorData # Temporary, this will actually be imported by the level editor
+from copy import deepcopy
 
 class FloorManager:
     '''Class responsible for creating and storing floor data.'''
@@ -55,7 +56,7 @@ class FloorManager:
         
         # Increment progression index
         cls.__next_floor_index += 1
-        return floor
+        return deepcopy(floor)
     
     @classmethod
     def get_floorpack_names(cls):
