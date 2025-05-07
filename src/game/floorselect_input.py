@@ -56,4 +56,4 @@ class LevelSelectControl(ArbitraryOptionsControl):
         # Select the floor and go to gameplay.
         FloorManager.select_floor(floor_index)
         SFXPlayer.play_sfx('menu')
-        return 'GameplayState'
+        return 'NewFloorState'

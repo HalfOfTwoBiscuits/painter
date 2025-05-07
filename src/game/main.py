@@ -61,20 +61,19 @@ class Game:
                 # Closing the window ends the program
                 return True
             if e.type == pg.KEYDOWN:
-                # Key pressing may result in repeated state change                
-                new_state = 'maybe'
+                # Process input: make stuff actually happen
+                new_state = self.__state.process_input(e.key)
+                # and if a string value was returned, change to the state with that name
+                # input may result in repeated state change
                 while new_state is not None:
-                    # Process input: make stuff actually happen
-                    new_state = self.__state.process_input(e.key)
-                    # and if a string value was returned, change to the state with that name
-                    if new_state is not None:
-                        # For test cases: returning a boolean value indicates success/failure.
-                        if isinstance(new_state, bool): return new_state
-                        # Change state
-                        self.__state = getattr(states, new_state)
-                        # Call the enter() method, which can *also* cause a change of state:
-                        # for temporary states that do processing before moving on
-                        new_state = self.__state.enter()
+                    # For test cases: returning a boolean value indicates success/failure.
+                    if isinstance(new_state, bool): return new_state
+                    # Change state
+                    print ('New state:', new_state)
+                    self.__state = getattr(states, new_state)
+                    # Call the enter() method, which can *also* cause a change of state:
+                    # for temporary states that do processing before moving on
+                    new_state = self.__state.enter()
         
         # Draw graphics
         VisualHandler.start_draw()

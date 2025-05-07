@@ -35,12 +35,9 @@ class PainterControl(InputHandler):
             SFXPlayer.play_sfx('invalid')
         
         if FloorPlayer.floor_is_over():
-            # TODO: Potentially, return FloorClearState instead
-            # to display 'well done' and require button press.
             if FloorManager.floorpack_is_over():
                 return 'LevelSelectState'
             else:
-                FloorManager.next_floor()
                 return "NewFloorState"
 
     @staticmethod

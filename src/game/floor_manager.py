@@ -12,21 +12,27 @@ class FloorManager:
 
     @classmethod
     def load_floors(cls):
-        '''Create a dummy floor to play,
-        put it in a floor pack and set that pack as the current one.
+        '''Create two dummy floors to play,
+        put them in a floor pack and set that pack as the current one.
         This is a temporary solution.'''
 
-        floor = FloorData(4,3) # 4x3 level
-        floor.set_initial_painter_position((0,1))
+        f1 = FloorData(4,3) # 4x3 level
+        f1.set_initial_painter_position((0,1))
 
         # Some cells start filled
-        cells = floor.get_cell_grid()
+        cells = f1.get_cell_grid()
         cells[(0,2)].start_filled()
         cells[(2,1)].start_filled()
 
+        f2 = FloorData(3,5) # 3x5 level
+        f2.set_initial_painter_position((1,3))
+
+        cells = f2.get_cell_grid()
+        cells[(0,0)].start_filled()
+
         # Add it to a floorpack and select that pack.
         # Floor pack selecting won't be in the first prototype.
-        cls.__floor_packs['DUMMY'] = [floor]
+        cls.__floor_packs['DUMMY'] = [f1, f2]
         cls.select_floorpack('DUMMY')
     
     @classmethod
@@ -34,7 +40,7 @@ class FloorManager:
         '''Return a boolean indicating whether the floorpack is over.
         True : All floors clear, False : Moving on to the next floor'''
         floorpack = cls.__floor_packs[cls.__current_pack_id]
-        return cls.__next_floor_index < len(floorpack)
+        return cls.__next_floor_index == len(floorpack)
     
     @classmethod
     def next_floor(cls):
@@ -44,6 +50,7 @@ class FloorManager:
         
         # Get next floor
         floorpack = cls.__floor_packs[cls.__current_pack_id]
+        print (f'Moving onto {cls.__next_floor_index + 1} of {len(floorpack)}')
         floor = floorpack[cls.__next_floor_index]
         
         # Increment progression index
