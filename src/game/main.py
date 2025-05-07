@@ -51,11 +51,10 @@ class Game:
         # Process key press events
         for e in pg.event.get():
             if e.type == pg.QUIT:
-                return False
+                return True
             if e.type == pg.KEYDOWN:
                 # On key press, process input
-                i_handler = self.__state.get_input_handler()
-                new_state = i_handler.process_input(i_handler, e.key)
+                new_state = self.__state.process_input(e.key)
                 # and if a string value was returned, change to the state with that name
                 if new_state is not None:
                     # For test cases: returning a boolean value indicates success/failure.

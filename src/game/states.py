@@ -18,7 +18,17 @@ class State:
         ...
 
     @classmethod
-    def get_input_handler(cls):
+    def process_input(cls, key_pressed):
+        '''Respond to a key press. Delegates to InputHandler.process_input().
+        Return any string identifier of a new state to change to.'''
+        i_handler = cls.__get_input_handler()
+
+        # Input handler may be a class or an instance, so 'self' is passed manually
+        new_state = i_handler.process_input(i_handler, key_pressed)
+        return new_state
+
+    @classmethod
+    def __get_input_handler(cls):
         '''Method that returns the input handler used.
         Defaults to the value of the _INPUT_HANDLER attribute.'''
         return cls._INPUT_HANDLER
@@ -40,10 +50,10 @@ class GameplayState(State):
     def enter(cls):
         '''Get the next floor object and use the program to set it up.'''
         floor_obj = FloorManager.next_floor()
-        cls.__start_floor(floor_obj)
+        cls._start_floor(floor_obj)
 
     @classmethod
-    def __start_floor(cls, floor_obj):
+    def _start_floor(cls, floor_obj):
         '''Update program state to account for the new floor.'''
 
         # Set up the new floor graphic.

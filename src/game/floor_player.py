@@ -7,7 +7,7 @@ class FloorPlayer:
         and undo history.'''
         cls.__painter_pos = floor_obj.get_initial_painter_position()
         cls.__grid = floor_obj.get_cell_grid()
-        cls.__position_history = [cls.__painter_pos] # Series of positions occupied
+        cls.__position_history = [] # Series of positions occupied
 
     @classmethod
     def painter_position_after_move(cls, direction: int):
@@ -34,17 +34,21 @@ class FloorPlayer:
         True : moved, False : blocked by wet paint.'''
 
         try:
+            # Raise ValueError if the position is not on the grid or is full.
+            new_cell = cls.__grid[new_pos]
+            if new_cell.get_full(): raise ValueError
+
             # Paint the old position.
-            cell = cls.__grid[cls.__painter_pos]
-            cell.paint()
+            old_cell = cls.__grid[cls.__painter_pos]
+            old_cell.paint()
         except ValueError:
             # The move is not possible.
             # The PainterVisual class does a SFX/animation/effect.
             return False
         else:
-            # Move painter, add to position history, and end.
+            # Move painter, add old position to history
+            cls.__position_history.append(cls.__painter_pos)
             cls.__painter_pos = new_pos
-            cls.__position_history.append(new_pos)
             return True
         
     @classmethod
@@ -53,13 +57,12 @@ class FloorPlayer:
 
         If the undo worked, return the painter's new position.
         Tuple : Move was undone, None : No moves to undo'''
-        if len(cls.__position_history) == 1: return None
+        if len(cls.__position_history) == 0: return None
 
-        cur_pos = cls.__position_history.pop()
-        prev_pos = cls.__position_history[-1]
+        prev_pos = cls.__position_history.pop()
 
-        cur_cell = cls.__grid[cur_pos]
-        cur_cell.revert()
+        prev_cell = cls.__grid[prev_pos]
+        prev_cell.revert()
         cls.__painter_pos = prev_pos
 
         return prev_pos
@@ -87,5 +90,5 @@ class FloorPlayer:
     def floor_is_over(cls):
         '''Return a boolean for whether the floor is clear.
         True : Well done, move on, False : More to paint
-        Delegates to CellGrid.is_painted()'''
+        Delegates to CellGrid.__is_painted()'''
         return cls.__grid.is_painted()

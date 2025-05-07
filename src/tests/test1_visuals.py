@@ -1,5 +1,5 @@
 from .tcase_bases import TestUsingWindow, TestUsingGameLoop
-from .tcase_states import PainterViewer, FloorViewer, FloorViewerWithPainter, GameplayTester
+from .tcase_states import PainterViewer, FloorViewer, FloorViewerWithPainter
 
 class GraphicsTest(TestUsingWindow):
     def test_a(self):
@@ -18,10 +18,3 @@ class VfxTest(TestUsingGameLoop):
     def test_painter_onfloor_withvfx(self):
         print ('Testing Painter and Floor Graphics with Rotate and Shake')
         self._do_test(FloorViewerWithPainter)
-
-'''
-class FinalTest(TestUsingGameLoop):
-    def test_gameplay(self):
-        print ('Testing Painter Graphic and Floor Graphic With Controls')
-        self._do_test(GameplayTester)
-'''

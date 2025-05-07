@@ -75,6 +75,7 @@ class CellGrid:
         '''Return a boolean indicating whether the level is complete.
         True : All cells are full (except the one the painter ended on)
         False : There are still cells to paint'''
+        #print (f'Checking if over: {self.__w * self.__h}, {len(self.get_full_cell_positions())}')
         return self.__w * self.__h == len(self.get_full_cell_positions()) - 1
 
 class Cell:
