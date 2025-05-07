@@ -20,8 +20,9 @@ class PauseMenuControl(InputHandler):
     
     @staticmethod
     def undo_all():
-        new_pos = FloorPlayer.undo_all()
-        if new_pos is not None:
+        new_loc = FloorPlayer.undo_all()
+        if new_loc is not None:
+            new_pos, _ = new_loc
             PainterVisual.go_to(new_pos)
             SFXPlayer.play_sfx('back')
         return 'GameplayState'

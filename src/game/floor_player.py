@@ -8,6 +8,7 @@ class FloorPlayer:
         cls.__painter_pos = floor_obj.get_initial_painter_position()
         cls.__grid = floor_obj.get_cell_grid()
         cls.__position_history = [] # Series of positions occupied
+        cls.__direction_history = [] # Same length: history of directions faced
 
     @classmethod
     def painter_position_after_move(cls, direction: int):
@@ -27,11 +28,14 @@ class FloorPlayer:
         return (x,y)
     
     @classmethod
-    def move_painter(cls, new_pos: tuple):
+    def move_painter(cls, new_pos: tuple, direction: int):
         '''Move the painter to the new position.
 
         Returns a boolean for whether the move worked.
-        True : moved, False : blocked by wet paint.'''
+        True : moved, False : blocked by wet paint.
+        
+        The direction the painter moved, and thus the painter visual should face,
+        is passed so it can be stored in position history, for reference when undoing.'''
 
         try:
             # Raise ValueError if the position is not on the grid or is full.
@@ -48,6 +52,7 @@ class FloorPlayer:
         else:
             # Move painter, add old position to history
             cls.__position_history.append(cls.__painter_pos)
+            cls.__direction_history.append(direction)
             cls.__painter_pos = new_pos
             return True
         
@@ -55,7 +60,7 @@ class FloorPlayer:
     def undo(cls):
         '''Undo the painter's last move.
 
-        If the undo worked, return the painter's new position.
+        If the undo worked, return the painter's new position and direction.
         Tuple : Move was undone, None : No moves to undo'''
         if len(cls.__position_history) == 0: return None
 
@@ -65,7 +70,9 @@ class FloorPlayer:
         prev_cell.revert()
         cls.__painter_pos = prev_pos
 
-        return prev_pos
+        prev_dir = cls.__direction_history.pop()
+
+        return prev_pos, prev_dir
     
     @classmethod
     def undo_all(cls):

@@ -25,7 +25,7 @@ class PainterControl(InputHandler):
         If the painter moved, it checks if the player won the floor,
         and if so, proceeds to the next one.'''
         new_pos = FloorPlayer.painter_position_after_move(direction)
-        could_move = FloorPlayer.move_painter(new_pos)
+        could_move = FloorPlayer.move_painter(new_pos, direction)
 
         if could_move:
             PainterVisual.go_to(new_pos, direction)
@@ -46,13 +46,14 @@ class PainterControl(InputHandler):
     @staticmethod
     def undo():
         '''Hook that responds to pressing backspace by undoing.'''
-        new_pos = FloorPlayer.undo()
+        new_loc = FloorPlayer.undo()
 
-        if new_pos is None:
+        if new_loc is None:
             PainterVisual.shake()
             SFXPlayer.play_sfx('invalid')
         else:
-            PainterVisual.go_to(new_pos)
+            new_pos, new_direction = new_loc
+            PainterVisual.go_to(new_pos, new_direction)
             SFXPlayer.play_sfx('back')
 
     @staticmethod

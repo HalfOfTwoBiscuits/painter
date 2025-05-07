@@ -6,6 +6,7 @@ import pygame as pg
 class PainterVisual(VisualHandler):
     __COL = pg.Color(255, 60, 60)
     __PADDING_FRACTION = 8
+    __SHAKE_FRACTION = 3
     __ARROWHEAD = [
         pg.math.Vector2(1,0),
         pg.math.Vector2(2,3),
@@ -13,7 +14,7 @@ class PainterVisual(VisualHandler):
         pg.math.Vector2(0,3)
     ]
     __ARROWHEAD_CENTRE = pg.math.Vector2(1,1.5)
-    __SHAKE_PERFRAME = 3
+    __SHAKE_PERFRAME = 6
 
     #__DEBUG_LINE_COLS = (pg.Color(0,0,255), pg.Color(0,255,0), pg.Color(255,255,0), pg.Color(0,255,255))
 
@@ -23,7 +24,9 @@ class PainterVisual(VisualHandler):
         and the direction that it faces.
         
         1 : Right, -1 : Left
-        2 : Down, -2 : Up'''
+        2 : Down, -2 : Up
+        
+        If the direction is not given, up is the default.'''
         cls.__position = pos
         cls.__direction = dir
 
@@ -54,10 +57,10 @@ class PainterVisual(VisualHandler):
         to respond to the passing of a frame.'''
         cls.__current_shake_amount += cls.__shake_increment
 
-        if cls.__current_shake_amount >= cls.__padding:
+        if cls.__current_shake_amount >= cls.__max_shake_offset:
             # Reached maximum positive offset, so go the other way
             cls.__shake_increment = -cls.__SHAKE_PERFRAME
-        elif cls.__current_shake_amount <= -cls.__padding:
+        elif cls.__current_shake_amount <= -cls.__max_shake_offset:
             # Reached maximum negative offset, so back to the centre
             cls.__shake_increment = cls.__SHAKE_PERFRAME
             cls.__stopping_shake = True
@@ -105,6 +108,7 @@ class PainterVisual(VisualHandler):
 
         # Use a fraction of the space available as padding.
         cls.__padding = cell_dimens // cls.__PADDING_FRACTION
+        cls.__max_shake_offset = cls.__padding // cls.__SHAKE_FRACTION
         # Subtract padding to find the space available.
         graphic_dimens = cell_dimens - cls.__padding * 2
         # Find offset into the cell
