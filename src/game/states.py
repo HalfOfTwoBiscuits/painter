@@ -39,21 +39,18 @@ class State:
         Defaults to the value of the _VISUAL_HANDLERS attribute.'''
         return cls._VISUAL_HANDLERS
 
-
-class GameplayState(State):
-    '''The player is painting the floor in gameplay.'''
-
-    _INPUT_HANDLER = PainterControl
-    _VISUAL_HANDLERS = (FloorVisual, PainterVisual)
-
+class NewFloorState(State):
+    '''The player has chosen to start a new floor.
+    Set it up before moving onto GameplayState.'''
     @classmethod
     def enter(cls):
         '''Get the next floor object and use the program to set it up.'''
         floor_obj = FloorManager.next_floor()
-        cls._start_floor(floor_obj)
+        cls.__start_floor(floor_obj)
+        return "GameplayState"
 
     @classmethod
-    def _start_floor(cls, floor_obj):
+    def __start_floor(cls, floor_obj):
         '''Update program state to account for the new floor.'''
 
         # Set up the new floor graphic.
@@ -73,6 +70,12 @@ class GameplayState(State):
         # Initialise the shaking vfx
         # (if the painter was shaking when the last floor ended, this will stop it)
         PainterVisual.initialise_shakevfx_state()
+
+class GameplayState(State):
+    '''The player is painting the floor in gameplay.'''
+
+    _INPUT_HANDLER = PainterControl
+    _VISUAL_HANDLERS = (FloorVisual, PainterVisual)
 
 class PauseMenuState(State):
     '''The player is playing a floor and has pressed CTRL to pause.

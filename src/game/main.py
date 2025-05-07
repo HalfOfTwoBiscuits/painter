@@ -10,7 +10,7 @@ def setup_state():
     only creates one floorpack (and floor) : there are no level files so the
     concept of a floorpack is not useful.'''
 
-    INITIAL_STATE = states.GameplayState
+    INITIAL_STATE = states.NewFloorState
 
     FloorManager.load_floors()
 
@@ -36,8 +36,15 @@ class Game:
     __clock = pg.time.Clock()
 
     def __init__(self, InitialState, window):
-        InitialState.enter()
-        self.__state = InitialState
+        '''Store game window, set up and store initial state.'''
+        # The initial state may be temporary and forward on to a new one.
+        # Repeatedly call enter() until it doesn't return another state name to change to.
+        new_state_name = 'maybe'
+        while new_state_name is not None:
+            self.__state = InitialState
+            new_state_name = InitialState.enter()
+            if new_state_name is not None:
+                InitialState = getattr(states, new_state_name)
         self.__window = window
 
     def main(self):
@@ -48,20 +55,26 @@ class Game:
         return output
 
     def loop(self):
-        # Process key press events
+        # Process input events
         for e in pg.event.get():
             if e.type == pg.QUIT:
+                # Closing the window ends the program
                 return True
             if e.type == pg.KEYDOWN:
-                # On key press, process input
-                new_state = self.__state.process_input(e.key)
-                # and if a string value was returned, change to the state with that name
-                if new_state is not None:
-                    # For test cases: returning a boolean value indicates success/failure.
-                    if isinstance(new_state, bool): return new_state
-                    # Change state
-                    self.__state = getattr(states, new_state)
-                    self.__state.enter()
+                # Key pressing may result in repeated state change                
+                new_state = 'maybe'
+                while new_state is not None:
+                    # Process input: make stuff actually happen
+                    new_state = self.__state.process_input(e.key)
+                    # and if a string value was returned, change to the state with that name
+                    if new_state is not None:
+                        # For test cases: returning a boolean value indicates success/failure.
+                        if isinstance(new_state, bool): return new_state
+                        # Change state
+                        self.__state = getattr(states, new_state)
+                        # Call the enter() method, which can *also* cause a change of state:
+                        # for temporary states that do processing before moving on
+                        new_state = self.__state.enter()
         
         # Draw graphics
         VisualHandler.start_draw()

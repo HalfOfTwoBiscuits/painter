@@ -41,6 +41,7 @@ class PainterControl(InputHandler):
                 return 'LevelSelectState'
             else:
                 FloorManager.next_floor()
+                return "NewFloorState"
 
     @staticmethod
     def undo():

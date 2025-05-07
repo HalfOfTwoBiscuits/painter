@@ -1,4 +1,4 @@
-from game.states import State, GameplayState
+from game.states import State
 from game.floor_visual import FloorVisual
 from game.painter_visual import PainterVisual
 from game.floor_data import FloorData
@@ -57,9 +57,9 @@ class FloorViewerWithPainter(FloorViewer):
     _INPUT_HANDLER = FloorViewerWithPainterControl
     _VISUAL_HANDLERS = (FloorVisual, PainterVisual)
 
-class GameplayTester(GameplayState):
+class GameplayTester(State):
     @classmethod
     def enter(cls):
+        # Load floors then start gameplay as normal
         FloorManager.load_floors()
-        floor = FloorManager.next_floor()
-        cls._start_floor(floor)
+        return "NewFloorState"
