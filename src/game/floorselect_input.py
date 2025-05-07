@@ -12,7 +12,6 @@ class ArbitraryOptionsControl(InputHandler, ABC):
         '''Store the MenuVisual object and set up number keys
         based on the number of options per page.'''
         self._menu = menu_visual_obj
-
         NUM_OPTIONS = menu_visual_obj.get_options_per_page()
 
         self.__class__._variable_actions = {
@@ -30,6 +29,18 @@ class ArbitraryOptionsControl(InputHandler, ABC):
         if there is one.'''
         ...
 
+    def _find_option_for_number(self, number: int):
+        # If the number pressed corresponds to an option, get the
+        # string used to describe it on the menu.
+        # If it doesn't then play an 'invalid' sfx.
+        try:
+            option_id = self._menu.option_for_number(number)
+        except ValueError:
+            SFXPlayer.play_sfx('invalid')
+        else:
+            SFXPlayer.play_sfx('menu')
+            return option_id
+
 class LevelSelectControl(ArbitraryOptionsControl):
 
     def __init__(self, menu_visual_obj):
@@ -39,14 +50,7 @@ class LevelSelectControl(ArbitraryOptionsControl):
         '''Set the floor manager to start from the selected floor,
         and switch to the gameplay state.'''
 
-        # If the number pressed corresponds to an option, get the
-        # string used to describe it on the menu.
-        # If it doesn't then play an 'invalid' sfx.
-        try:
-            option_id = self._menu.option_for_number(number)
-        except ValueError:
-            SFXPlayer.play_sfx('invalid')
-            return
+        option_id = self._find_option_for_number(number)
 
         # As dictated by FloorManager.get_floor_names(),
         # the last character in the string is the floor number.
@@ -55,5 +59,4 @@ class LevelSelectControl(ArbitraryOptionsControl):
 
         # Select the floor and go to gameplay.
         FloorManager.select_floor(floor_index)
-        SFXPlayer.play_sfx('menu')
         return 'NewFloorState'

@@ -1,10 +1,11 @@
 from game.states import State
 from game.floor_visual import FloorVisual
 from game.painter_visual import PainterVisual
+from game.menu_visual import MenuVisual
 from game.floor_data import FloorData
 from game.floor_manager import FloorManager
 
-from .tcase_handlers import FloorViewerControl, FloorViewerWithPainterControl, ViewerControl
+from .tcase_handlers import FloorViewerControl, FloorViewerWithPainterControl, ViewerControl, MenuTesterControl
 
 def list_of_floors():
     '''Manually a list of FloorData objects for testing.
@@ -56,6 +57,49 @@ class FloorViewer(State):
 class FloorViewerWithPainter(FloorViewer):
     _INPUT_HANDLER = FloorViewerWithPainterControl
     _VISUAL_HANDLERS = (FloorVisual, PainterVisual)
+
+class MenuTester(State):
+    '''Test visuals and controls for menus with different amounts of options.'''
+    __input_handler = None
+    __visual_handler = None
+
+    __TITLES = ['Pause', 'Words']
+    __OPTION_LISTS = [
+        ['Continue', 'Restart', 'Exit'],
+        ['Fish', 'Flan', 'Fries', 'Fillet', 'Frozen',
+         'Greater', 'Gaping', 'Green', 'Greed', 'Grasp',
+         'Hispanic', 'Hardship', 'Hollow'],
+    ]
+    __menu_index = 0
+
+    @classmethod
+    def enter(cls):
+        cls.__new_menu()
+
+    @classmethod
+    def get_visual_handlers(cls):
+        return (cls.__visual_handler,)
+    
+    @classmethod
+    def get_input_handler(cls):
+        if cls.__input_handler.get_finished():
+            # If we're finished with this menu, go onto the next one
+            cls.__menu_index += 1
+
+            try: cls.__new_menu()
+            # No more menus means the test is successful
+            except IndexError: return
+            
+        return cls.__input_handler
+    
+    @classmethod
+    def __new_menu(cls):
+        # Use the index of the current menu in the series to retrieve title and option names
+        title = cls.__TITLES[cls.__menu_index]
+        options = cls.__OPTION_LISTS[cls.__menu_index]
+        # update the stored index and visual handler for the menu
+        cls.__visual_handler = MenuVisual(title, options)
+        cls.__input_handler = MenuTesterControl(cls.__visual_handler)
 
 class GameplayTester(State):
     @classmethod

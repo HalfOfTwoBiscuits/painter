@@ -9,7 +9,7 @@ from .floor_manager import FloorManager
 
 class State:
     _INPUT_HANDLER = None
-    _VISUAL_HANDLERS = None
+    _VISUAL_HANDLERS = ()
 
     @classmethod
     def enter(cls):
@@ -21,16 +21,19 @@ class State:
     def process_input(cls, key_pressed):
         '''Respond to a key press. Delegates to InputHandler.process_input().
         Return any string identifier of a new state to change to.'''
-        i_handler = cls._get_input_handler()
+        i_handler = cls.get_input_handler()
+        # get_input_handler() can return None to end the program
+        if i_handler is None: return True
 
         # Input handler may be a class or an instance, so 'self' is passed manually
         new_state = i_handler.process_input(i_handler, key_pressed)
         return new_state
 
     @classmethod
-    def _get_input_handler(cls):
+    def get_input_handler(cls):
         '''Method that returns the input handler used.
-        Defaults to the value of the _INPUT_HANDLER attribute.'''
+        Defaults to the value of the _INPUT_HANDLER attribute.
+        If it returns None then the program ends.'''
         return cls._INPUT_HANDLER
     
     @classmethod
@@ -114,7 +117,7 @@ class LevelSelectState(State):
         return (cls.__menu_visual,)
     
     @classmethod
-    def _get_input_handler(cls):
+    def get_input_handler(cls):
         return cls.__input_handler
     
 class FloorPackSelect(State):

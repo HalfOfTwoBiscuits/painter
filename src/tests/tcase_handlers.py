@@ -2,7 +2,8 @@ from game.input_handler_base import InputHandler
 #from game.visual_handler_base import VisualHandler
 from game.floor_visual import FloorVisual
 from game.painter_visual import PainterVisual
-from game.sound import SFXPlayer
+from game.menu_visual import MenuVisual
+from game.floorselect_input import ArbitraryOptionsControl
 
 import pygame as pg
 
@@ -92,3 +93,32 @@ class FloorViewerWithPainterControl(FloorViewerControl):
     def shake_painter():
         '''Do the shake VFX on the painter graphic'''
         PainterVisual.shake()
+
+class MenuTesterControl(ArbitraryOptionsControl):
+
+    __MOVE_ON_ID = 'Next Test' # Option added to the end, select it to move on    
+
+    def __init__(self, menu_visual_obj):
+        super().__init__(menu_visual_obj)
+
+        # Set to True when the move on option is selected
+        self.__finished = False
+
+    def append_moveon_option(self, options: list[str]):
+        options.append(self.__class__.__MOVE_ON_ID)
+        return options
+    
+    def get_finished(self):
+        return self.__finished
+    
+    def select(self, number: int):
+        # Find the option string chosen
+        option_id = self._find_option_for_number(number)
+        if option_id == self.__class__.__MOVE_ON_ID:
+            self.__finished = True
+        else: self._menu.set_title(option_id)
+
+class MenuTestOverControl(InputHandler):
+    __ACTIONS = {
+        
+    }

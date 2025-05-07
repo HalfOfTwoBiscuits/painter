@@ -158,3 +158,8 @@ class MenuVisual(VisualHandler):
     def get_options_per_page(self):
         '''Return the constant number of options per page'''
         return self.__class__.__OPTIONS_PER_PAGE
+    
+    def set_title(self, new_title: str):
+        '''Change the title of the menu.
+        Called during unit tests to visually indicate a chosen option.'''
+        self.__title = new_title
