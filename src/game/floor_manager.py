@@ -29,7 +29,8 @@ class FloorManager:
         f2.set_initial_painter_position((1,3))
 
         cells = f2.get_cell_grid()
-        cells[(0,0)].start_filled()
+#        cells[(0,0)].start_filled()
+        cells[(2,2)].start_filled()
 
         # Add it to a floorpack and select that pack.
         # Floor pack selecting won't be in the first prototype.
