@@ -85,7 +85,7 @@ class PauseMenuState(State):
     '''The player is playing a floor and has pressed CTRL to pause.
     They can choose to continue, restart the floor, or return to the level select.'''
 
-    __TITLE = 'Pause'
+    __TITLE = 'Menu'
     __OPTION_NAMES = ['Continue', 'Restart', 'Exit']
     _INPUT_HANDLER = PauseMenuControl
     __visual_handlers = None
