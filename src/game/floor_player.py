@@ -54,6 +54,7 @@ class FloorPlayer:
             cls.__position_history.append(cls.__painter_pos)
             cls.__direction_history.append(direction)
             cls.__painter_pos = new_pos
+            cls.__painter_dir = direction
             return True
         
     @classmethod
@@ -89,7 +90,7 @@ class FloorPlayer:
             # If the painter moved, repeatedly call undo()
             # until all moves are undone. 
             while cls.undo(): pass
-            return cls.__painter_pos
+            return cls.__painter_pos, cls.__painter_dir
         else:
             return None
         
@@ -97,5 +98,14 @@ class FloorPlayer:
     def floor_is_over(cls):
         '''Return a boolean for whether the floor is clear.
         True : Well done, move on, False : More to paint
-        Delegates to CellGrid.__is_painted()'''
-        return cls.__grid.is_painted()
+        Delegates to CellGrid.__is_painted().
+
+        If it would return True, also paint the square the painter is on,
+        so the graphics will show the entire floor being painted.
+        (This is not currently seen before the next floor starts,
+        but would be useful if there was a special 'level complete' visual
+        where the floor was still visible behind)'''
+
+        done = cls.__grid.is_painted()
+        if done: cls.__grid[cls.__painter_pos].paint()
+        return done

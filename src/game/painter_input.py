@@ -8,7 +8,7 @@ from .sound import SFXPlayer
 class PainterControl(InputHandler):
     '''Input handler for when playing a level.
     Move with the arrows, use backspace to undo,
-    and control to open the menu.'''
+    and control or escape to open the menu.'''
     _ACTIONS = {
         pg.K_RIGHT : ('move', 1),
         pg.K_LEFT : ('move', -1),
@@ -16,7 +16,8 @@ class PainterControl(InputHandler):
         pg.K_UP : ('move', -2),
         pg.K_BACKSPACE : ('undo',),
         pg.K_LCTRL : ('open_menu',),
-        pg.K_RCTRL : ('open_menu',)
+        pg.K_RCTRL : ('open_menu',),
+        pg.K_ESCAPE : ('open_menu',)
     }
 
     @staticmethod
