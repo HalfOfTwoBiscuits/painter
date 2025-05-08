@@ -33,7 +33,8 @@ class State:
     def get_input_handler(cls):
         '''Method that returns the input handler used.
         Defaults to the value of the _INPUT_HANDLER attribute.
-        If it returns None then the program ends.'''
+        It is public only for unit tests, otherwise it is only called in process_input().
+        If it returns None to process_input() then the program ends.'''
         return cls._INPUT_HANDLER
     
     @classmethod

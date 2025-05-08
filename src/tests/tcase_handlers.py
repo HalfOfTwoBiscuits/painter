@@ -100,12 +100,12 @@ class MenuTesterControl(ArbitraryOptionsControl):
 
     def __init__(self, menu_visual_obj):
         super().__init__(menu_visual_obj)
-
         # Set to True when the move on option is selected
         self.__finished = False
 
-    def append_moveon_option(self, options: list[str]):
-        options.append(self.__class__.__MOVE_ON_ID)
+    @classmethod
+    def append_moveon_option(cls, options: list[str]):
+        options.append(cls.__MOVE_ON_ID)
         return options
     
     def get_finished(self):
@@ -114,11 +114,7 @@ class MenuTesterControl(ArbitraryOptionsControl):
     def select(self, number: int):
         # Find the option string chosen
         option_id = self._find_option_for_number(number)
+        print ('Selected:', option_id)
         if option_id == self.__class__.__MOVE_ON_ID:
             self.__finished = True
-        else: self._menu.set_title(option_id)
-
-class MenuTestOverControl(InputHandler):
-    __ACTIONS = {
-        
-    }
+        elif option_id is not None: self._menu.set_title(option_id)

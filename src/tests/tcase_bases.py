@@ -14,12 +14,11 @@ class TestUsingWindow(unittest.TestCase):
     def _do_test(self, State):
         g = Game(State, self.__class__._window)
         g.loop()
-        ih = State.get_input_handler()
         result = None
         while result is None:
             for e in pg.event.get():
                 if e.type == pg.KEYDOWN:
-                    result = ih.process_input(ih, e.key)
+                    result = State.process_input(e.key)
                     g.loop()
                 if e.type == pg.QUIT:
                     return True

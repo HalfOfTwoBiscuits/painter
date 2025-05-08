@@ -63,14 +63,16 @@ class MenuTester(State):
     __input_handler = None
     __visual_handler = None
 
-    __TITLES = ['Pause', 'Words']
+    __TITLES = ['Pause', 'Floor Select', 'Words']
     __OPTION_LISTS = [
         ['Continue', 'Restart', 'Exit'],
+        ['First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh'],
         ['Fish', 'Flan', 'Fries', 'Fillet', 'Frozen',
          'Greater', 'Gaping', 'Green', 'Greed', 'Grasp',
          'Hispanic', 'Hardship', 'Hollow'],
     ]
     __menu_index = 0
+    __success = False
 
     @classmethod
     def enter(cls):
@@ -78,18 +80,20 @@ class MenuTester(State):
 
     @classmethod
     def get_visual_handlers(cls):
-        return (cls.__visual_handler,)
-    
-    @classmethod
-    def get_input_handler(cls):
+        # Make use of this being called every frame to check if
+        # we moved onto the next menu.
         if cls.__input_handler.get_finished():
-            # If we're finished with this menu, go onto the next one
             cls.__menu_index += 1
 
             try: cls.__new_menu()
             # No more menus means the test is successful
-            except IndexError: return
-            
+            except IndexError: cls.__success = True
+        return (cls.__visual_handler,)
+    
+    @classmethod
+    def get_input_handler(cls):
+        # Returning None finishes test.
+        if cls.__success: return
         return cls.__input_handler
     
     @classmethod
@@ -97,6 +101,7 @@ class MenuTester(State):
         # Use the index of the current menu in the series to retrieve title and option names
         title = cls.__TITLES[cls.__menu_index]
         options = cls.__OPTION_LISTS[cls.__menu_index]
+        options = MenuTesterControl.append_moveon_option(options)
         # update the stored index and visual handler for the menu
         cls.__visual_handler = MenuVisual(title, options)
         cls.__input_handler = MenuTesterControl(cls.__visual_handler)

@@ -77,7 +77,8 @@ class Game:
         
         # Draw graphics
         VisualHandler.start_draw()
-        for visual_handler in self.__state.get_visual_handlers():
+        handlers = self.__state.get_visual_handlers()
+        for visual_handler in handlers:
             visual_handler.draw()
 
         graphics_surf = VisualHandler.get_graphics()
