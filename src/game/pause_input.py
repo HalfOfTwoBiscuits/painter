@@ -17,6 +17,7 @@ class PauseMenuControl(InputHandler):
 
     @staticmethod
     def resume():
+        SFXPlayer.play_sfx('menu')
         return 'GameplayState'
     
     @staticmethod
@@ -30,4 +31,5 @@ class PauseMenuControl(InputHandler):
 
     @staticmethod
     def exit():
+        SFXPlayer.play_sfx('menu')
         return 'LevelSelectState'

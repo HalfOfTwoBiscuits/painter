@@ -57,4 +57,5 @@ class PainterControl(InputHandler):
     @staticmethod
     def open_menu():
         '''Hook that responds to pressing control by opening the menu.'''
+        SFXPlayer.play_sfx('menu')
         return 'PauseMenuState'
