@@ -36,6 +36,7 @@ class FloorManager:
 
         cells = f3.get_cell_grid()
         cells[(0,0)].start_filled()
+        cells[(5,0)].start_filled()
         cells[(2,1)].start_filled()
 
         # Add it to a floorpack and select that pack.
