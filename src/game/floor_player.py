@@ -29,7 +29,7 @@ class FloorPlayer:
         else:
             y += direction // 2
             y = cls.__loop_round(y, grid_h)
-        print (f'Moving to {x},{y}')
+        #print (f'Moving to {x},{y}')
         return (x,y)
     
     @staticmethod

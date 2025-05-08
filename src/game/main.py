@@ -10,7 +10,7 @@ def setup_state():
     only creates one floorpack (and floor) : there are no level files so the
     concept of a floorpack is not useful.'''
 
-    INITIAL_STATE = states.NewFloorState
+    INITIAL_STATE = states.LevelSelectState
 
     FloorManager.load_floors()
 
