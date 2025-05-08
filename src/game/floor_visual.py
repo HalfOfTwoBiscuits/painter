@@ -4,7 +4,8 @@ from math import ceil
 
 class FloorVisual(VisualHandler):
     __LINE_SIZE = 4
-    __LINE_COL = pg.Color(200,200,200)
+    __LINE_COL = pg.Color(255,255,255)
+    __WRAP_LINE_COL = pg.Color(60,60,60)
     __PAINT_COL = pg.Color(150,30,30)
     __BG_COL = pg.Color(0,0,0)
 
@@ -44,21 +45,23 @@ class FloorVisual(VisualHandler):
     def draw(cls):
         '''Draw the floor on the screen,
         with lines to show the grid and painted cells filled in.'''
+        win_w, win_h = cls._window_dimensions
+
         # Draw vertical lines
         for x in range(cls.__left_edge, cls.__right_edge + 1,
                        cls.__cell_dimens):
             
-            pg.draw.line(cls._window, cls.__LINE_COL,
-                         (x, cls.__top_edge), (x, cls.__bottom_edge),
-                         width=cls.__LINE_SIZE)
+            cls.__draw_line((x, cls.__top_edge), (x, cls.__bottom_edge))
+            cls.__draw_line((x, 0), (x, cls.__top_edge), faded=True)
+            cls.__draw_line((x, cls.__bottom_edge), (x, win_h), faded=True)
         
         # Draw horizontal lines
         for y in range(cls.__top_edge, cls.__bottom_edge + 1,
                        cls.__cell_dimens):
             
-            pg.draw.line(cls._window, cls.__LINE_COL,
-                         (cls.__left_edge, y), (cls.__right_edge, y),
-                         width=cls.__LINE_SIZE)
+            cls.__draw_line((cls.__left_edge, y), (cls.__right_edge, y))
+            cls.__draw_line((0, y), (cls.__left_edge, y), faded=True)
+            cls.__draw_line((cls.__right_edge, y), (win_w, y), faded=True)
         
         # Fill in the painted cells
         for pos in cls.__grid.get_full_cell_positions():
@@ -68,6 +71,14 @@ class FloorVisual(VisualHandler):
             # Draw a filled square
             pg.draw.rect(cls._window, cls.__PAINT_COL,
                          (x, y, space, space))
+            
+    @classmethod
+    def __draw_line(cls, start: tuple, end: tuple, faded: bool=False):
+        '''Private method used to shorten the call to pg.draw.line().
+        Faded argument indicates the faded colour used for the lines
+        that indicate the ability to wrap around from one edge to the other.'''
+        col = faded and cls.__WRAP_LINE_COL or cls.__LINE_COL
+        pg.draw.line(cls._window, col, start, end, width=cls.__LINE_SIZE)
 
     @classmethod
     def topleft_for(cls, cell_pos: tuple):
