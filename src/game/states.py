@@ -1,5 +1,5 @@
 from .painter_input import PainterControl
-from .pause_input import PauseMenuControl
+from .pause_input import PauseMenuControl, ExitMenuControl, FloorClearMenuControl
 from .floorselect_input import LevelSelectControl
 from .painter_visual import PainterVisual
 from .floor_visual import FloorVisual
@@ -139,3 +139,26 @@ class FloorPackSelect(State):
         '''Return a MenuVisual instance with the floorpacks as options,
         as created when entering this state.'''
         return (cls.__menu_visual,)
+    
+class FloorClearState(State):
+    '''The player has painted the floor and is choosing whether to
+    continue or return to the level select.'''
+
+    _TITLE = 'Well done!'
+    _OPTION_NAMES = ['Next Floor', 'Exit']
+    _INPUT_HANDLER = FloorClearMenuControl
+    _visual_handlers = None
+    
+    @classmethod
+    def get_visual_handlers(cls):
+        if cls._visual_handlers is None:
+            cls._visual_handlers = (FloorVisual, MenuVisual(cls._TITLE, cls._OPTION_NAMES))
+        return cls._visual_handlers
+    
+class FloorpackOverState(FloorClearState):
+    '''The player has painted the last floor in the pack,
+    and can only choose to return to the floor select.'''
+    
+    _INPUT_HANDLER = ExitMenuControl
+    _OPTION_NAMES = ['Exit']
+    _visual_handlers = None

@@ -37,9 +37,9 @@ class PainterControl(InputHandler):
         
         if FloorPlayer.floor_is_over():
             if FloorManager.floorpack_is_over():
-                return 'LevelSelectState'
+                return 'FloorpackOverState'
             else:
-                return "NewFloorState"
+                return "FloorClearState"
 
     @staticmethod
     def undo():
