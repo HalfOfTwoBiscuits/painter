@@ -1,4 +1,4 @@
-from src.game.floor_data import FloorData
+from src.editor.floor_data import FloorData
 from src.file_utility import FileUtility
 from os import path
 import yaml
@@ -29,7 +29,7 @@ def create():
 
 def save(floor_objects, packname: str):
     pack_path = FileUtility.path_to_resource('floors', packname)
-    with open(pack_path, 'x') as file:
+    with open(pack_path, 'w') as file:
         yaml.dump(floor_objects, file)
 
 if __name__ == '__main__':
