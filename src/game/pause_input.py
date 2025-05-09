@@ -13,8 +13,6 @@ class ExitMenuControl(InputHandler):
         pg.K_1 : ('exit',),
         pg.K_RETURN : ('exit',),
         pg.K_ESCAPE : ('exit',),
-        pg.K_LCTRL : ('exit',),
-        pg.K_RCTRL : ('exit',),
     }
     @staticmethod
     def exit():
@@ -42,11 +40,11 @@ class PauseMenuControl(ExitMenuControl):
     
     @staticmethod
     def undo_all():
+        SFXPlayer.play_sfx('back')
         new_loc = FloorPlayer.undo_all()
         if new_loc is not None:
             new_pos, _ = new_loc
             PainterVisual.go_to(new_pos)
-            SFXPlayer.play_sfx('back')
         return 'GameplayState'
 
 class FloorClearMenuControl(ExitMenuControl):
@@ -58,8 +56,6 @@ class FloorClearMenuControl(ExitMenuControl):
         pg.K_RETURN : ('next_floor',),
         pg.K_2 : ('exit',),
         pg.K_ESCAPE : ('exit',),
-        pg.K_LCTRL : ('exit',),
-        pg.K_RCTRL : ('exit',)
     }
 
     @staticmethod
