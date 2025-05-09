@@ -1,4 +1,4 @@
-from game.main import Game, setup_state, setup_window
+from src.game.main import Game, setup_state, setup_window
 if __name__ == '__main__':
     InitialState = setup_state()
     window = setup_window()
