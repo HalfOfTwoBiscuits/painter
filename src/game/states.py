@@ -1,5 +1,6 @@
 from .painter_input import PainterControl
 from .pause_input import PauseMenuControl, ExitMenuControl, FloorClearMenuControl
+from .pause_input import PauseMenuControl, ExitMenuControl, FloorClearMenuControl
 from .floorselect_input import LevelSelectControl
 from .painter_visual import PainterVisual
 from .floor_visual import FloorVisual
