@@ -1,5 +1,7 @@
-from .floor_data import FloorData # Temporary, this will actually be imported by the level editor
-from copy import deepcopy
+from ..file_utility import FileUtility
+import copy
+import os
+import yaml
 
 class FloorManager:
     '''Class responsible for creating and storing floor data.'''
@@ -13,36 +15,34 @@ class FloorManager:
 
     @classmethod
     def load_floors(cls):
-        '''Create two dummy floors to play,
-        put them in a floor pack and set that pack as the current one.
-        This is a temporary solution.'''
+        '''Iterate through the yaml files in the resources/floors directory,
+        deserialising a list of FloorData objects from each.
+        These 'floorpacks' will be stored so they can be played later.
 
-        f1 = FloorData(4,3) # 4x3 level
-        f1.set_initial_painter_position((1,1))
+        Currently only one floorpack will be used due to the input handler
+        for floor pack selection not being done yet.'''
 
-        # Some cells start filled
-        cells = f1.get_cell_grid()
-        cells[(0,2)].start_filled()
-        cells[(2,1)].start_filled()
+        floorpack_dir = FileUtility.path_to_resource_directory('floors')
+        # Iterate over files in the directory
+        # (this will also load floorpack files in subdirectories,
+        # though this is not used)
+        for rootpath, _, filenames in os.walk(floorpack_dir):
 
-        f2 = FloorData(3,5) # 3x5 level
-        f2.set_initial_painter_position((1,3))
+            for fname in filenames:
+                # Join directory and fname to find the path
+                path = os.path.join(rootpath, fname)
+                # Load floorpack file
+                with open(path) as file:
+                    floorpack = yaml.load(file, Loader=yaml.Loader)
+                
+                # Retrieve fname without extention: the floorpack ID used as a key
+                floorpack_id = fname[:fname.index('.')]
+                cls.__floor_packs[floorpack_id] = floorpack
 
-        cells = f2.get_cell_grid()
-        cells[(2,2)].start_filled()
-
-        f3 = FloorData(6,3)
-        f3.set_initial_painter_position((1,1))
-
-        cells = f3.get_cell_grid()
-        cells[(0,0)].start_filled()
-        cells[(5,0)].start_filled()
-        cells[(2,1)].start_filled()
-
-        # Add it to a floorpack and select that pack.
-        # Floor pack selecting won't be in the first prototype.
-        cls.__floor_packs['DUMMY'] = [f1, f2, f3]
-        cls.select_floorpack('DUMMY')
+        # Since FloorpackSelectState is not currently used, select an arbitrary pack:
+        # the last one that was processed.
+        # (there is only expected to be one in any case)
+        cls.select_floorpack(floorpack_id)
     
     @classmethod
     def floorpack_is_over(cls):
@@ -64,7 +64,7 @@ class FloorManager:
         
         # Increment progression index
         cls.__next_floor_index += 1
-        return deepcopy(floor)
+        return copy.deepcopy(floor)
     
     @classmethod
     def get_floorpack_names(cls):

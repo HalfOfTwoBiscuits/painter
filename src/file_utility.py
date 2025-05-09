@@ -13,14 +13,20 @@ class FileUtility:
     __EXTENTIONS = {
         'sfx' : '.ogg',
         'font' : '.ttf',
-        'floors' : '.bin'
+        'floors' : '.yaml'
     }
     
     @classmethod
     def path_to_resource(cls, resource_type: str, filename: str):
         '''Given the type of a resource (the name of the directory it is in)
-        and its filename without extention, return the path to the file.
+        and its filename without extention, return the absolute path to the file.
         The extention to use is determined by the resource type.'''
-        
+
         extention = cls.__EXTENTIONS.get(resource_type, '')
         return path.join(cls.__RESOURCES_DIR, resource_type, filename + extention)
+    
+    @classmethod
+    def path_to_resource_directory(cls, resource_type: str):
+        '''Given a the name of a subdirectory for a type of resource,
+        return the absolute path to that directory.'''
+        return path.join(cls.__RESOURCES_DIR, resource_type)
