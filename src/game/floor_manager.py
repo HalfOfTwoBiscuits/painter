@@ -18,7 +18,7 @@ class FloorManager:
         This is a temporary solution.'''
 
         f1 = FloorData(4,3) # 4x3 level
-        f1.set_initial_painter_position((0,1))
+        f1.set_initial_painter_position((1,1))
 
         # Some cells start filled
         cells = f1.get_cell_grid()
