@@ -13,10 +13,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Checkout
-    # Name 'main.py' changed to run_game_online.py
       run: |
             python -m pip install pygbag
-            python -m pygbag --build $GITHUB_WORKSPACE/run_game_online.py
+            python -m pygbag --build $GITHUB_WORKSPACE/main.py
     - name : "Upload to GitHub pages branch gh-pages"
       uses: JamesIves/github-pages-deploy-action@4.1.7
       with:
