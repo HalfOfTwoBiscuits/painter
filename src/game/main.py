@@ -1,14 +1,12 @@
-#import asyncio
-import pygame as pg
 from . import states
 from .visual_handler_base import VisualHandler
 from .floor_manager import FloorManager
+import asyncio
+import pygame as pg
 
 def setup_state():
     '''Set up the game and return the initial state.
-    For now it is LevelSelect and not FloorPackSelect because load_floors()
-    only creates one floorpack (and floor) : there are no level files so the
-    concept of a floorpack is not useful.'''
+    For now it is LevelSelect and not FloorPackSelect.'''
 
     INITIAL_STATE = states.LevelSelectState
 
@@ -53,6 +51,12 @@ class Game:
         output = None
         while output is None: output = self.loop()
         return output
+    
+    async def online_main(self):
+        while True:
+            self.loop()
+            # Await asynchronous processing of pygbag needed for web hosting
+            await asyncio.sleep(0)
 
     def loop(self):
         # Process input events
@@ -87,5 +91,3 @@ class Game:
 
         # Limit frame rate
         self.__class__.__clock.tick(30)
-        # Await asynchronous processing of pygbag needed for web hosting
-        #await asyncio.sleep(0)

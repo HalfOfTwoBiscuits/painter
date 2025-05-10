@@ -1,6 +1,5 @@
 from .visual_handler_base import VisualHandler
 import pygame as pg
-from math import ceil
 
 class FloorVisual(VisualHandler):
     __LINE_SIZE = 4
