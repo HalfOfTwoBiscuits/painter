@@ -1,0 +1,24 @@
+# GitHub Action to create web build
+# Not coded by me, retrieved from:
+# https://pygame-web.github.io/wiki/publishing/github.io/pygbag.yml
+name: pygbag_build
+on: [workflow_dispatch]
+
+
+jobs:
+  build-pygbag:
+    name: Build for Emscripten pygbag runtime
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Checkout
+    # Name 'main.py' changed to run_game_online.py
+      run: |
+            python -m pip install pygbag
+            python -m pygbag --build $GITHUB_WORKSPACE/run_game_online.py
+    - name : "Upload to GitHub pages branch gh-pages"
+      uses: JamesIves/github-pages-deploy-action@4.1.7
+      with:
+        branch: gh-pages
+        folder: build/web
