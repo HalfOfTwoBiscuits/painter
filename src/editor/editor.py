@@ -1,5 +1,5 @@
 from ..game.floor_visual import FloorVisual
-from ..game.main import Game
+from ..game.game import Game
 from .floor_data import FloorData
 import pygame_gui
 
