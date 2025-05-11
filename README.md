@@ -18,7 +18,7 @@ By pressing escape or control, you can choose to start again, or paint a differe
 
 ### To try the game...
 - On Windows, you can download the executable version from the 'releases' area on the right of the page.
-- On any platform, you can clone this repository and execute run_offline.py with Python.
+- On any platform, you can clone this repository and execute main_offline.py with Python.
 #### In future...
 - I plan to create Linux executable version(s).
 - I was unsucessful in creating a web build with pygbag, and I'm unclear what the issue is, but hope to resolve it.
