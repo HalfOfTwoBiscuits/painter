@@ -17,7 +17,12 @@ If you get stuck, you can:
 By pressing escape or control, you can choose to start again, or paint a different floor instead.
 
 ### To try the game...
-...
+- On Windows, you can download the executable version from the 'releases' area on the right of the page.
+- On any platform, you can clone this repository and execute run_offline.py with Python.
+#### In future...
+- I plan to create Linux executable version(s).
+- I was unsucessful in creating a web build with pygbag, and I'm unclear what the issue is, but hope to resolve it.
+  - pygbag would also allow me to create a mobile build, though the controls would probably need a rework to allow that.
 
 ### Ideas to make the game more interesting
 - Some areas can be painted, but don't have to be,
@@ -34,3 +39,4 @@ Level data stored using YAML and PyYAML [https://pypi.org/project/PyYAML/]
 I attempted to create a web build with pygbag,
 following [https://pygame-web.github.io/wiki/publishing/github.io/],
 but it doesn't currently work.
+Executable build(s) created with pyinstaller [https://pypi.org/project/pyinstaller/].
