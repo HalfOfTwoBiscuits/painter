@@ -1,6 +1,5 @@
-from src.editor.floor_data import FloorData
 from src.file_utility import FileUtility
-from os import path
+from src.editor.floor_data import FloorData
 import yaml
 
 def create():
@@ -18,14 +17,25 @@ def create():
     cells = f2.get_cell_grid()
     cells[(2,2)].start_filled()
 
-    f3 = FloorData(6,3)
+    f3 = FloorData(4,4)
     f3.set_initial_painter_position((1,1))
 
     cells = f3.get_cell_grid()
+    cells[(0,2)].start_filled()
+    cells[(1,2)].start_filled()
+    cells[(2,2)].start_filled()
+    cells[(2,3)].start_filled()
+    cells[(2,1)].start_filled()
+    cells[(2,0)].start_filled()
+
+    f4 = FloorData(6,3)
+    f4.set_initial_painter_position((1,1))
+
+    cells = f4.get_cell_grid()
     cells[(0,0)].start_filled()
     cells[(5,0)].start_filled()
     cells[(2,1)].start_filled()
-    return [f1,f2,f3]
+    return [f1,f2,f3,f4]
 
 def save(floor_objects, packname: str):
     pack_path = FileUtility.path_to_resource('floors', packname)
