@@ -3,6 +3,13 @@ import copy
 import os
 import yaml
 
+# FloorData is not used here: the floors to paint are created beforehand.
+# But it must be imported somewhere in the main project for pyinstaller to detect it exists,
+# so that when we load the floor yaml in the built version of the project,
+# floor_data.py is included in the build.
+# It's imported in this file because the floor yaml is loaded in this file.
+from ..editor.floor_data import FloorData
+
 class FloorManager:
     '''Class responsible for creating and storing floor data.'''
 
