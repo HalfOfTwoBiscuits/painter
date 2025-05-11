@@ -22,7 +22,7 @@ class TestUsingWindow(unittest.TestCase):
                     g.loop()
                 if e.type == pg.QUIT:
                     return True
-        return result
+        self.assertTrue(result)
         
 
 class TestUsingGameLoop(TestUsingWindow):
