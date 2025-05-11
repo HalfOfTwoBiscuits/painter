@@ -1,5 +1,6 @@
 from os import path
 class FileUtility:
+    '''Class used to load game resource files.'''
     __RESOURCES_DIRNAME = 'resources'
 
     # This file is in the src directory
@@ -10,6 +11,7 @@ class FileUtility:
     __RESOURCES_DIR = path.join(
         path.split(__SRC_DIR)[0], __RESOURCES_DIRNAME)
     
+    # Resource folder names to the extentions of files in those folders
     __EXTENTIONS = {
         'sfx' : '.ogg',
         'font' : '.ttf',

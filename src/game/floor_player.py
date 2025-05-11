@@ -112,13 +112,10 @@ class FloorPlayer:
     def floor_is_over(cls):
         '''Return a boolean for whether the floor is clear.
         True : Well done, move on, False : More to paint
-        Delegates to CellGrid.__is_painted().
+        Delegates to CellGrid.is_painted().
 
         If it would return True, also paint the square the painter is on,
-        so the graphics will show the entire floor being painted.
-        (This is not currently seen before the next floor starts,
-        but would be useful if there was a special 'level complete' visual
-        where the floor was still visible behind)'''
+        so the graphics will show the entire floor being painted.'''
 
         done = cls.__grid.is_painted()
         if done: cls.__grid[cls.__painter_pos].paint()

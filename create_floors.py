@@ -1,3 +1,7 @@
+'''This script creates four FloorData objects and saves them as the floorpack dummy.yaml.
+It is used to create the levels played in the current version of the game.
+In future, I hope to create a level editor that outputs FloorData objects into these yaml floorpacks,
+and a game state for a menu used to select which one to play.'''
 from src.file_utility import FileUtility
 from src.editor.floor_data import FloorData
 import yaml

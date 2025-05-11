@@ -1,3 +1,8 @@
+'''This script is intended for the use of pygbag, a tool for
+creating web builds of pygame programs. The guidelines said that the
+script to create the web build should be called main.py,
+so despite the web build not currently working, this file is named in that fashion.
+To play the game use offline_main.py'''
 # /// script
 # dependencies = [
 #   "PyYAML",

@@ -5,8 +5,11 @@ import asyncio
 import pygame as pg
 
 def setup_state():
-    '''Set up the game and return the initial state.
-    For now it is LevelSelect and not FloorPackSelect.'''
+    '''Return the initial state used by the game,
+    passed to the Game instance during startup.
+    To ensure all states can access necessary data,
+    also load the game levels
+    with FloorManager.load_floors()'''
 
     INITIAL_STATE = states.LevelSelectState
 
@@ -15,6 +18,8 @@ def setup_state():
     return INITIAL_STATE
 
 def setup_window():
+    '''Create and return the game window object
+    passed to the Game instance during startup.'''
     TITLE = "Painter"
     WINDOW_SIZE = (960, 680)
 
@@ -30,14 +35,18 @@ def setup_window():
     return window
 
 class Game:
+    '''An instance of this class manages the game loop.'''
+
     # For frame rate limiting
     __clock = pg.time.Clock()
 
     def __init__(self, InitialState, window):
         '''Store game window, set up and store initial state.'''
+        
+        new_state_name = 'maybe'
+
         # The initial state may be temporary and forward on to a new one.
         # Repeatedly call enter() until it doesn't return another state name to change to.
-        new_state_name = 'maybe'
         while new_state_name is not None:
             self.__state = InitialState
             new_state_name = InitialState.enter()
@@ -53,12 +62,18 @@ class Game:
         return output
     
     async def online_main(self):
+        '''A version of the main function intended to be used with a pygbag
+        web build. That web build doesn't currently work (see README.md)'''
         while True:
             self.loop()
             # Await asynchronous processing of pygbag needed for web hosting
             await asyncio.sleep(0)
 
     def loop(self):
+        '''One iteration of the game loop.
+        Called in main(), online_main(), and also independently
+        to process one frame, during unit tests.'''
+
         # Process input events
         for e in pg.event.get():
             if e.type == pg.QUIT:

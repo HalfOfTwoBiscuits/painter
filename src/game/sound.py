@@ -2,6 +2,7 @@ import pygame as pg
 from ..file_utility import FileUtility
 
 class SFXPlayer:
+    '''Class responsible for playing sound effects.'''
     __SFX_DIRNAME = 'sfx'
 
     __sfx = {}
@@ -9,7 +10,7 @@ class SFXPlayer:
 
     @classmethod
     def play_sfx(cls, sfx_name: str):
-        '''Play a sound effect with the given filename.'''
+        '''Play a sound effect with the given filename (without extention)'''
 
         # Lazy initialisation:
         # if the sfx hasn't been played before, load the file and store it.

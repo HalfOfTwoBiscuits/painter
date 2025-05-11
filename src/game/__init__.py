@@ -1,0 +1,1 @@
+'''This package contains game code. It is the largest and most important.'''

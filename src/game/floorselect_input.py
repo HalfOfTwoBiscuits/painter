@@ -35,9 +35,9 @@ class ArbitraryOptionsControl(InputHandler, ABC):
         ...
 
     def _find_option_for_number(self, number: int):
-        # If the number pressed corresponds to an option, get the
-        # string used to describe it on the menu.
-        # If it doesn't then play an 'invalid' sfx.
+        '''If the number given corresponds to an option, 
+        return the string used to describe it on the menu.
+        If it doesn't then play an 'invalid' sfx.'''
         try:
             option_id = self._menu.option_for_number(number)
         except ValueError:
@@ -56,7 +56,7 @@ class ArbitraryOptionsControl(InputHandler, ABC):
         self._menu.prev_page()
 
 class LevelSelectControl(ArbitraryOptionsControl):
-
+    '''Input handler for floor selection.'''
     def __init__(self, menu_visual_obj):
         super().__init__(menu_visual_obj)
 

@@ -2,6 +2,7 @@ from .visual_handler_base import VisualHandler
 import pygame as pg
 
 class FloorVisual(VisualHandler):
+    '''Class that draws graphics for an ingame level (floor)'''
     __LINE_SIZE = 4
     __LINE_COL = pg.Color(255,255,255)
     __WRAP_LINE_COL = pg.Color(60,60,60)

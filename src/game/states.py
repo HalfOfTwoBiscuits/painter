@@ -121,9 +121,11 @@ class LevelSelectState(State):
     @classmethod
     def get_input_handler(cls):
         return cls.__input_handler
-    
-class FloorPackSelect(State):
-    '''The player is choosing a floorpack to play.'''
+
+class FloorpackSelectState(State):
+    '''The player is choosing a floorpack to play.
+    Currently unused: because the level editor is not made yet,
+    there is only one floorpack.'''
 
     __TITLE = 'Select Level Pack'
     _INPUT_HANDLER = LevelSelectControl
