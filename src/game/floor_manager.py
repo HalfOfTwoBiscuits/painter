@@ -27,7 +27,8 @@ class FloorManager:
         These 'floorpacks' will be stored so they can be played later.
 
         Currently only one floorpack will be used due to the input handler
-        for floor pack selection not being done yet.'''
+        for floor pack selection, and the editor program to create floorpacks,
+        not being done yet.'''
 
         floorpack_dir = FileUtility.path_to_resource_directory('floors')
         # Iterate over files in the directory
@@ -48,7 +49,7 @@ class FloorManager:
 
         # Since FloorpackSelectState is not currently used, select an arbitrary pack:
         # the last one that was processed.
-        # (there is only expected to be one in any case)
+        # (there is only expected to be one at the moment, in any case)
         cls.select_floorpack(floorpack_id)
     
     @classmethod
@@ -96,3 +97,13 @@ class FloorManager:
         '''Start playing floors from this index in the current floorpack,
         setting progression to start from that floor for future next_floor() calls.'''
         cls.__next_floor_index = floor_index
+
+    @staticmethod
+    def index_from_floor_name(floor_name: str):
+        '''Given the name for a floor returned from get_floor_names(),
+        return the index of that floor in the floorpack.'''
+        
+        # As dictated by get_floor_names(),
+        # the last character in the string is the floor number.
+        # Cast to an integer and subtract 1 to find the index of the floor.
+        return int(floor_name[-1]) - 1

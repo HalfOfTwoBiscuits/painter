@@ -67,10 +67,7 @@ class LevelSelectControl(ArbitraryOptionsControl):
         option_id = self._find_option_for_number(number)
         if option_id is None: return
 
-        # As dictated by FloorManager.get_floor_names(),
-        # the last character in the string is the floor number.
-        # Cast to an integer and subtract 1 to find the index of the floor.
-        floor_index = int(option_id[-1]) - 1
+        floor_index = FloorManager.index_from_floor_name(option_id)
 
         # Select the floor and go to gameplay.
         FloorManager.select_floor(floor_index)
