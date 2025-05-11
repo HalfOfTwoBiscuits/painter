@@ -9,17 +9,15 @@ However, the paint is wet, and you can't cross it until it's dry. You'll paint t
 If you paint yourself into a corner, don't lose hope! Crossing the edge of the floor will wrap you round to the opposite side.
 You can utilise that to reach areas enclosed by paint, and find your own way to paint everything.
 
+In menus, press the number key beside the option you want.
+
 If you get stuck, you can:
 - undo by pressing backspace
-- bring up the menu by pressing escape or control
-In the menu you can choose to start again or paint a different floor instead.
+- press escape or control
+By pressing escape or control, you can choose to start again, or paint a different floor instead.
 
-In the menu, press the number key beside the option you want.
-When choosing a floor to paint, the floors might go onto more than one page;
-in that case, you can change page using the arrow keys.
-
-### To try the game online...
-...you can visit [link to be added]
+### To try the game...
+...
 
 ### Ideas to make the game more interesting
 - Some areas can be painted, but don't have to be,
@@ -31,5 +29,8 @@ in that case, you can change page using the arrow keys.
   - indicated by the grid edge lines turning red.
 
 ### Attribution
-Made using Pygame.
-Web build created with Pygbag [https://pygame-web.github.io/wiki/publishing/github.io/]
+Made using pygame-ce [https://pypi.org/project/pygame-ce/].
+Level data stored using YAML and PyYAML [https://pypi.org/project/PyYAML/]
+I attempted to create a web build with pygbag,
+following [https://pygame-web.github.io/wiki/publishing/github.io/],
+but it doesn't currently work.
