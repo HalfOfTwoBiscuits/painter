@@ -7,6 +7,7 @@ class FloorVisual(VisualHandler):
     __LINE_COL = pg.Color(255,255,255)
     __WRAP_LINE_COL = pg.Color(60,60,60)
     __PAINT_COL = pg.Color(150,30,30)
+    __WRAP_PAINT_COL = pg.Color(75,15,15)
     __BG_COL = pg.Color(0,0,0)
 
     @classmethod
@@ -63,15 +64,66 @@ class FloorVisual(VisualHandler):
             cls.__draw_line((0, y), (cls.__left_edge, y), faded=True)
             cls.__draw_line((cls.__right_edge, y), (win_w, y), faded=True)
         
+        grd_w, grd_h = cls.__grid.get_size()
+        
         # Fill in the painted cells
-        for pos in cls.__grid.get_full_cell_positions():
-            # Calculate pixel position of the cell
-            x, y = cls.topleft_for(pos)
-            space = cls.get_cell_dimens_no_line()
-            # Draw a filled square
-            pg.draw.rect(cls._window, cls.__PAINT_COL,
-                         (x, y, space, space))
+        for cell_pos in cls.__grid.get_full_cell_positions():
+
+            # Add paint
+            cls.__draw_paint(cell_pos)
+
+            # If the cell is on the edge of the grid,
+            # also draw paint outside the grid to indicate
+            # the painter can't go to the opposite side.
+            x, y = cell_pos
             
+            if x == 0 or x == grd_w - 1:
+                cls.__draw_paint((grd_w, y), extend=2)
+                cls.__draw_paint((-1, y), extend=1)
+
+            if y == 0 or y == grd_h - 1:
+                cls.__draw_paint((x, grd_h), extend=4)
+                cls.__draw_paint((x, -1), extend=3)
+
+    @classmethod
+    def __draw_paint(cls, cell_pos: tuple, extend: int=0):
+        '''Draw paint in the cell with the given position.
+        The position doesn't have to be on the grid - paint off the grid
+        is used to indicate you can't go to the opposite side.
+        
+        The extend argument indicates a direction in which the paint
+        should extend to the edge of the window, used for the off-grid paint.
+        0 : normal, 1 : left, 2 : right,
+        3 : top, 4 : bottom.
+        Any value other than 0 means a more faded red will be used.'''
+
+        # Calculate pixel position of the cell
+        pixel_x, pixel_y = cls.topleft_for(cell_pos)
+        x_dimens = y_dimens = cls.get_cell_dimens_no_line()
+
+        # Alter colour, position and dimensions based on
+        # any specified extention to the edge of the window.
+        if extend == 0:
+            colour = cls.__PAINT_COL
+        else:
+            # Get window dimensions
+            win_w, win_h = cls._window_dimensions
+            colour = cls.__WRAP_PAINT_COL
+            if extend == 1:
+                x_dimens += pixel_x
+                pixel_x = 0
+            elif extend == 2:
+                x_dimens = (win_w - pixel_x)
+            elif extend == 3:
+                y_dimens += pixel_y
+                pixel_y = 0
+            elif extend == 4:
+                y_dimens = (win_h - pixel_y)
+
+        # Draw a filled square
+        pg.draw.rect(cls._window, colour,
+                    (pixel_x, pixel_y, x_dimens, y_dimens))
+        
     @classmethod
     def __draw_line(cls, start: tuple, end: tuple, faded: bool=False):
         '''Private method used to shorten the call to pg.draw.line().
