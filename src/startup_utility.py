@@ -1,4 +1,4 @@
-from .game.states import LevelSelectState
+from .game.states import FloorpackSelectState
 from .game.visual_handler_base import VisualHandler
 from .game.floor_manager import FloorManager
 import pygame as pg
@@ -9,7 +9,7 @@ def setup_state(editor: bool=False):
     To ensure all states can access necessary data,
     also load the game levels
     with FloorManager.load_floors()'''
-    initial_state = editor and None or LevelSelectState
+    initial_state = editor and None or FloorpackSelectState
 
     FloorManager.load_floors()
 

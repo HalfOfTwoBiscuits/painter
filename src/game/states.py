@@ -1,7 +1,9 @@
+from abc import ABC
+
 from .painter_input import PainterControl
 from .pause_input import PauseMenuControl, ExitMenuControl, FloorClearMenuControl
 from .pause_input import PauseMenuControl, ExitMenuControl, FloorClearMenuControl
-from .floorselect_input import LevelSelectControl
+from .floorselect_input import LevelSelectControl, FloorpackSelectControl
 from .painter_visual import PainterVisual
 from .floor_visual import FloorVisual
 from .menu_visual import MenuVisual
@@ -97,51 +99,55 @@ class PauseMenuState(State):
             cls.__visual_handlers = (FloorVisual, PainterVisual, MenuVisual(cls.__TITLE, cls.__OPTION_NAMES))
         return cls.__visual_handlers
 
-class LevelSelectState(State):
-    '''The player is choosing a floor to play from a floorpack.
-    Any floor can be chosen regardless of which have been finished already.'''
-
-    __TITLE = 'Select Level'
-    __input_handler = None
-    __menu_visual = None
+class GameContentSelectState(ABC, State):
+    '''Base class for floor select and floorpack select.'''
+    _menu_input_handler = None
+    _menu_visual = None
+    _TITLE = 'Menu'
 
     @classmethod
-    def enter(cls):
-        '''Create a MenuVisual instance with the floors from the pack.'''
-        floornames = FloorManager.get_floor_names()
-        cls.__menu_visual = MenuVisual(cls.__TITLE, floornames)
-        cls.__input_handler = LevelSelectControl(cls.__menu_visual)
+    def _setup_menu_visual(cls, menu_options: list[str]):
+        cls._menu_visual = MenuVisual(cls._TITLE, menu_options)
 
     @classmethod
     def get_visual_handlers(cls):
         '''Return a MenuVisual instance with the levels as options,
         as created when entering this state.'''
-        return (cls.__menu_visual,)
+        return (cls._menu_visual,)
     
     @classmethod
     def get_input_handler(cls):
-        return cls.__input_handler
+        return cls._menu_input_handler
 
-class FloorpackSelectState(State):
+class LevelSelectState(GameContentSelectState):
+    '''The player is choosing a floor to play from a floorpack.
+    Any floor can be chosen regardless of which have been finished already.'''
+
+    _TITLE = 'Select Level'
+    __BACK_OPTION = 'Another Levelpack'
+
+    @classmethod
+    def enter(cls):
+        '''Create a MenuVisual instance with the floors from the pack.'''
+        floornames = FloorManager.get_floor_names()
+        
+        options = floornames + [cls.__BACK_OPTION]
+
+        cls._setup_menu_visual(options)
+        cls._menu_input_handler = LevelSelectControl(cls._menu_visual, cls.__BACK_OPTION)
+
+class FloorpackSelectState(GameContentSelectState):
     '''The player is choosing a floorpack to play.
-    Currently unused: because the level editor is not made yet,
-    there is only one floorpack.'''
+    Skipped if there is only one floorpack.'''
 
-    __TITLE = 'Select Level Pack'
-    _INPUT_HANDLER = LevelSelectControl
-    __menu_visual = None
+    _TITLE = 'Select Level Pack'
 
     @classmethod
     def enter(cls):
         '''Create a MenuVisual instance with floor packs.'''
         packnames = FloorManager.get_floorpack_names()
-        cls.__menu_visual = MenuVisual(cls.__TITLE, packnames)
-
-    @classmethod
-    def get_visual_handlers(cls):
-        '''Return a MenuVisual instance with the floorpacks as options,
-        as created when entering this state.'''
-        return (cls.__menu_visual,)
+        cls._setup_menu_visual(packnames)
+        cls._menu_input_handler = FloorpackSelectControl(cls._menu_visual)
     
 class FloorClearState(State):
     '''The player has painted the floor and is choosing whether to

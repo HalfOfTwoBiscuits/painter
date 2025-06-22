@@ -46,11 +46,6 @@ class FloorManager:
                 # Retrieve fname without extention: the floorpack ID used as a key
                 floorpack_id = fname[:fname.index('.')]
                 cls.__floor_packs[floorpack_id] = floorpack
-
-        # Since FloorpackSelectState is not currently used, select an arbitrary pack:
-        # the last one that was processed.
-        # (there is only expected to be one at the moment, in any case)
-        cls.select_floorpack(floorpack_id)
     
     @classmethod
     def floorpack_is_over(cls):
