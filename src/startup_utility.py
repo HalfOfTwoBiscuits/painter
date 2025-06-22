@@ -1,6 +1,6 @@
-from game.states import LevelSelectState
-from game.visual_handler_base import VisualHandler
-from game.floor_manager import FloorManager
+from .game.states import LevelSelectState
+from .game.visual_handler_base import VisualHandler
+from .game.floor_manager import FloorManager
 import pygame as pg
 
 def setup_state(editor: bool=False):
