@@ -1,8 +1,7 @@
 from abc import ABC
 
 from .painter_input import PainterControl
-from .pause_input import PauseMenuControl, ExitMenuControl, FloorClearMenuControl
-from .pause_input import PauseMenuControl, ExitMenuControl, FloorClearMenuControl
+from .pause_input import PauseMenuControl, RestartMenuControl, RestartExitMenuControl, FloorClearMenuControl
 from .floorselect_input import LevelSelectControl, FloorpackSelectControl
 from .painter_visual import PainterVisual
 from .floor_visual import FloorVisual
@@ -128,10 +127,23 @@ class LevelSelectState(GameContentSelectState):
 
     @classmethod
     def enter(cls):
-        '''Create a MenuVisual instance with the floors from the pack.'''
+        '''If there's only one floor, skip to gameplay.
+        Otherwise, create a MenuVisual instance with the floors from the pack.
+        If there's more than one floorpack, add to the menu a 'Back' option which
+        will return to the floorpack select.'''
+
         floornames = FloorManager.get_floor_names()
         
-        options = floornames + [cls.__BACK_OPTION]
+        # If there's only one floor, select it
+        if len(floornames) == 1:
+            FloorManager.select_floor(0)
+            return 'GameplayState'
+
+        # Unless there's only one floorpack, include a 'back' option.
+        if FloorManager.get_num_floorpacks() == 1:
+            options = floornames
+        else:
+            options = floornames + [cls.__BACK_OPTION]
 
         cls._setup_menu_visual(options)
         cls._menu_input_handler = LevelSelectControl(cls._menu_visual, cls.__BACK_OPTION)
@@ -144,8 +156,15 @@ class FloorpackSelectState(GameContentSelectState):
 
     @classmethod
     def enter(cls):
-        '''Create a MenuVisual instance with floor packs.'''
+        '''If there's only one floorpack, skip to the floor select.
+        Otherwise, create a MenuVisual instance with floor packs.'''
         packnames = FloorManager.get_floorpack_names()
+
+        # If there's only one floorpack, select it
+        if len(packnames) == 1:
+            FloorManager.select_floorpack(packnames[0])
+            return 'LevelSelectState'
+        
         cls._setup_menu_visual(packnames)
         cls._menu_input_handler = FloorpackSelectControl(cls._menu_visual)
     
@@ -154,7 +173,7 @@ class FloorClearState(State):
     continue or return to the level select.'''
 
     _TITLE = 'Well done!'
-    _OPTION_NAMES = ['Next Floor', 'Exit']
+    _OPTION_NAMES = ['Next Floor', 'Restart', 'Exit']
     _INPUT_HANDLER = FloorClearMenuControl
     _visual_handlers = None
     
@@ -166,8 +185,22 @@ class FloorClearState(State):
     
 class FloorpackOverState(FloorClearState):
     '''The player has painted the last floor in the pack,
-    and can only choose to return to the floor select.'''
+    and can only choose to return to the floor select.
+    May redirect to SingleFloorClearState if there's only one floor and one pack.'''
     
-    _INPUT_HANDLER = ExitMenuControl
-    _OPTION_NAMES = ['Exit']
+    _INPUT_HANDLER = RestartExitMenuControl
+    _OPTION_NAMES = ['Restart', 'Exit']
+    _visual_handlers = None
+
+    @classmethod
+    def enter(cls):
+        if FloorManager.get_num_floors() == FloorManager.get_num_floorpacks() == 1:
+            return 'SingleFloorClearState'
+
+class SingleFloorClearState(FloorpackOverState):
+    '''The player has painted the only floor in the pack,
+    and there is only one pack, so they can only choose to restart.'''
+
+    _INPUT_HANDLER = RestartMenuControl
+    _OPTION_NAMES = ['Restart']
     _visual_handlers = None

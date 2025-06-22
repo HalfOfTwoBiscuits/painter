@@ -118,5 +118,11 @@ class FloorPlayer:
         so the graphics will show the entire floor being painted.'''
 
         done = cls.__grid.is_painted()
-        if done: cls.__grid[cls.__painter_pos].paint()
+        if done:
+            cls.__grid[cls.__painter_pos].paint()
+            # Add this final cell to position history:
+            # when choosing to play the floor again,
+            # it needs to be unpainted as well.
+            cls.__position_history.append(cls.__painter_pos)
+            cls.__direction_history.append(cls.__painter_dir)
         return done

@@ -76,6 +76,11 @@ class FloorManager:
         return [name for name in cls.__floor_packs.keys()]
     
     @classmethod
+    def get_num_floorpacks(cls):
+        '''Return the number of floorpacks.'''
+        return len(cls.__floor_packs)
+    
+    @classmethod
     def select_floorpack(cls, pack_name: str):
         '''Floors will be chosen from the floorpack with this name.'''
         cls.__current_pack_id = pack_name
@@ -86,6 +91,12 @@ class FloorManager:
         'Floor 1', 'Floor 2', and so on, to be picked from in the level select menu.'''
         floorpack = cls.__floor_packs[cls.__current_pack_id]
         return [f'Floor {index + 1}' for index in range(len(floorpack))]
+    
+    @classmethod
+    def get_num_floors(cls):
+        '''Return the number of floors in the current pack.'''
+        floorpack = cls.__floor_packs[cls.__current_pack_id]
+        return len(floorpack)
     
     @classmethod
     def select_floor(cls, floor_index: int):
