@@ -1,38 +1,7 @@
 from . import states
 from .visual_handler_base import VisualHandler
-from .floor_manager import FloorManager
 import asyncio
 import pygame as pg
-
-def setup_state():
-    '''Return the initial state used by the game,
-    passed to the Game instance during startup.
-    To ensure all states can access necessary data,
-    also load the game levels
-    with FloorManager.load_floors()'''
-
-    INITIAL_STATE = states.LevelSelectState
-
-    FloorManager.load_floors()
-
-    return INITIAL_STATE
-
-def setup_window():
-    '''Create and return the game window object
-    passed to the Game instance during startup.'''
-    TITLE = "Painter"
-    WINDOW_SIZE = (960, 680)
-
-    # Create window
-    pg.display.set_caption(TITLE)
-    window = pg.display.set_mode(WINDOW_SIZE)
-
-    draw_surf = pg.Surface(WINDOW_SIZE)
-
-    # Pass the window surface to the base VisualHandler
-    # so the classes that inherit from it can draw graphics on the window
-    VisualHandler.set_window(draw_surf)
-    return window
 
 class Game:
     '''An instance of this class manages the game loop.'''
