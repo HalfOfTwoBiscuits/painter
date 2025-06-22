@@ -113,3 +113,14 @@ class FloorManager:
         # the last character in the string is the floor number.
         # Cast to an integer and subtract 1 to find the index of the floor.
         return int(floor_name[-1]) - 1
+    
+    @classmethod
+    def insert_test_floorpack(cls, pack: list):
+        '''Add an already-loaded floorpack to the manager,
+        and select it to be played.
+        Used in tests, where the floor data is created manually
+        and interacted with. Not for actual gameplay.'''
+        TEST_FLOORPACK_ID = 'TEST'
+
+        cls.__floor_packs[TEST_FLOORPACK_ID] = pack
+        cls.select_floorpack(TEST_FLOORPACK_ID)

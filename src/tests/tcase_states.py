@@ -8,8 +8,12 @@ from ..game.floor_manager import FloorManager
 from .tcase_handlers import FloorViewerControl, FloorViewerWithPainterControl, ViewerControl, MenuTesterControl
 
 def list_of_floors():
-    '''Manually a list of FloorData objects for testing.
-    It would be better to use files but that logic isn't done yet.'''
+    '''Manually a create a list of FloorData objects for testing.
+    
+    This could be put into a file, separating the FloorData creation
+    from FloorManager.load_floors().
+    Consider again when making the level editor - that functionality might
+    be part of the editor in some way.'''
 
     f1 = FloorData(4,3) # 4x3 level
     f1.set_initial_painter_position((0,1))
@@ -109,6 +113,7 @@ class MenuTester(State):
 class GameplayTester(State):
     @classmethod
     def enter(cls):
-        # Load floors then start gameplay as normal
-        FloorManager.load_floors()
+        # Start gameplay using the test floorpack.
+        fpack = list_of_floors()
+        FloorManager.insert_test_floorpack(fpack)
         return "NewFloorState"

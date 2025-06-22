@@ -1,7 +1,8 @@
 import unittest
 import pygame as pg
 
-from ..game.game import Game, setup_window
+from ..game.game import Game
+from ..startup_utility import setup_window
 
 class TestUsingWindow(unittest.TestCase):
     '''A test that draws graphics on the game window but does not
