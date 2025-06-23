@@ -1,12 +1,12 @@
 from .visual_handler_base import VisualHandler
 from .floor_visual import FloorVisual
-from .sound import SFXPlayer
 import pygame as pg
 
 class PainterVisual(VisualHandler):
     __COL = pg.Color(255, 60, 60)
     __PADDING_FRACTION = 8
     __SHAKE_FRACTION = 3
+    __SHAKE_PERFRAME_FRACTION = 1.25
     __ARROWHEAD = [
         pg.math.Vector2(1,0),
         pg.math.Vector2(2,3),
@@ -14,7 +14,6 @@ class PainterVisual(VisualHandler):
         pg.math.Vector2(0,3)
     ]
     __ARROWHEAD_CENTRE = pg.math.Vector2(1,1.5)
-    __SHAKE_PERFRAME = 6
 
     #__DEBUG_LINE_COLS = (pg.Color(0,0,255), pg.Color(0,255,0), pg.Color(255,255,0), pg.Color(0,255,255))
 
@@ -41,7 +40,7 @@ class PainterVisual(VisualHandler):
         '''Cause the painter graphic to shake from side to side
         in the next few frames, indicating that an action isn't possible.'''
         if cls.__shake_increment == 0:
-            cls.__shake_increment = cls.__SHAKE_PERFRAME
+            cls.__shake_increment = cls.__shake_perframe
 
     @classmethod
     def initialise_shakevfx_state(cls):
@@ -59,10 +58,10 @@ class PainterVisual(VisualHandler):
 
         if cls.__current_shake_amount >= cls.__max_shake_offset:
             # Reached maximum positive offset, so go the other way
-            cls.__shake_increment = -cls.__SHAKE_PERFRAME
+            cls.__shake_increment = -cls.__shake_perframe
         elif cls.__current_shake_amount <= -cls.__max_shake_offset:
             # Reached maximum negative offset, so back to the centre
-            cls.__shake_increment = cls.__SHAKE_PERFRAME
+            cls.__shake_increment = cls.__shake_perframe
             cls.__stopping_shake = True
         elif cls.__current_shake_amount == 0 and cls.__stopping_shake:
             # Got back to the centre after reaching max negative,
@@ -75,8 +74,7 @@ class PainterVisual(VisualHandler):
         '''Draw the painter onscreen.
         The painter appears as an arrowhead shape in a cell.'''
 
-        # Get the pixel position of the cell,
-        # and dimension of a cell to use for scaling.
+        # Get the pixel position of the cell.
         topleft_x, topleft_y = FloorVisual.topleft_for(cls.__position)
 
         # Offset into the cell based on current direction facing
@@ -109,6 +107,7 @@ class PainterVisual(VisualHandler):
         # Use a fraction of the space available as padding.
         cls.__padding = cell_dimens // cls.__PADDING_FRACTION
         cls.__max_shake_offset = cls.__padding // cls.__SHAKE_FRACTION
+        cls.__shake_perframe = int(cls.__max_shake_offset / cls.__SHAKE_PERFRAME_FRACTION)
         # Subtract padding to find the space available.
         graphic_dimens = cell_dimens - cls.__padding * 2
         # Find offset into the cell
@@ -125,7 +124,7 @@ class PainterVisual(VisualHandler):
     def __find_vertices(cls, x: int, y: int, direction: int):
         '''Return position vectors for the vertices of an
         arrowhead shape centred at the given x,y position
-        using the stored scale factor, facing in the stored direction.
+        using the stored scale factor, facing in the given direction.
         Called in draw().'''
 
         # Facing up by default,
