@@ -1,9 +1,9 @@
 from ..abstract_states import State
+from ..floor_manager import FloorManager
+from ..menu_visual import MenuVisual
 from ..game.floor_visual import FloorVisual
 from ..game.painter_visual import PainterVisual
-from ..game.menu_visual import MenuVisual
 from ..editor.floor_data import FloorData
-from ..game.floor_manager import FloorManager
 
 from .tcase_handlers import FloorViewerControl, FloorViewerWithPainterControl, ViewerControl, MenuTesterControl
 

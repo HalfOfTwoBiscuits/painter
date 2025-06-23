@@ -1,7 +1,7 @@
-from .game.game_states import FloorpackSelectState
-from .game.visual_handler_base import VisualHandler
-from .game.floor_manager import FloorManager
 import pygame as pg
+from .floor_manager import FloorManager
+from .visual_handler_base import VisualHandler
+from .game.game_states import FloorpackSelectState
 
 def setup_state(editor: bool=False):
     '''Return the initial state used by the game,

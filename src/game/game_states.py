@@ -1,12 +1,12 @@
 from ..abstract_states import State, GameContentSelectState
+from ..floor_manager import FloorManager
+from ..menu_visual import MenuVisual
 from .painter_input import PainterControl
 from .pause_input import PauseMenuControl, RestartMenuControl, RestartExitMenuControl, FloorClearMenuControl
 from .floorselect_input import LevelSelectControl, FloorpackSelectControl
 from .painter_visual import PainterVisual
 from .floor_visual import FloorVisual
-from .menu_visual import MenuVisual
 from .floor_player import FloorPlayer
-from .floor_manager import FloorManager
 
 class NewFloorState(State):
     '''The player has chosen to start a new floor.

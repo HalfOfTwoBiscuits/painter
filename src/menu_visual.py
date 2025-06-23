@@ -1,7 +1,7 @@
 import pygame as pg
 from math import ceil
 from .visual_handler_base import VisualHandler
-from ..file_utility import FileUtility
+from .file_utility import FileUtility
 
 class MenuVisual(VisualHandler):
     '''A visual for menus where the player chooses a numbered option.

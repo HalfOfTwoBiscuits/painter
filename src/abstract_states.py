@@ -1,5 +1,5 @@
 from abc import ABC
-from .game.menu_visual import MenuVisual
+from .menu_visual import MenuVisual
 
 class State(ABC):
     _INPUT_HANDLER = None

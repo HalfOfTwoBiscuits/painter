@@ -1,4 +1,4 @@
-from ..file_utility import FileUtility
+from .file_utility import FileUtility
 import copy
 import os
 import yaml
@@ -8,7 +8,7 @@ import yaml
 # so that when we load the floor yaml in the built version of the project,
 # floor_data.py is included in the build.
 # It's imported in this file because the floor yaml is loaded in this file.
-from ..editor.floor_data import FloorData
+from .editor.floor_data import FloorData
 
 class FloorManager:
     '''Class responsible for creating and storing floor data.'''
