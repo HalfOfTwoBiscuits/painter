@@ -36,9 +36,9 @@ class RestartExitMenuControl(RestartMenuControl):
 
     _ACTIONS = {
         pg.K_1 : ('restart',),
-        pg.K_RETURN : ('restart',),
         pg.K_BACKSPACE : ('restart',),
         pg.K_2 : ('exit',),
+        pg.K_RETURN : ('exit',),
         pg.K_ESCAPE : ('exit',),
     }
 
