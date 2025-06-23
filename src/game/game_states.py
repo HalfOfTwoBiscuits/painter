@@ -1,5 +1,4 @@
-from abc import ABC
-
+from ..abstract_states import State, GameContentSelectState
 from .painter_input import PainterControl
 from .pause_input import PauseMenuControl, RestartMenuControl, RestartExitMenuControl, FloorClearMenuControl
 from .floorselect_input import LevelSelectControl, FloorpackSelectControl
@@ -8,42 +7,6 @@ from .floor_visual import FloorVisual
 from .menu_visual import MenuVisual
 from .floor_player import FloorPlayer
 from .floor_manager import FloorManager
-
-class State:
-    _INPUT_HANDLER = None
-    _VISUAL_HANDLERS = ()
-
-    @classmethod
-    def enter(cls):
-        '''Method called when the program enters this state.
-        Optional to implement.'''
-        ...
-
-    @classmethod
-    def process_input(cls, key_pressed):
-        '''Respond to a key press. Delegates to InputHandler.process_input().
-        Return any string identifier of a new state to change to.'''
-        i_handler = cls.get_input_handler()
-        # get_input_handler() can return None to end the program
-        if i_handler is None: return True
-
-        # Input handler may be a class or an instance, so 'self' is passed manually
-        new_state = i_handler.process_input(i_handler, key_pressed)
-        return new_state
-
-    @classmethod
-    def get_input_handler(cls):
-        '''Method that returns the input handler used.
-        Defaults to the value of the _INPUT_HANDLER attribute.
-        It is public only for unit tests, otherwise it is only called in process_input().
-        If it returns None to process_input() then the program ends.'''
-        return cls._INPUT_HANDLER
-    
-    @classmethod
-    def get_visual_handlers(cls):
-        '''Method that returns the visual handlers used.
-        Defaults to the value of the _VISUAL_HANDLERS attribute.'''
-        return cls._VISUAL_HANDLERS
 
 class NewFloorState(State):
     '''The player has chosen to start a new floor.
@@ -97,26 +60,6 @@ class PauseMenuState(State):
         if cls.__visual_handlers is None:
             cls.__visual_handlers = (FloorVisual, PainterVisual, MenuVisual(cls.__TITLE, cls.__OPTION_NAMES))
         return cls.__visual_handlers
-
-class GameContentSelectState(ABC, State):
-    '''Base class for floor select and floorpack select.'''
-    _menu_input_handler = None
-    _menu_visual = None
-    _TITLE = 'Menu'
-
-    @classmethod
-    def _setup_menu_visual(cls, menu_options: list[str]):
-        cls._menu_visual = MenuVisual(cls._TITLE, menu_options)
-
-    @classmethod
-    def get_visual_handlers(cls):
-        '''Return a MenuVisual instance with the levels as options,
-        as created when entering this state.'''
-        return (cls._menu_visual,)
-    
-    @classmethod
-    def get_input_handler(cls):
-        return cls._menu_input_handler
 
 class LevelSelectState(GameContentSelectState):
     '''The player is choosing a floor to play from a floorpack.

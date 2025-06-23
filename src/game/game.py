@@ -1,4 +1,4 @@
-from . import states
+from . import game_states
 from .visual_handler_base import VisualHandler
 import asyncio
 import pygame as pg
@@ -20,7 +20,7 @@ class Game:
             self.__state = InitialState
             new_state_name = InitialState.enter()
             if new_state_name is not None:
-                InitialState = getattr(states, new_state_name)
+                InitialState = getattr(game_states, new_state_name)
         self.__window = window
 
     def main(self):
@@ -58,7 +58,7 @@ class Game:
                     if isinstance(new_state, bool): return new_state
                     # Change state
                     print ('New state:', new_state)
-                    self.__state = getattr(states, new_state)
+                    self.__state = getattr(game_states, new_state)
                     # Call the enter() method, which can *also* cause a change of state:
                     # for temporary states that do processing before moving on
                     new_state = self.__state.enter()

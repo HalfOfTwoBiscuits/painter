@@ -1,4 +1,4 @@
-from ..game.states import State
+from ..abstract_states import State
 from ..game.floor_visual import FloorVisual
 from ..game.painter_visual import PainterVisual
 from ..game.menu_visual import MenuVisual

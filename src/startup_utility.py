@@ -1,4 +1,4 @@
-from .game.states import FloorpackSelectState
+from .game.game_states import FloorpackSelectState
 from .game.visual_handler_base import VisualHandler
 from .game.floor_manager import FloorManager
 import pygame as pg
