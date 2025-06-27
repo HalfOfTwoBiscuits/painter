@@ -1,7 +1,6 @@
-from ..game.input_handler_base import InputHandler
+from ..abstract_handlers import InputHandler, ArbitraryOptionsControl
 from ..game.floor_visual import FloorVisual
 from ..game.painter_visual import PainterVisual
-from ..game.floorselect_input import ArbitraryOptionsControl
 
 import pygame as pg
 

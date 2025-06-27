@@ -1,5 +1,5 @@
 import pygame as pg
-from ..file_utility import FileUtility
+from .file_utility import FileUtility
 
 class SFXPlayer:
     '''Class responsible for playing sound effects.'''

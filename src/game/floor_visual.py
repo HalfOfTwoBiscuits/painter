@@ -1,4 +1,4 @@
-from .visual_handler_base import VisualHandler
+from ..abstract_handlers import VisualHandler
 import pygame as pg
 
 class FloorVisual(VisualHandler):

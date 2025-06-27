@@ -1,6 +1,6 @@
 import pygame as pg
 from math import ceil
-from .visual_handler_base import VisualHandler
+from ..abstract_handlers import VisualHandler
 from ..file_utility import FileUtility
 
 class MenuVisual(VisualHandler):
