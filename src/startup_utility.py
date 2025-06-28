@@ -1,6 +1,6 @@
 import pygame as pg
 from .abstract_handlers import VisualHandler
-from .game.floor_manager import FloorManager
+from .floor_manager import FloorManager
 
 def setup_state(editor: bool=False):
     '''Return the initial state used by the game,
