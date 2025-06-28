@@ -11,27 +11,20 @@ class App(ABC):
     # For frame rate limiting
     __clock = pg.time.Clock()
 
-    # Source file for states: game_states.py or editor_states.py
+    # Source file for states:
+    # game_states.py, editor_states.py, tcase_states.py, or all_states.py
     # Specified by children.
     _state_module = None
 
-    def __init__(self, InitialState, window):
-        '''Store window, set up and store initial state.'''
-        
-        new_state_name = 'maybe'
-
-        # The initial state may be temporary and forward on to a new one.
-        # Repeatedly call enter() until it doesn't return another state name to change to.
-        while new_state_name is not None:
-            self.__state = InitialState
-            new_state_name = InitialState.enter()
-            if new_state_name is not None:
-                InitialState = getattr(self.__class__._state_module, new_state_name)
+    def __init__(self, initial_state_name: str, window):
+        '''Store window, enter initial state.'''
+        self.__change_state(initial_state_name)
         self.__window = window
 
     def main(self):
         '''Run game loop.
-        Allow returning an output True for successful unit test or False for unsucessful.'''
+        Allow returning an output:
+        True for successful unit test or False for unsucessful.'''
         output = None
         while output is None: output = self.loop()
         return output
@@ -57,17 +50,10 @@ class App(ABC):
             if e.type == pg.KEYDOWN:
                 # Process input: make stuff actually happen
                 new_state = self.__state.process_input(e.key)
-                # and if a string value was returned, change to the state with that name
-                # input may result in repeated state change
-                while new_state is not None:
-                    # For test cases: returning a boolean value indicates success/failure.
-                    if isinstance(new_state, bool): return new_state
-                    # Change state
-                    print ('New state:', new_state)
-                    self.__state = getattr(self.__class__._state_module, new_state)
-                    # Call the enter() method, which can *also* cause a change of state:
-                    # for temporary states that do processing before moving on
-                    new_state = self.__state.enter()
+                # For test cases: returning a boolean value indicates success/failure.
+                if isinstance(new_state, bool): return new_state
+
+                self.__change_state(new_state)
         
         # Draw graphics
         VisualHandler.start_draw()
@@ -81,3 +67,18 @@ class App(ABC):
 
         # Limit frame rate
         self.__class__.__clock.tick(30)
+    
+    def __change_state(self, state_name: str):
+        '''Retrieve the given state, a class,
+        from the module specified where states are contained
+        (e.g. game_states.py, editor_states.py).
+        Set up the state with the enter() classmethod and store it for later use.
+        The enter() method may forward onto a different state to the one specified.'''
+
+        while state_name is not None:
+            # Change state
+            print ('New state:', state_name)
+            self.__state = getattr(self.__class__._state_module, state_name)
+            # Call the enter() method, which can *also* cause a change of state:
+            # for temporary states that do processing before moving on
+            state_name = self.__state.enter()

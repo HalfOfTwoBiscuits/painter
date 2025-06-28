@@ -1,7 +1,6 @@
 import pygame as pg
 from .abstract_handlers import VisualHandler
 from .game.floor_manager import FloorManager
-from .game.game_states import FloorpackSelectState
 
 def setup_state(editor: bool=False):
     '''Return the initial state used by the game,
@@ -9,11 +8,11 @@ def setup_state(editor: bool=False):
     To ensure all states can access necessary data,
     also load the game levels
     with FloorManager.load_floors()'''
-    initial_state = editor and None or FloorpackSelectState
+    initial_state_name = editor and None or "FloorpackSelectState"
 
     FloorManager.load_floors()
 
-    return initial_state
+    return initial_state_name
 
 def setup_window(editor: bool=False):
     '''Create and return the game window object
