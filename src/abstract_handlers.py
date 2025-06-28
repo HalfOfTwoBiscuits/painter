@@ -2,7 +2,7 @@ import pygame as pg
 from abc import abstractmethod, ABC
 from .audio_utility import SFXPlayer
 
-class InputHandler(ABC):
+class KeyboardInputHandler(ABC):
     '''A base class for input handlers that specifies the
     process_input() method to respond to key presses.'''
 
@@ -36,7 +36,7 @@ class InputHandler(ABC):
             state_change = method_to_call(*arguments)
             return state_change
         
-class ArbitraryOptionsControl(InputHandler, ABC):
+class ArbitraryOptionsControl(KeyboardInputHandler, ABC):
     '''Base class for an input handler that uses the MenuVisual
     to prompt the user to choose from an arbitrary list of options.'''
     _menu = None

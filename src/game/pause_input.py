@@ -1,11 +1,11 @@
 import pygame as pg
-from ..abstract_handlers import InputHandler
+from ..abstract_handlers import KeyboardInputHandler
 from ..audio_utility import SFXPlayer
 from .painter_visual import PainterVisual
 from .floor_player import FloorPlayer
 from .floor_manager import FloorManager
 
-class RestartMenuControl(InputHandler):
+class RestartMenuControl(KeyboardInputHandler):
     '''A menu with the ability to restart the floor.
     Used as a base class for the pause menu and floor complete menus,
     and when completing the only floor in the only floorpack.'''

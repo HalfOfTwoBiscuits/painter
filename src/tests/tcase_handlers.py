@@ -1,10 +1,10 @@
-from ..abstract_handlers import InputHandler, ArbitraryOptionsControl
+from ..abstract_handlers import KeyboardInputHandler, ArbitraryOptionsControl
 from ..game.floor_visual import FloorVisual
 from ..game.painter_visual import PainterVisual
 
 import pygame as pg
 
-class ViewerControl(InputHandler):
+class ViewerControl(KeyboardInputHandler):
     '''Input handler when testing whether a displayed graphic looks right.'''
     _ACTIONS = {
         pg.K_RETURN : ('good',),

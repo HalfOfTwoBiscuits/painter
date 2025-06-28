@@ -1,11 +1,11 @@
 import pygame as pg
-from ..abstract_handlers import InputHandler
+from ..abstract_handlers import KeyboardInputHandler
 from ..audio_utility import SFXPlayer
 from .painter_visual import PainterVisual
 from .floor_player import FloorPlayer
 from .floor_manager import FloorManager
 
-class PainterControl(InputHandler):
+class PainterControl(KeyboardInputHandler):
     '''Input handler for when playing a level.
     Move with the arrows, use backspace to undo,
     and control or escape to open the menu.'''
