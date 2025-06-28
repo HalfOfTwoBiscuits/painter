@@ -1,6 +1,6 @@
 from ..abstract_handlers import ArbitraryOptionsControl
 from ..audio_utility import SFXPlayer
-from .floor_manager import FloorManager
+from ..floor_manager import FloorManager
 
 class LevelSelectControl(ArbitraryOptionsControl):
     '''Input handler for floor selection.'''

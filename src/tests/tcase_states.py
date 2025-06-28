@@ -3,7 +3,7 @@ from ..game.floor_visual import FloorVisual
 from ..game.painter_visual import PainterVisual
 from ..game.menu_visual import MenuVisual
 from ..editor.floor_data import FloorData
-from ..game.floor_manager import FloorManager
+from .tcase_floor_manager import TestFloorManager
 
 from .tcase_handlers import FloorViewerControl, FloorViewerWithPainterControl, ViewerControl, MenuTesterControl
 
@@ -115,5 +115,5 @@ class GameplayTester(State):
     def enter(cls):
         # Start gameplay using the test floorpack.
         fpack = list_of_floors()
-        FloorManager.insert_test_floorpack(fpack)
+        TestFloorManager.insert_test_floorpack(fpack)
         return "NewFloorState"

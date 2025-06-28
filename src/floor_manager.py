@@ -1,22 +1,22 @@
-from ..file_utility import FileUtility
-import copy
+from .file_utility import FileUtility
 import os
 import yaml
+from copy import deepcopy
 
 # FloorData is not used here: the floors to paint are created beforehand.
 # But it must be imported somewhere in the main project for pyinstaller to detect it exists,
 # so that when we load the floor yaml in the built version of the project,
 # floor_data.py is included in the build.
 # It's imported in this file because the floor yaml is loaded in this file.
-from ..editor.floor_data import FloorData
+from .editor.floor_data import FloorData
 
 class FloorManager:
     '''Class responsible for creating and storing floor data.'''
 
     # Data for floors (levels)
-    __floor_packs = {}
+    _floor_packs = {}
     # String ID of the current list of floors
-    __current_pack_id = ''
+    _current_pack_id = ''
     # Index of the floor to play next
     __next_floor_index = 0
 
@@ -45,13 +45,13 @@ class FloorManager:
                 
                 # Retrieve fname without extention: the floorpack ID used as a key
                 floorpack_id = fname[:fname.index('.')]
-                cls.__floor_packs[floorpack_id] = floorpack
-    
+                cls._floor_packs[floorpack_id] = floorpack
+
     @classmethod
     def floorpack_is_over(cls):
         '''Return a boolean indicating whether the floorpack is over.
         True : All floors clear, False : Moving on to the next floor'''
-        floorpack = cls.__floor_packs[cls.__current_pack_id]
+        floorpack = cls._floor_packs[cls._current_pack_id]
         return cls.__next_floor_index == len(floorpack)
     
     @classmethod
@@ -61,41 +61,41 @@ class FloorManager:
         Assumes the floorpack is not over.'''
         
         # Get next floor
-        floorpack = cls.__floor_packs[cls.__current_pack_id]
+        floorpack = cls._floor_packs[cls._current_pack_id]
         print (f'Moving onto {cls.__next_floor_index + 1} of {len(floorpack)}')
         floor = floorpack[cls.__next_floor_index]
         
         # Increment progression index
         cls.__next_floor_index += 1
-        return copy.deepcopy(floor)
+        return deepcopy(floor)
     
     @classmethod
     def get_floorpack_names(cls):
         '''Return a list of the names of floorpacks.
         They can then be options in floorpack selection.'''
-        return [name for name in cls.__floor_packs.keys()]
+        return [name for name in cls._floor_packs.keys()]
     
     @classmethod
     def get_num_floorpacks(cls):
         '''Return the number of floorpacks.'''
-        return len(cls.__floor_packs)
+        return len(cls._floor_packs)
     
     @classmethod
     def select_floorpack(cls, pack_name: str):
         '''Floors will be chosen from the floorpack with this name.'''
-        cls.__current_pack_id = pack_name
+        cls._current_pack_id = pack_name
     
     @classmethod
     def get_floor_names(cls):
         '''Return a list of the names of levels in the current floorpack:
         'Floor 1', 'Floor 2', and so on, to be picked from in the level select menu.'''
-        floorpack = cls.__floor_packs[cls.__current_pack_id]
+        floorpack = cls._floor_packs[cls._current_pack_id]
         return [f'Floor {index + 1}' for index in range(len(floorpack))]
     
     @classmethod
     def get_num_floors(cls):
         '''Return the number of floors in the current pack.'''
-        floorpack = cls.__floor_packs[cls.__current_pack_id]
+        floorpack = cls._floor_packs[cls._current_pack_id]
         return len(floorpack)
     
     @classmethod
@@ -113,14 +113,3 @@ class FloorManager:
         # the last character in the string is the floor number.
         # Cast to an integer and subtract 1 to find the index of the floor.
         return int(floor_name[-1]) - 1
-    
-    @classmethod
-    def insert_test_floorpack(cls, pack: list):
-        '''Add an already-loaded floorpack to the manager,
-        and select it to be played.
-        Used in tests, where the floor data is created manually
-        and interacted with. Not for actual gameplay.'''
-        TEST_FLOORPACK_ID = 'TEST'
-
-        cls.__floor_packs[TEST_FLOORPACK_ID] = pack
-        cls.select_floorpack(TEST_FLOORPACK_ID)

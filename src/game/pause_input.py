@@ -3,7 +3,7 @@ from ..abstract_handlers import KeyboardInputHandler
 from ..audio_utility import SFXPlayer
 from .painter_visual import PainterVisual
 from .floor_player import FloorPlayer
-from .floor_manager import FloorManager
+from ..floor_manager import FloorManager
 
 class RestartMenuControl(KeyboardInputHandler):
     '''A menu with the ability to restart the floor.

@@ -6,7 +6,7 @@ from .painter_visual import PainterVisual
 from .floor_visual import FloorVisual
 from .menu_visual import MenuVisual
 from .floor_player import FloorPlayer
-from .floor_manager import FloorManager
+from ..floor_manager import FloorManager
 
 class NewFloorState(State):
     '''The player has chosen to start a new floor.
