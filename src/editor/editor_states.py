@@ -1,7 +1,8 @@
 from ..abstract_states import State, GameContentSelectState
 from ..game.menu_visual import MenuVisual
 from .editor_floor_manager import EditorFloorManager
-from .editor_floorselect_input import EditFloorpacksControl, EditFloorsControl, MoveFloorControl, FloorDestinationControl
+from .editor_floorselect_input import EditFloorpacksControl, EditFloorsControl, MoveFloorControl, FloorDestinationControl, \
+    SelectFloorToDeleteControl, ConfirmDeleteFloorControl
 
 class EditFloorpacksState(GameContentSelectState):
     _TITLE = 'Select Floor Pack'
@@ -10,8 +11,9 @@ class EditFloorpacksState(GameContentSelectState):
     @classmethod
     def enter(cls):
         '''Create a menu with the floorpack names, plus a 'Create Floorpack' option.'''
+        # TODO: make this method generic in a parent. Maybe for the ingame floor select too.
+        # FLOOR_MANAGER and INPUT_HANDLER_CLASS and OTHER_OPTIONS can be class constants.
         packnames = EditorFloorManager.get_floorpack_names()
-        
         options = packnames + [cls.__CREATE_OPTION]
         cls._setup_menu_visual(options)
         cls._menu_input_handler = EditFloorpacksControl(cls._menu_visual, cls.__CREATE_OPTION)
@@ -20,7 +22,8 @@ class EditFloorsState(GameContentSelectState):
     _TITLE = 'Select Floor To Edit'
     __CREATE_OPTION = 'Create New'
     __MOVE_OPTION = 'Re-order'
-    __BACK_OPTION = 'Another Floorpack'
+    __DELETE_OPTION = 'Delete'
+    __BACK_OPTION = 'Back'
 
     @classmethod
     def enter(cls):
@@ -28,10 +31,10 @@ class EditFloorsState(GameContentSelectState):
         create a new floor or move an existing one.'''
         floornames = EditorFloorManager.get_floor_names()
 
-        options = floornames + [cls.__CREATE_OPTION, cls.__MOVE_OPTION, cls.__BACK_OPTION]
+        options = floornames + [cls.__CREATE_OPTION, cls.__MOVE_OPTION, cls.__DELETE_OPTION, cls.__BACK_OPTION]
         cls._setup_menu_visual(options)
         cls._menu_input_handler = EditFloorsControl(
-            cls._menu_visual, cls.__CREATE_OPTION, cls.__MOVE_OPTION, cls.__BACK_OPTION)
+            cls._menu_visual, cls.__CREATE_OPTION, cls.__MOVE_OPTION, cls.__DELETE_OPTION, cls.__BACK_OPTION)
         
 class SelectFloorToMoveState(GameContentSelectState):
     _TITLE = 'Select Floor To Move'
@@ -40,7 +43,6 @@ class SelectFloorToMoveState(GameContentSelectState):
     @classmethod
     def enter(cls):
         floornames = EditorFloorManager.get_floor_names()
-
         options = floornames + [cls.__BACK_OPTION]
         cls._setup_menu_visual(options)
         cls._menu_input_handler = MoveFloorControl(cls._menu_visual, cls.__BACK_OPTION)
@@ -58,3 +60,26 @@ class SelectFloorDestinationState(GameContentSelectState):
 
         cls._menu_visual = MenuVisual(cls._TITLE, menu_options, option_ids=floornames)
         cls._menu_input_handler = FloorDestinationControl(cls._menu_visual, cls.__BACK_OPTION)
+
+class SelectFloorToDeleteState(GameContentSelectState):
+    _TITLE = 'Select Floor To Delete'
+    __BACK_OPTION = 'Cancel'
+
+    @classmethod
+    def enter(cls):
+        floornames = EditorFloorManager.get_floor_names()
+        options = floornames + [cls.__BACK_OPTION]
+        cls._setup_menu_visual(options)
+        cls._menu_input_handler = SelectFloorToDeleteControl(cls._menu_visual, cls.__BACK_OPTION)
+
+class ConfirmDeleteFloorState(State):
+    __TITLE = 'Are you sure?'
+    __OPTION_NAMES = ['Confirm', 'Cancel']
+    _INPUT_HANDLER = ConfirmDeleteFloorControl
+    __visual_handlers = None
+    
+    @classmethod
+    def get_visual_handlers(cls):
+        if cls.__visual_handlers is None:
+            cls.__visual_handlers = (MenuVisual(cls.__TITLE, cls.__OPTION_NAMES),)
+        return cls.__visual_handlers

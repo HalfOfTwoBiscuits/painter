@@ -87,6 +87,38 @@ class ArbitraryOptionsControl(KeyboardInputHandler, ABC):
         SFXPlayer.play_sfx('move')
         self._menu.prev_page()
 
+class ArbitraryOptionsControlWithBackButton(ArbitraryOptionsControl, ABC):
+    def __init__(self, menu_visual_obj, BACK_OPTION_ID: str):
+        super().__init__(menu_visual_obj)
+        self._BACK_OPTION = BACK_OPTION_ID
+        self.__class__._variable_actions[pg.K_BACKSPACE] = ('back',)
+        self.__class__._variable_actions[pg.K_ESCAPE] = ('back',)
+
+    def _check_for_back_option(self, number: int):
+        '''If the back option was selected, return True.
+        If another option was selected, return False.
+        If the selection was invalid, raise ValueError.
+        Store option ID for later reference so find_option_for_number
+        doesn't have to be called again.'''
+
+        # Small optimisation: make _find_option_for_number raise ValueError.
+        self._option_id = self._find_option_for_number(number)
+        if self._option_id is None: raise ValueError
+        elif self._option_id == self._BACK_OPTION:
+            SFXPlayer.play_sfx('menu')
+            return True
+        return False
+    
+    @staticmethod
+    @abstractmethod
+    def back():
+        ...
+
+class FloorManagementControl(ArbitraryOptionsControlWithBackButton, ABC):
+    @staticmethod
+    def back():
+        return 'EditFloorsState'
+
 class VisualHandler:
     '''Has access to the window surface to draw graphics onto,
     and implements a draw() method.

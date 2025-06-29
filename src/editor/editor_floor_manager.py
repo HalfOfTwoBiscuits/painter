@@ -59,6 +59,16 @@ class EditorFloorManager(FloorManager):
         cls.__move_floor(cls.__floor_index_to_move, to_index)
 
     @classmethod
+    def select_floor_to_delete(cls, index: int):
+        '''Store a floor index for later use by delete_selected_floor().
+        Assumes the index is in the pack.'''
+        cls.__floor_index_to_delete = index
+    
+    @classmethod
+    def delete_selected_floor(cls):
+        del cls._floor_packs[cls._current_pack_id][cls.__floor_index_to_delete]
+
+    @classmethod
     def save_floorpack(cls):
         '''Save the current floorpack into a YAML file in the resources/floors directory.
         Does not check whether the file exists or not, though,
