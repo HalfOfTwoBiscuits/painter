@@ -16,12 +16,13 @@ class EditFloorpacksControl(ArbitraryOptionsControl):
         option_id = self._find_option_for_number(number)
         if option_id is None: return
         
-        SFXPlayer.play_sfx('menu')
         if option_id == self.__CREATE_OPTION:
             # Create floorpack.
+            SFXPlayer.play_sfx('menu')
             return 'CreateFloorpackState'
 
         # Edit floorpack.
+        SFXPlayer.play_sfx('start')
         EditorFloorManager.select_floorpack(option_id)
         return 'EditFloorsState'
 
