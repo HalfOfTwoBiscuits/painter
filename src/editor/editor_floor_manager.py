@@ -30,21 +30,33 @@ class EditorFloorManager(FloorManager):
 
     @classmethod
     def create_floor(cls):
-        '''Create a 3x3 floor where the painter starts at 0,0
-        and insert it at the end of the current floorpack.'''
-        floor = FloorData(0,0)
+        '''Create a 3x3 floor where the painter starts at 0,0.
+        Insert it at the end of the current floorpack,
+        and select it.'''
+        floor = FloorData(3,3)
         floor.set_initial_painter_position((0,0))
         pack = cls._floor_packs[cls._current_pack_id]
         pack.append(floor)
+        cls.select_floor(len(pack) - 1)
 
     @classmethod
-    def move_floor(cls, from_index: int, to_index: int):
-        '''Move the floor at the given index in the pack to a different index.
-        By the behaviour of list.pop(),
-        will raise IndexError if from_index is outside the pack.'''
+    def __move_floor(cls, from_index: int, to_index: int):
+        '''Move the floor at the given index in the pack to a different index.'''
         pack = cls._floor_packs[cls._current_pack_id]
         floor = pack.pop(from_index)
         pack.insert(to_index, floor)
+
+    @classmethod
+    def select_floor_to_move(cls, index: int):
+        '''Store a floor index for later use by move_selected_floor().
+        Assumes the index is in the pack.'''
+        cls.__floor_index_to_move = index
+    
+    @classmethod
+    def move_selected_floor(cls, to_index: int):
+        '''Move the floor at the index previously given to select_floor_to_move()
+        to the other index given.'''
+        cls.__move_floor(cls.__floor_index_to_move, to_index)
 
     @classmethod
     def save_floorpack(cls):

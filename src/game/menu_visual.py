@@ -8,7 +8,7 @@ class MenuVisual(VisualHandler):
     Unlike the other visual handlers an instance is created rather than using the class:
     this is because the options can vary but the logic is the same.'''
 
-    __OPTIONS_PER_PAGE = 5 # Maximum of 9, to correspond with the number keys 1-9
+    __OPTIONS_PER_PAGE = 9 # Maximum of 9, to correspond with the number keys 1-9
     __PADDING_PX = 4 # Used for option padding and rounding of corners
     __SIDE_PADDING = 10 # Added to pad the edge
 
@@ -25,9 +25,10 @@ class MenuVisual(VisualHandler):
     __FONT = pg.font.Font(__FONT_PATH, 17)
     __TITLE_FONT = pg.font.Font(__FONT_PATH, 20)
 
-    def __init__(self, title: str, options: list[str]):
+    def __init__(self, title: str, options: list[str], option_ids: list[str]=[]):
         self.__title = title
         self.__options = options
+        self.__option_ids = option_ids
         self.__page_index = 0
         self.__num_pages = ceil(len(options) / self.__class__.__OPTIONS_PER_PAGE)
 
@@ -145,7 +146,13 @@ class MenuVisual(VisualHandler):
                 # Multiply __OPTIONS_PER_PAGE by the page index to find how many along we already are,
                 # and add number_pressed - 1
                 option_index = index_increment + self.__first_option_index(self.__page_index)
-                return self.__options[option_index]
+                try:
+                    id = self.__option_ids[option_index]
+                    if id is None: raise IndexError
+                except IndexError:
+                    return self.__options[option_index]
+                else:
+                    return id
             
             # Raise error if the number isn't within 1 to __OPTIONS_PER_PAGE
             # or the resulting index is past the final option

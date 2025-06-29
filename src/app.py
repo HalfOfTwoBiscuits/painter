@@ -54,6 +54,7 @@ class App(ABC):
                 if isinstance(new_state, bool): return new_state
 
                 self.__change_state(new_state)
+            else: self._process_other_event(e)
         
         # Draw graphics
         VisualHandler.start_draw()
@@ -82,3 +83,6 @@ class App(ABC):
             # Call the enter() method, which can *also* cause a change of state:
             # for temporary states that do processing before moving on
             state_name = self.__state.enter()
+
+    def _process_other_event(self, event):
+        ...
