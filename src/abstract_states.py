@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 from .game.menu_visual import MenuVisual
 
 class State(ABC):
@@ -16,8 +16,9 @@ class State(ABC):
         '''Respond to a key press. Delegates to InputHandler.process_input().
         Return any string identifier of a new state to change to.'''
         i_handler = cls.get_input_handler()
-        # get_input_handler() can return None to end the program
-        if i_handler is None: return True
+        # get_input_handler() can return None for no input or True to end the program
+        if i_handler is True: return True
+        elif i_handler is None: return
 
         # Input handler may be a class or an instance, so 'self' is passed manually
         new_state = i_handler.process_input(i_handler, key_pressed)
@@ -56,3 +57,16 @@ class GameContentSelectState(State, ABC):
     @classmethod
     def get_input_handler(cls):
         return cls._menu_input_handler
+    
+class StateWithGUI(State, ABC):
+
+    @classmethod
+    @abstractmethod
+    def process_bespoke_input(cls, event):
+        '''Serves the same purpose as process_input, but addresses
+        flexible sorts of input based on the event, rather than
+        just keyboard input using the predefined structure of
+        an input handler.
+        Will not be called for keypresses;
+        this is used for GUIs that make use of the mouse.'''
+        ...

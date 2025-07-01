@@ -96,8 +96,8 @@ class MenuTester(State):
     
     @classmethod
     def get_input_handler(cls):
-        # Returning None finishes test.
-        if cls.__success: return
+        # Returning True finishes test.
+        if cls.__success: return True
         return cls.__input_handler
     
     @classmethod
