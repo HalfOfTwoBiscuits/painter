@@ -1,8 +1,11 @@
-from ..abstract_states import State, GameContentSelectState
+import pygame_gui as gui
+from ..abstract_states import State, GameContentSelectState, StateWithGUI
 from ..game.menu_visual import MenuVisual
 from .editor_floor_manager import EditorFloorManager
 from .editor_floorselect_input import EditFloorpacksControl, EditFloorsControl, MoveFloorControl, FloorDestinationControl, \
     SelectFloorToDeleteControl, ConfirmDeleteFloorControl
+from .gui_visual import FloorpackCreateVisual
+from .gui_handler import GUIHandler, GUIElementDatum
 
 class EditFloorpacksState(GameContentSelectState):
     _TITLE = 'Select Floor Pack'
@@ -83,3 +86,25 @@ class ConfirmDeleteFloorState(State):
         if cls.__visual_handlers is None:
             cls.__visual_handlers = (MenuVisual(cls.__TITLE, cls.__OPTION_NAMES),)
         return cls.__visual_handlers
+
+class CreateFloorpackState(StateWithGUI):
+    '''Draft'''
+    __BUTTONS = {
+        'Create' : (0,0),
+    }
+    __CREATE_BUTTON = GUIElementDatum()
+    __visual_handler = None
+
+    @classmethod
+    def enter(cls):
+        cls.__visual_handler = FloorpackCreateVisual(cls.__BUTTONS)
+
+    @classmethod
+    def get_visual_handlers(cls):
+        return cls.__visual_handler
+
+    @classmethod
+    def process_bespoke_input(cls, event):
+        if event.type == gui.UI_BUTTON_PRESSED \
+            and event.ui_element == GUIHandler.get_element(cls.__CREATE_BUTTON.id):
+            return 'EditFloorpacksState'

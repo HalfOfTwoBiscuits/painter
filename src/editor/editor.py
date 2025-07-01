@@ -15,4 +15,7 @@ class Editor(App):
         GUIHandler.init(size)
 
     def _process_other_event(self, e):
-        GUIHandler.process_event(e)
+        GUIHandler.update(e)
+        try: new_state_name = self.__state.process_bespoke_input(e)
+        except AttributeError: pass
+        else: self.__change_state(new_state_name)
