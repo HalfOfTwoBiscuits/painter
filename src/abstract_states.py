@@ -70,3 +70,7 @@ class StateWithGUI(State, ABC):
         Will not be called for keypresses;
         this is used for GUIs that make use of the mouse.'''
         ...
+
+    @staticmethod
+    def _use_id_as_key(elems: set):
+        return {e['id'] : e for e in elems}

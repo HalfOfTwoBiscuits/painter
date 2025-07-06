@@ -5,7 +5,7 @@ from .editor_floor_manager import EditorFloorManager
 from .editor_floorselect_input import EditFloorpacksControl, EditFloorsControl, MoveFloorControl, FloorDestinationControl, \
     SelectFloorToDeleteControl, ConfirmDeleteFloorControl
 from .gui_visual import FloorpackCreateVisual
-from .gui_handler import GUIHandler, GUIElementDatum
+from .gui_handler import GUIHandler
 
 class EditFloorpacksState(GameContentSelectState):
     _TITLE = 'Select Floor Pack'
@@ -88,23 +88,24 @@ class ConfirmDeleteFloorState(State):
         return cls.__visual_handlers
 
 class CreateFloorpackState(StateWithGUI):
-    '''Draft'''
-    __BUTTONS = {
-        'Create' : (0,0),
-    }
-    __CREATE_BUTTON = GUIElementDatum()
-    __visual_handler = None
+    _VISUAL_HANDLERS = (FloorpackCreateVisual,)
+
+    __FIELD_ID = 'new_packname'
 
     @classmethod
     def enter(cls):
-        cls.__visual_handler = FloorpackCreateVisual(cls.__BUTTONS)
-
-    @classmethod
-    def get_visual_handlers(cls):
-        return cls.__visual_handler
+        FloorpackCreateVisual.init(cls.__FIELD_ID)
 
     @classmethod
     def process_bespoke_input(cls, event):
-        if event.type == gui.UI_BUTTON_PRESSED \
-            and event.ui_element == GUIHandler.get_element(cls.__CREATE_BUTTON.id):
-            return 'EditFloorpacksState'
+        match event.type:
+            case gui.UI_BUTTON_PRESSED:
+                '''Proof of concept for multiple buttons. Use form submit event.
+                if GUIHandler.id_for(event.ui_element) == "Create":
+                    packname = GUIHandler.
+                '''
+                return 'EditFloorpacksState'
+            case gui.UI_FORM_SUBMITTED:
+                packname = event.ui_element.get_current_values()[cls.__FIELD_ID]
+                EditorFloorManager.create_floorpack(packname)
+                return 'EditFloorpacksState'
