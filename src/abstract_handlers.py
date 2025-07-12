@@ -1,6 +1,7 @@
 import pygame as pg
 from abc import abstractmethod, ABC
 from .audio_utility import SFXPlayer
+from .editor.gui_handler import GUIHandler
 
 class KeyboardInputHandler(ABC):
     '''A base class for input handlers that specifies the
@@ -154,4 +155,4 @@ class GUIVisualHandler(VisualHandler, ABC):
 
     @classmethod
     def draw(cls):
-        pass
+        GUIHandler.draw(cls._window)

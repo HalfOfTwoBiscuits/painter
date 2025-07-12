@@ -18,7 +18,7 @@ class App(ABC):
 
     def __init__(self, initial_state_name: str, window):
         '''Store window, enter initial state.'''
-        self.__change_state(initial_state_name)
+        self._change_state(initial_state_name)
         self.__window = window
 
     def main(self):
@@ -49,16 +49,16 @@ class App(ABC):
                 return True
             if e.type == pg.KEYDOWN:
                 # Process input: make stuff actually happen
-                new_state = self.__state.process_input(e.key)
+                new_state = self._state.process_input(e.key)
                 # For test cases: returning a boolean value indicates success/failure.
                 if isinstance(new_state, bool): return new_state
 
-                self.__change_state(new_state)
-            else: self._process_other_event(e)
+                self._change_state(new_state)
+            self._process_other_event(e)
         
         # Draw graphics
         VisualHandler.start_draw()
-        handlers = self.__state.get_visual_handlers()
+        handlers = self._state.get_visual_handlers()
         for visual_handler in handlers:
             visual_handler.draw()
 
@@ -67,9 +67,10 @@ class App(ABC):
         pg.display.update()
 
         # Limit frame rate
-        self.__class__.__clock.tick(30)
+        delta_time = self.__class__.__clock.tick(30) / 1000
+        self._use_delta(delta_time)
     
-    def __change_state(self, state_name: str):
+    def _change_state(self, state_name: str):
         '''Retrieve the given state, a class,
         from the module specified where states are contained
         (e.g. game_states.py, editor_states.py).
@@ -79,10 +80,18 @@ class App(ABC):
         while state_name is not None:
             # Change state
             print ('New state:', state_name)
-            self.__state = getattr(self.__class__._state_module, state_name)
+            self._state = getattr(self.__class__._state_module, state_name)
             # Call the enter() method, which can *also* cause a change of state:
             # for temporary states that do processing before moving on
-            state_name = self.__state.enter()
+            state_name = self._state.enter()
 
     def _process_other_event(self, event):
+        '''Respond to other events than keyboard presses
+        or closing the game.
+        Overridden by the editor.'''
+        ...
+    
+    def _use_delta(self, dt: float):
+        '''Respond to the delta time since the last frame.
+        Overridden by the editor.'''
         ...

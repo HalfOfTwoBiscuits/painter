@@ -90,24 +90,19 @@ class ConfirmDeleteFloorState(State):
 class CreateFloorpackState(StateWithBespokeInput):
     _VISUAL_HANDLERS = (FloorpackCreateVisual,)
 
-    __FIELD_ID = 'new_packname'
+    __FIELD_ID = 'New Floorpack Name'
+    __CANCEL_ID = 'Cancel'
 
     @classmethod
     def enter(cls):
-        FloorpackCreateVisual.init(cls.__FIELD_ID)
+        FloorpackCreateVisual.init(cls.__FIELD_ID, cls.__CANCEL_ID)
 
     @classmethod
     def process_bespoke_input(cls, event):
         match event.type:
             case gui.UI_BUTTON_PRESSED:
-                '''Proof of concept for multiple buttons
-                and retrieval of data from a UITextEntryLine.
-                In actual implementation use form submit event
-                and only the cancel button is created separately and pressable.
-                if GUIHandler.id_for(event.ui_element) == "Create":
-                    packname = GUIHandler.get_element("CreateField").get_text()
-                '''
-                return 'EditFloorpacksState'
+                if event.ui_object_id.endswith(cls.__CANCEL_ID):
+                    return 'EditFloorpacksState'
             case gui.UI_FORM_SUBMITTED:
                 packname = event.ui_element.get_current_values()[cls.__FIELD_ID]
                 EditorFloorManager.create_floorpack(packname)
