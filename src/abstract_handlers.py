@@ -147,3 +147,11 @@ class VisualHandler:
     def start_draw(cls):
         '''Fill the surface with a background to prepare for drawing'''
         cls._window.fill(cls.__BG_COL)
+
+class GUIVisualHandler(VisualHandler, ABC):
+    '''Visual handler that makes use of the GUIHandler to create UI elements
+    rather than drawing graphics itself.'''
+
+    @classmethod
+    def draw(cls):
+        pass

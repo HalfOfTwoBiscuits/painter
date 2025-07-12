@@ -14,8 +14,8 @@ class GUIHandler:
         cls.__ui.process_events(e)
 
     @classmethod
-    def set_topleft(cls, x: int, y: int):
-        cls.__container.set_dimensions((x,y,0,0))
+    def set_dimensions(cls, x: int, y: int, w: int=0, h: int=0):
+        cls.__container.set_dimensions((x,y,w,h))
 
     @classmethod
     def add_button(cls, id: str, location_rect, text: str=None):
@@ -34,7 +34,7 @@ class GUIHandler:
                                            placeholder_text=placeholder,
                                            manager=cls.__ui,
                                            container=cls.__container)
-        cls.__store_elem(inp)
+        cls.__store_elem(inp, id)
 
     @classmethod
     def add_form(cls, id: str, location_rect, questionaire: dict[str:str]):
@@ -44,18 +44,28 @@ class GUIHandler:
                                   questionnaire=questionaire,
                                   manager=cls.__ui_manager,
                                   container=cls.__container)
-        cls.__store_elem(frm)
+        cls.__store_elem(frm, id)
+
     @classmethod
     def __store_elem(cls, element, id: str):
+        '''Store an element in the list of elements.
+        The given ID will have the same index in a separate list,
+        so that if the ID is stored outside the class, the element
+        can be retrieved.
+        (I think there's actually a built-in version of this in pygame-gui
+        that adds the ID to the event, that might be better in a refactor.)'''
         cls.__elements.append(element)
         cls.__element_ids.append(id)
 
     @classmethod
     def id_for(cls, elem_obj):
+        '''Get the ID corresponding to the element object from an event involving it.'''
         index = cls.__elements.index(elem_obj)
         return cls.__element_ids[index]
     
     @classmethod
     def get_element(cls, id: str):
+        '''Get the element with the given ID.
+        If there is more than one element with that ID, will go by order created.'''
         index = cls.__element_ids.index(id)
         return cls.__elements[index]

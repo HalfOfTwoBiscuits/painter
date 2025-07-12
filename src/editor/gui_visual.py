@@ -1,17 +1,16 @@
-from ..abstract_handlers import VisualHandler
+from ..abstract_handlers import GUIVisualHandler
 from .gui_handler import GUIHandler
-class FloorpackCreateVisual(VisualHandler):
-    __BUTTONS = {{'id' : 'Create', 'location_rect' : (20)},
-                {'id' : 'Cancel'}}
-    __TOPLEFT_X = 100
-    __TOPLEFT_Y = 100
+class FloorpackCreateVisual(GUIVisualHandler):
+    __CANCEL_BUTTON_RECT = (100,100,100,50)
+    __CANCEL_BUTTON_TEXT = 'Cancel'
+    __DIMENSIONS = (100,100,200,200) # Could base on window size.
+    __CREATE_BUTTON_TEXT = 'Create'
     
     @classmethod
     def init(cls, FIELD_ID: str):
-        for button_data in cls.__BUTTONS:
-            GUIHandler.add_button(
-                button_data['id'], button_data['location_rect'])
-        
-        GUIHandler.set_topleft(cls.__TOPLEFT_X, cls.__TOPLEFT_Y)
+        GUIHandler.set_dimensions(*cls.__DIMENSIONS)
 
-        
+        GUIHandler.add_button(cls.__CANCEL_BUTTON_TEXT, cls.__CANCEL_BUTTON_RECT)
+
+        # Don't seem to be able to specify submit button text as 'Create'
+        GUIHandler.add_form('frm', '{"%s" : "short_text"}' % FIELD_ID)
