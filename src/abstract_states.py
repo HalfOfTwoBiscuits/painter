@@ -58,7 +58,7 @@ class GameContentSelectState(State, ABC):
     def get_input_handler(cls):
         return cls._menu_input_handler
     
-class StateWithGUI(State, ABC):
+class StateWithBespokeInput(State, ABC):
 
     @classmethod
     @abstractmethod
@@ -67,10 +67,7 @@ class StateWithGUI(State, ABC):
         flexible sorts of input based on the event, rather than
         just keyboard input using the predefined structure of
         an input handler.
-        Will not be called for keypresses;
-        this is used for GUIs that make use of the mouse.'''
+        Will not be called for the usual pygame keypress events;
+        it responds to the events from pygame_gui in the editor
+        (and could hypothetically respond to other input)'''
         ...
-
-    @staticmethod
-    def _use_id_as_key(elems: set):
-        return {e['id'] : e for e in elems}

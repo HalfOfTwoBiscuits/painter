@@ -1,5 +1,5 @@
 import pygame_gui as gui
-from ..abstract_states import State, GameContentSelectState, StateWithGUI
+from ..abstract_states import State, GameContentSelectState, StateWithBespokeInput
 from ..game.menu_visual import MenuVisual
 from .editor_floor_manager import EditorFloorManager
 from .editor_floorselect_input import EditFloorpacksControl, EditFloorsControl, MoveFloorControl, FloorDestinationControl, \
@@ -87,7 +87,7 @@ class ConfirmDeleteFloorState(State):
             cls.__visual_handlers = (MenuVisual(cls.__TITLE, cls.__OPTION_NAMES),)
         return cls.__visual_handlers
 
-class CreateFloorpackState(StateWithGUI):
+class CreateFloorpackState(StateWithBespokeInput):
     _VISUAL_HANDLERS = (FloorpackCreateVisual,)
 
     __FIELD_ID = 'new_packname'
@@ -100,9 +100,12 @@ class CreateFloorpackState(StateWithGUI):
     def process_bespoke_input(cls, event):
         match event.type:
             case gui.UI_BUTTON_PRESSED:
-                '''Proof of concept for multiple buttons. Use form submit event.
+                '''Proof of concept for multiple buttons
+                and retrieval of data from a UITextEntryLine.
+                In actual implementation use form submit event
+                and only the cancel button is created separately and pressable.
                 if GUIHandler.id_for(event.ui_element) == "Create":
-                    packname = GUIHandler.
+                    packname = GUIHandler.get_element("CreateField").get_text()
                 '''
                 return 'EditFloorpacksState'
             case gui.UI_FORM_SUBMITTED:
