@@ -1,11 +1,11 @@
 import pygame_gui as gui
 from ..abstract_states import State, GameContentSelectState, StateWithBespokeInput
+from ..audio_utility import SFXPlayer
 from ..game.menu_visual import MenuVisual
 from .editor_floor_manager import EditorFloorManager
 from .editor_floorselect_input import EditFloorpacksControl, EditFloorsControl, MoveFloorControl, FloorDestinationControl, \
     SelectFloorToDeleteControl, ConfirmDeleteFloorControl
 from .gui_visual import FloorpackCreateVisual
-from .gui_handler import GUIHandler
 
 class EditFloorpacksState(GameContentSelectState):
     _TITLE = 'Select Floor Pack'
@@ -102,8 +102,10 @@ class CreateFloorpackState(StateWithBespokeInput):
         match event.type:
             case gui.UI_BUTTON_PRESSED:
                 if event.ui_object_id.endswith(cls.__CANCEL_ID):
+                    SFXPlayer.play_sfx('menu')
                     return 'EditFloorpacksState'
             case gui.UI_FORM_SUBMITTED:
                 packname = event.ui_element.get_current_values()[cls.__FIELD_ID]
                 EditorFloorManager.create_floorpack(packname)
+                SFXPlayer.play_sfx('start')
                 return 'EditFloorpacksState'
