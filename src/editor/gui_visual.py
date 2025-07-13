@@ -19,7 +19,7 @@ class FloorpackCreateVisual(CentredFixedSizeGUIVisualHandler):
 
 class EditorButtonsVisual(GUIVisualHandler):
     __MARGIN_PX = 4
-    __EDITOR_HEIGHT_FRAC = 2
+    __EDITOR_HEIGHT_FRAC = 3
     __BUTTON_WIDTH_FRAC = 1.5
     __BUTTON_HEIGHT_FRAC = 4
 

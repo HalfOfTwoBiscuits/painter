@@ -9,7 +9,7 @@ class FloorVisual(VisualHandler):
     __PAINT_COL = pg.Color(150,30,30)
     __WRAP_PAINT_COL = pg.Color(75,15,15)
     __BG_COL = pg.Color(0,0,0)
-    __EDITOR_HEIGHT_FRAC = 1.5
+    __EDITOR_HEIGHT_FRAC = 1.25
 
     @classmethod
     def new_floor(cls, floor_obj, editor: bool=False):
