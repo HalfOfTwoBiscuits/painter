@@ -163,3 +163,21 @@ class GUIVisualHandler(VisualHandler, ABC):
         '''Return the x, y position for a GUI element with the given width and height
         so that it is centred inside an area with the given dimensions.'''
         return (x_dimens - elem_w) // 2, (y_dimens - elem_h) // 2
+
+class CentredFixedSizeGUIVisualHandler(GUIVisualHandler, ABC):
+    _GUI_WIDTH = 175
+    _GUI_HEIGHT = 175
+
+    @classmethod
+    def _setup_container(cls):
+        '''Set the GUI to be centred in the window,
+        given it has the width and height specified.
+        Delegates to _centred_in_dimensions() but
+        allows reuse of the logic to create a centred GUI window.
+        Also clears existing GUI elements.'''
+
+        GUIHandler.clear_elements()
+        win_w, win_h = cls._window_dimensions
+        x, y = cls._centred_in_dimensions(win_w, win_h, cls._GUI_WIDTH, cls._GUI_HEIGHT)
+        GUIHandler.set_container(x, y, cls._GUI_WIDTH, cls._GUI_HEIGHT)
+        

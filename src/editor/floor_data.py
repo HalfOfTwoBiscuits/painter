@@ -66,6 +66,11 @@ class CellGrid:
         Called when loading a level, to set up visuals'''
         return self.__w, self.__h
     
+    def set_size(self, new_w: int, new_h: int):
+        '''Resize this grid. Called by the level editor.'''
+        self.__w = new_w
+        self.__h = new_h
+    
     def get_full_cell_positions(self):
         '''Return a list of positions where cells have been filled.
         Called when drawing level visuals and in the is_painted() method'''

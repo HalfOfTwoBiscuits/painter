@@ -8,7 +8,7 @@ from ..game.floor_visual import FloorVisual
 from .editor_floor_manager import EditorFloorManager
 from .editor_floorselect_input import EditFloorpacksControl, EditFloorsControl, MoveFloorControl, FloorDestinationControl, \
     SelectFloorToDeleteControl, ConfirmDeleteFloorControl
-from .gui_visual import FloorpackCreateVisual, EditorButtonsVisual
+from .gui_visual import FloorpackCreateVisual, EditorButtonsVisual, ResizeMenuVisual
 
 class EditFloorpacksState(GameContentSelectState):
     _TITLE = 'Select Floor Pack'
@@ -107,7 +107,7 @@ class CreateFloorpackState(StateWithBespokeInput):
         match event.type:
             case gui.UI_BUTTON_PRESSED:
                 if event.ui_object_id.endswith(cls.__CANCEL_ID):
-                    SFXPlayer.play_sfx('menu')
+                    SFXPlayer.play_sfx('back')
                     return 'EditFloorpacksState'
             case gui.UI_FORM_SUBMITTED:
                 packname = event.ui_element.get_current_values()[cls.__FIELD_ID]
@@ -135,12 +135,17 @@ class EditState(StateWithBespokeInput):
         if event.type == gui.UI_BUTTON_PRESSED:
             # On UI button press, resize floors, save, or exit.
             if event.ui_object_id.endswith(cls.__RESIZE_ID):
+                # Store current changes to the floor,
+                # so ResizeFloorState can access the right FloorData object.
+                EditorFloorManager.edit_floor(cls.__floor)
                 return 'ResizeFloorState'
             elif event.ui_object_id.endswith(cls.__SAVE_ID):
                 SFXPlayer.play_sfx('start')
+                EditorFloorManager.edit_floor(cls.__floor)
                 EditorFloorManager.save_floorpack()
             elif event.ui_object_id.endswith(cls.__EXIT_ID):
                 if cls.__changes_made:
+                    # Unused currently. __changes_made is never set.
                     return 'ConfirmExitState'
                 else: 
                     return 'EditFloorsState'
@@ -180,3 +185,38 @@ class EditState(StateWithBespokeInput):
                         cell.revert()
                         PainterVisual.go_to(cell_pos)
                         cls.__floor.set_initial_painter_position(cell_pos)
+
+class ResizeFloorState(StateWithBespokeInput):
+    _VISUAL_HANDLERS = (FloorVisual, PainterVisual, ResizeMenuVisual)
+    __WIDTH_FIELD_ID = 'Width'
+    __HEIGHT_FIELD_ID = 'Height'
+    __CANCEL_ID = 'Cancel'
+
+    @classmethod
+    def enter(cls):
+        ResizeMenuVisual.init(cls.__WIDTH_FIELD_ID, cls.__HEIGHT_FIELD_ID, cls.__CANCEL_ID)
+
+    @classmethod
+    def process_bespoke_input(cls, event):
+        match event.type:
+            case gui.UI_BUTTON_PRESSED:
+                # Cancel
+                if event.ui_object_id.endswith(cls.__CANCEL_ID):
+                    SFXPlayer.play_sfx('back')
+                    return 'EditState'
+            case gui.UI_FORM_SUBMITTED:
+                SFXPlayer.play_sfx('destroy')
+
+                # Get new width and height from the form
+                data = event.ui_element.get_current_values()
+                new_width = data[cls.__WIDTH_FIELD_ID]
+                new_height = data[cls.__HEIGHT_FIELD_ID]
+
+                # Change size of the current floor grid.
+                floor = EditorFloorManager.get_floor_being_edited()
+                grid = floor.get_cell_grid()
+                grid.set_size(new_width, new_height)
+
+                # Store changes and return to editing
+                EditorFloorManager.edit_floor(floor)
+                return 'EditState'

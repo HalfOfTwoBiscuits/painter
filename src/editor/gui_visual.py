@@ -1,18 +1,14 @@
-from ..abstract_handlers import GUIVisualHandler
+from ..abstract_handlers import GUIVisualHandler, CentredFixedSizeGUIVisualHandler
 from .gui_handler import GUIHandler
-class FloorpackCreateVisual(GUIVisualHandler):
-    __GUI_WIDTH = 175
-    __GUI_HEIGHT = 200
+class FloorpackCreateVisual(CentredFixedSizeGUIVisualHandler):
+    _GUI_WIDTH = 175
+    _GUI_HEIGHT = 200
     __FORM_DIMENSIONS = (0,0,175,150)
     __CANCEL_DIMENSIONS = (0,150,175,50)
     
     @classmethod
     def init(cls, FIELD_ID: str, CANCEL_ID: str):
-        GUIHandler.clear_elements()
-        # Find position and dimensions of UI container
-        win_w, win_h = cls._window_dimensions
-        x, y = cls._centred_in_dimensions(win_w, win_h, cls.__GUI_WIDTH, cls.__GUI_HEIGHT)
-        GUIHandler.set_container(x, y, cls.__GUI_WIDTH, cls.__GUI_HEIGHT)
+        cls._setup_container()
 
         # Add cancel button
         GUIHandler.add_button(CANCEL_ID, cls.__CANCEL_DIMENSIONS)
@@ -54,3 +50,20 @@ class EditorButtonsVisual(GUIVisualHandler):
         # Add the width-per-button to shift to the right.
         GUIHandler.add_button(SAVE_ID, (button_x + width_per_button, button_y, button_w, button_h))
         GUIHandler.add_button(EXIT_ID, (button_x + width_per_button * 2, button_y, button_w, button_h))
+
+class ResizeMenuVisual(CentredFixedSizeGUIVisualHandler):
+    _GUI_WIDTH = 175
+    _GUI_HEIGHT = 250
+    __FORM_DIMENSIONS = (0,0,175,200)
+    __CANCEL_DIMENSIONS = (0,200,175,50)
+
+    @classmethod
+    def init(cls, WIDTH_FIELD_ID: str, HEIGHT_FIELD_ID: str, CANCEL_ID: str):
+       cls._setup_container()
+
+       # Add cancel button
+       GUIHandler.add_button(CANCEL_ID, cls.__CANCEL_DIMENSIONS)
+
+       # Add form with inputs for width and height, and submit button.
+       GUIHandler.add_form('frm', cls.__FORM_DIMENSIONS, 
+                           {WIDTH_FIELD_ID : 'integer', HEIGHT_FIELD_ID : 'integer'})
