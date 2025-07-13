@@ -1,11 +1,14 @@
+import pygame as pg
 import pygame_gui as gui
 from ..abstract_states import State, GameContentSelectState, StateWithBespokeInput
 from ..audio_utility import SFXPlayer
 from ..game.menu_visual import MenuVisual
+from ..game.painter_visual import PainterVisual
+from ..game.floor_visual import FloorVisual
 from .editor_floor_manager import EditorFloorManager
 from .editor_floorselect_input import EditFloorpacksControl, EditFloorsControl, MoveFloorControl, FloorDestinationControl, \
     SelectFloorToDeleteControl, ConfirmDeleteFloorControl
-from .gui_visual import FloorpackCreateVisual
+from .gui_visual import FloorpackCreateVisual, EditorButtonsVisual
 
 class EditFloorpacksState(GameContentSelectState):
     _TITLE = 'Select Floor Pack'
@@ -111,3 +114,68 @@ class CreateFloorpackState(StateWithBespokeInput):
                 EditorFloorManager.create_floorpack(packname)
                 SFXPlayer.play_sfx('start')
                 return 'EditFloorsState'
+            
+class EditState(StateWithBespokeInput):
+    _VISUAL_HANDLERS = (FloorVisual, PainterVisual)
+    __RESIZE_ID = 'Resize'
+    __SAVE_ID = 'Save'
+    __EXIT_ID = 'Exit'
+    @classmethod
+    def enter(cls):
+        #EditorButtonsVisual.init(cls.__RESIZE_ID, cls.__SAVE_ID, cls.__EXIT_ID)
+        cls.__floor = EditorFloorManager.get_floor_being_edited()
+        cls.__grid = cls.__floor.get_cell_grid()
+        FloorVisual.new_floor(cls.__floor, editor=True)
+        cell_dimens = FloorVisual.get_cell_dimens_no_line()
+        PainterVisual.new_floor(cls.__floor, cell_dimens)
+        cls.__changes_made = False
+    
+    @classmethod
+    def process_bespoke_input(cls, event):
+        if event.type == gui.UI_BUTTON_PRESSED:
+            # On UI button press, resize floors, save, or exit.
+            if event.ui_object_id.endswith(cls.__RESIZE_ID):
+                return 'ResizeFloorState'
+            elif event.ui_object_id.endswith(cls.__SAVE_ID):
+                EditorFloorManager.save_floorpack()
+            elif event.ui_object_id.endswith(cls.__EXIT_ID):
+                if cls.__changes_made:
+                    return 'ConfirmExitState'
+                else: 
+                    return 'EditFloorsState'
+        elif event.type == pg.MOUSEBUTTONDOWN:
+            # Get mouse click position, size of grid, and dimension of a cell.
+            mouse_x, mouse_y = event.pos
+            cell_dimens = FloorVisual.get_cell_dimens_no_line()
+            grid_w, grid_h = cls.__grid.get_size()
+            cell_pos = None
+            # Iterate through the grid, checking if the click is within a cell.
+            for x in range(0, grid_w):
+                for y in range(0, grid_h):
+                    left_x, top_y = FloorVisual.topleft_for((x, y))
+                    if left_x <= mouse_x <= left_x + cell_dimens and \
+                    top_y <= mouse_y <= top_y + cell_dimens:
+                        cell_pos = (x,y)
+                        break
+            # If it was, then check whether it was a left or right click.
+            if cell_pos is not None:
+                cell = cls.__grid[cell_pos]
+                match event.button:
+                    case 1:
+                        # Left clicks toggle whether the cell starts painted.
+                        if cell.get_full():
+                            SFXPlayer.play_sfx('back')
+                            cell.revert()
+                        else:
+                            if cell_pos == cls.__floor.get_initial_painter_position():
+                                SFXPlayer.play_sfx('invalid')
+                            else:
+                                SFXPlayer.play_sfx('move')
+                                cell.start_filled()
+                    case 3:
+                        # Right clicks set the painter's initial position.
+                        # Initial cell cannot start painted.
+                        SFXPlayer.play_sfx('start')
+                        cell.revert()
+                        PainterVisual.go_to(cell_pos)
+                        cls.__floor.set_initial_painter_position(cell_pos)

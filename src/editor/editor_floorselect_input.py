@@ -68,7 +68,7 @@ class EditFloorsControl(ArbitraryOptionsControl):
         else:
             # Load floor
             floor_index = EditorFloorManager.index_from_floor_name(option_id)
-            EditorFloorManager.select_floor(floor_index)
+            EditorFloorManager.select_floor_to_edit(floor_index)
 
         # Begin editing
         return 'EditState'

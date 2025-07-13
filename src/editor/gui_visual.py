@@ -18,3 +18,6 @@ class FloorpackCreateVisual(GUIVisualHandler):
         # Don't seem to be able to specify submit button text as 'Create'
         # __CREATE_BUTTON_TEXT = 'Create'
         GUIHandler.add_form('frm', cls.__FORM_DIMENSIONS, {FIELD_ID : "short_text"})
+
+class EditorButtonsVisual:
+    ...

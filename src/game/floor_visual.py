@@ -9,9 +9,10 @@ class FloorVisual(VisualHandler):
     __PAINT_COL = pg.Color(150,30,30)
     __WRAP_PAINT_COL = pg.Color(75,15,15)
     __BG_COL = pg.Color(0,0,0)
+    __EDITOR_HEIGHT_FRAC = 1.5
 
     @classmethod
-    def new_floor(cls, floor_obj):
+    def new_floor(cls, floor_obj, editor: bool=False):
         '''Set up graphical parameters used to draw the grid for a floor.
         Called once when the floor starts.'''
         cls._window.fill(cls.__BG_COL)
@@ -21,6 +22,7 @@ class FloorVisual(VisualHandler):
         cls.__grid = floor_obj.get_cell_grid()
         grid_w, grid_h = cls.__grid.get_size()
         win_w, win_h = cls._window_dimensions
+        if editor: win_h = int(win_h / cls.__EDITOR_HEIGHT_FRAC)
 
         # Calculate width and height taken up by lines between cells
         all_lines_w = cls.__LINE_SIZE * (grid_w + 1)
@@ -145,6 +147,5 @@ class FloorVisual(VisualHandler):
     
     @classmethod
     def get_cell_dimens_no_line(cls):
-        '''Return the dimension of a cell minus the pixels used for the line.
-        Called in GameplayState.__start_floor()'''
+        '''Return the dimension of a cell minus the pixels used for the line.'''
         return cls.__cell_dimens - cls.__LINE_SIZE

@@ -21,7 +21,7 @@ class EditorFloorManager(FloorManager):
             raise FileExistsError
         
         # Save an empty list to the file.
-        # (If the file was empty, it would need a special case)
+        # (If the file were completely empty, it would need a special case)
         with open(path_for_pack, 'x') as file:
             yaml.dump([], file)
 
@@ -45,6 +45,28 @@ class EditorFloorManager(FloorManager):
         pack = cls._floor_packs[cls._current_pack_id]
         floor = pack.pop(from_index)
         pack.insert(to_index, floor)
+
+    @classmethod
+    def select_floor_to_edit(cls, index: int):
+        '''Select a floor index as the current one being edited.
+        Its data will be returned by get_floor_being_edited(), and
+        after being changed, that data can be passed to edit_floor()
+        to put it at this index.'''
+        cls.__floor_index_being_edited = index
+    
+    @classmethod
+    def get_floor_being_edited(cls):
+        '''Return the floor data at the index previously passed to select_floor_to_edit().'''
+        pack = cls._floor_packs[cls._current_pack_id]
+        return pack[cls.__floor_index_being_edited]
+    
+    @classmethod
+    def edit_floor(cls, floor_data_obj):
+        '''Store the given FloorData object at the index
+        previously chosen by select_floor_to_edit().
+        Does not actually write the floor data to the floorpack file:
+        call save_floorpack() to do that.'''
+        cls._floor_packs[cls._current_pack_id][cls.__floor_index_being_edited] = floor_data_obj
 
     @classmethod
     def select_floor_to_move(cls, index: int):
