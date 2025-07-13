@@ -155,4 +155,11 @@ class GUIVisualHandler(VisualHandler, ABC):
 
     @classmethod
     def draw(cls):
+        '''This visual handler draws a GUI.'''
         GUIHandler.draw(cls._window)
+
+    @staticmethod
+    def _centred_in_dimensions(x_dimens: int, y_dimens: int, elem_w: int, elem_h: int):
+        '''Return the x, y position for a GUI element with the given width and height
+        so that it is centred inside an area with the given dimensions.'''
+        return (x_dimens - elem_w) // 2, (y_dimens - elem_h) // 2

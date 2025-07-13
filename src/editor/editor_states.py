@@ -116,13 +116,13 @@ class CreateFloorpackState(StateWithBespokeInput):
                 return 'EditFloorsState'
             
 class EditState(StateWithBespokeInput):
-    _VISUAL_HANDLERS = (FloorVisual, PainterVisual)
+    _VISUAL_HANDLERS = (FloorVisual, PainterVisual, EditorButtonsVisual)
     __RESIZE_ID = 'Resize'
     __SAVE_ID = 'Save'
     __EXIT_ID = 'Exit'
     @classmethod
     def enter(cls):
-        #EditorButtonsVisual.init(cls.__RESIZE_ID, cls.__SAVE_ID, cls.__EXIT_ID)
+        EditorButtonsVisual.init(cls.__RESIZE_ID, cls.__SAVE_ID, cls.__EXIT_ID)
         cls.__floor = EditorFloorManager.get_floor_being_edited()
         cls.__grid = cls.__floor.get_cell_grid()
         FloorVisual.new_floor(cls.__floor, editor=True)
@@ -137,6 +137,7 @@ class EditState(StateWithBespokeInput):
             if event.ui_object_id.endswith(cls.__RESIZE_ID):
                 return 'ResizeFloorState'
             elif event.ui_object_id.endswith(cls.__SAVE_ID):
+                SFXPlayer.play_sfx('start')
                 EditorFloorManager.save_floorpack()
             elif event.ui_object_id.endswith(cls.__EXIT_ID):
                 if cls.__changes_made:
