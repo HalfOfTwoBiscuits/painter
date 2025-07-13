@@ -80,7 +80,7 @@ class LevelSelectState(GameContentSelectState):
         # If there's only one floor, select it
         if len(floornames) == 1:
             FloorManager.select_floor(0)
-            return 'GameplayState'
+            return 'NewFloorState'
 
         # Unless there's only one floorpack, include a 'back' option.
         if FloorManager.get_num_floorpacks() == 1:
