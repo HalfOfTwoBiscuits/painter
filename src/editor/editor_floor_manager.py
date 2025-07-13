@@ -53,6 +53,10 @@ class EditorFloorManager(FloorManager):
         cls.__floor_index_to_move = index
     
     @classmethod
+    def get_floor_index_being_moved(cls):
+        return cls.__floor_index_to_move
+    
+    @classmethod
     def move_selected_floor(cls, to_index: int):
         '''Move the floor at the index previously given to select_floor_to_move()
         to the other index given.'''

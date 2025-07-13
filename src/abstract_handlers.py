@@ -106,7 +106,7 @@ class ArbitraryOptionsControlWithBackButton(ArbitraryOptionsControl, ABC):
         self._option_id = self._find_option_for_number(number)
         if self._option_id is None: raise ValueError
         elif self._option_id == self._BACK_OPTION:
-            SFXPlayer.play_sfx('menu')
+            SFXPlayer.play_sfx('back')
             return True
         return False
     

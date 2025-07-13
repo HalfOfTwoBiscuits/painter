@@ -51,18 +51,20 @@ class SelectFloorToMoveState(GameContentSelectState):
         cls._menu_input_handler = MoveFloorControl(cls._menu_visual, cls.__BACK_OPTION)
 
 class SelectFloorDestinationState(GameContentSelectState):
-    _TITLE = 'Select Destination'
-    __BACK_OPTION = 'Cancel'
+    __BACK_OPTION = 'Move A Different Floor'
+    __CANCEL_OPTION = "Don't Move Floors"
 
     @classmethod
     def enter(cls):
         floornames = EditorFloorManager.get_floor_names()
+        num_moving = EditorFloorManager.get_floor_index_being_moved() + 1
+        title = f'Select Destination for Floor {num_moving}'
         menu_options = ['Start'] + \
-            [f'Between {num} and {num + 1}' for num in range(1, len(floornames))] + \
-            ['End'] + [cls.__BACK_OPTION]
+            [f'After Floor {num}' for num in range(1, len(floornames) + 1) if num != num_moving] \
+            + [cls.__BACK_OPTION, cls.__CANCEL_OPTION]
 
-        cls._menu_visual = MenuVisual(cls._TITLE, menu_options, option_ids=floornames)
-        cls._menu_input_handler = FloorDestinationControl(cls._menu_visual, cls.__BACK_OPTION)
+        cls._menu_visual = MenuVisual(title, menu_options, option_ids=floornames)
+        cls._menu_input_handler = FloorDestinationControl(cls._menu_visual, cls.__BACK_OPTION, cls.__CANCEL_OPTION)
 
 class SelectFloorToDeleteState(GameContentSelectState):
     _TITLE = 'Select Floor To Delete'
@@ -108,4 +110,4 @@ class CreateFloorpackState(StateWithBespokeInput):
                 packname = event.ui_element.get_current_values()[cls.__FIELD_ID]
                 EditorFloorManager.create_floorpack(packname)
                 SFXPlayer.play_sfx('start')
-                return 'EditFloorpacksState'
+                return 'EditFloorsState'
