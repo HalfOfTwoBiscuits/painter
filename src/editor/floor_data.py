@@ -10,14 +10,33 @@ class FloorData:
         return self.__initial_painter_position
 
     def set_initial_painter_position(self, new_pos: tuple):
+        # Ensure position is on-grid, and remove any paint in it.
         self.__grid.ensure_valid_position(new_pos)
-        # Painter position doesn't start filled.
-        # If this could be called more than once, also need to unfill previous
-        #cell = self.__grid[new_pos]
+        cell = self.__grid[new_pos]
+        cell.revert()
         self.__initial_painter_position = new_pos
 
     def get_cell_grid(self):
         return self.__grid
+    
+    def resize(self, new_width: int, new_height: int):
+        '''Change the dimensions of the floor to the new width and height.
+        If the grid shrinks so that the painter's initial position no longer exists,
+        move the initial position up and to the left as needed to be on-grid again.'''
+
+        full_cells = self.__grid.get_full_cell_positions()
+        # Replace CellGrid instance.
+        self.__grid = CellGrid(new_width, new_height)
+        # Paint all the cells that were filled before and are still on the grid.
+        for pos in full_cells:
+            try: self.__grid[pos].start_filled()
+            except ValueError: pass
+
+        # Ensure painter position is in the grid.
+        painter_x, painter_y = self.__initial_painter_position
+        painter_x = min(painter_x, new_width - 1)
+        painter_y = min(painter_y, new_height - 1)
+        self.set_initial_painter_position((painter_x, painter_y))
 
 class CellGrid:
     '''Class representing a grid of cells, the main part of a level.
@@ -65,11 +84,6 @@ class CellGrid:
         '''Return the dimensions of this grid.
         Called when loading a level, to set up visuals'''
         return self.__w, self.__h
-    
-    def set_size(self, new_w: int, new_h: int):
-        '''Resize this grid. Called by the level editor.'''
-        self.__w = new_w
-        self.__h = new_h
     
     def get_full_cell_positions(self):
         '''Return a list of positions where cells have been filled.

@@ -165,9 +165,9 @@ class EditState(StateWithBespokeInput):
                         break
             # If it was, then check whether it was a left or right click.
             if cell_pos is not None:
-                cell = cls.__grid[cell_pos]
                 match event.button:
                     case 1:
+                        cell = cls.__grid[cell_pos]
                         # Left clicks toggle whether the cell starts painted.
                         if cell.get_full():
                             SFXPlayer.play_sfx('back')
@@ -182,7 +182,6 @@ class EditState(StateWithBespokeInput):
                         # Right clicks set the painter's initial position.
                         # Initial cell cannot start painted.
                         SFXPlayer.play_sfx('start')
-                        cell.revert()
                         PainterVisual.go_to(cell_pos)
                         cls.__floor.set_initial_painter_position(cell_pos)
 
@@ -214,8 +213,10 @@ class ResizeFloorState(StateWithBespokeInput):
 
                 # Change size of the current floor grid.
                 floor = EditorFloorManager.get_floor_being_edited()
-                grid = floor.get_cell_grid()
-                grid.set_size(new_width, new_height)
+                floor.resize(new_width, new_height)
+                FloorVisual.new_floor(floor, editor=True)
+                cell_dimens = FloorVisual.get_cell_dimens_no_line()
+                PainterVisual.new_floor(floor, cell_dimens)
 
                 # Store changes and return to editing
                 EditorFloorManager.edit_floor(floor)
