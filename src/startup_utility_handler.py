@@ -21,4 +21,4 @@ class StartupMenuControl(KeyboardInputHandler):
     def editor(): return 2
 
     @staticmethod
-    def exit(): return 3
+    def quit(): return 3

@@ -9,7 +9,6 @@ def main():
         game_window = setup_window()
         s = StartupMenu(STATE_NAME, game_window)
         exit_code = s.main()
-        print (exit_code)
         match exit_code:
             case 3 | True:
                 # Exit option or closing the window will exit
