@@ -1,6 +1,8 @@
 import pygame as pg
 from .abstract_handlers import VisualHandler
 from .floor_manager import FloorManager
+from .app import App
+from . import startup_utility_state
 
 def setup_state(editor: bool=False):
     '''Return the initial state used by the game,
@@ -33,3 +35,6 @@ def setup_window(editor: bool=False):
     # so the classes that inherit from it can draw graphics on the window
     VisualHandler.set_window(draw_surf)
     return window
+
+class StartupMenu(App):
+    _state_module = startup_utility_state

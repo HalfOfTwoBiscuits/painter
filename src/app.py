@@ -50,10 +50,14 @@ class App(ABC):
             if e.type == pg.KEYDOWN:
                 # Process input: make stuff actually happen
                 new_state = self._state.process_input(e.key)
-                # For test cases: returning a boolean value indicates success/failure.
-                if isinstance(new_state, bool): return new_state
-
-                self._change_state(new_state)
+                # Returning a string will change to the state with that name,
+                # returning None will do nothing,
+                # returning another value will end the program
+                # and return that value as an exit code.
+                # e.g. for test cases: returning a boolean value indicates success/failure.
+                if new_state is not None:
+                    if not isinstance(new_state, str): return new_state
+                    self._change_state(new_state)
             self._process_other_event(e)
         
         # Draw graphics
