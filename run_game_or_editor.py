@@ -1,6 +1,7 @@
 from src.game.game import Game
 from src.editor.editor import Editor
 from src.startup_utility import setup_state, setup_window, StartupMenu
+from src.audio_utility import SFXPlayer
 
 def main():
     running = True
@@ -15,11 +16,13 @@ def main():
                 running = False
             case 1:
                 # First option opens the game
+                SFXPlayer.play_sfx('start')
                 initial_state = setup_state()
                 g = Game(initial_state, game_window)
                 g.main()
             case 2:
                 # Second option opens the editor
+                SFXPlayer.play_sfx('menu')
                 initial_state = setup_state(editor=True)
                 editor_window = setup_window(True)
                 e = Editor(initial_state, editor_window)
