@@ -13,6 +13,7 @@ from .gui_visual import FloorpackCreateVisual, EditorButtonsVisual, ResizeMenuVi
 class EditFloorpacksState(GameContentSelectState):
     _TITLE = 'Select Floor Pack'
     __CREATE_OPTION = 'Create New'
+    __EXIT_OPTION = 'Exit Editor'
 
     @classmethod
     def enter(cls):
@@ -20,9 +21,9 @@ class EditFloorpacksState(GameContentSelectState):
         # TODO: make this method generic in a parent. Maybe for the ingame floor select too.
         # FLOOR_MANAGER and INPUT_HANDLER_CLASS and OTHER_OPTIONS can be class constants.
         packnames = EditorFloorManager.get_floorpack_names()
-        options = packnames + [cls.__CREATE_OPTION]
+        options = packnames + [cls.__CREATE_OPTION, cls.__EXIT_OPTION]
         cls._setup_menu_visual(options)
-        cls._menu_input_handler = EditFloorpacksControl(cls._menu_visual, cls.__CREATE_OPTION)
+        cls._menu_input_handler = EditFloorpacksControl(cls._menu_visual, cls.__CREATE_OPTION, cls.__EXIT_OPTION)
 
 class EditFloorsState(GameContentSelectState):
     _TITLE = 'Select Floor To Edit'

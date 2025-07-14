@@ -4,32 +4,13 @@ from ..audio_utility import SFXPlayer
 from .painter_visual import PainterVisual
 from .floor_player import FloorPlayer
 from ..floor_manager import FloorManager
-
-class RestartMenuControl(KeyboardInputHandler):
-    '''A menu with the ability to restart the floor.
-    Used as a base class for the pause menu and floor complete menus,
-    and when completing the only floor in the only floorpack.'''
     
-    _ACTIONS = {
-        pg.K_1 : ('restart',),
-        pg.K_RETURN : ('restart',),
-        pg.K_ESCAPE : ('restart',),
-        pg.K_BACKSPACE : ('restart',),
-    }
-
-    @staticmethod
-    def restart():
-        SFXPlayer.play_sfx('back')
-        new_loc = FloorPlayer.undo_all()
-        if new_loc is not None:
-            new_pos, _ = new_loc
-            PainterVisual.go_to(new_pos)
-        return 'GameplayState'
-    
-class RestartExitMenuControl(RestartMenuControl):
+class RestartExitMenuControl(KeyboardInputHandler):
     '''A menu with the ability to exit or restart the floor.
-    The exit option will go to the floor select, unless there is only
-    one floor in the pack, in which case it will go to the floorpack select.
+    The exit option will go to the floor select
+        - unless there is only one floor, in which case it goes to the floorpack select
+        - unless there is only one floorpack, in which case it quits the game
+        - unless the player is using the combined game+editor, in which case it goes to the game/editor select.
 
     Used as a base class for the pause and floor complete menus,
     and on completing the last floor in a pack.'''
@@ -43,10 +24,27 @@ class RestartExitMenuControl(RestartMenuControl):
     }
 
     @staticmethod
+    def restart():
+        SFXPlayer.play_sfx('back')
+        new_loc = FloorPlayer.undo_all()
+        if new_loc is not None:
+            new_pos, _ = new_loc
+            PainterVisual.go_to(new_pos)
+        return 'GameplayState'
+    
+    @staticmethod
     def exit():
         SFXPlayer.play_sfx('menu')
         if FloorManager.get_num_floors() == 1:
-            return 'FloorpackSelectState'
+            if FloorManager.get_num_floorpacks() == 1:
+                # If there's only one floor and one floorpack, exit game,
+                # or if using the game and editor combination,
+                # go back to choosing which to use.
+                return 3
+            else:
+                # Select a floorpack if there's only one floor.
+                return 'FloorpackSelectState'
+        # Otherwise select a floor.
         return 'LevelSelectState'
 
 class PauseMenuControl(RestartExitMenuControl):

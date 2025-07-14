@@ -16,18 +16,19 @@ def main():
                 running = False
             case 1:
                 # First option opens the game
-                SFXPlayer.play_sfx('start')
+                SFXPlayer.play_sfx('menu')
                 initial_state = setup_state()
                 g = Game(initial_state, game_window)
-                g.main()
+                exit_code = g.main()
+                if exit_code != 3: running = False
             case 2:
                 # Second option opens the editor
                 SFXPlayer.play_sfx('menu')
                 initial_state = setup_state(editor=True)
                 editor_window = setup_window(True)
                 e = Editor(initial_state, editor_window)
-                e.main()
-            
+                exit_code = e.main()
+                if exit_code != 3: running = False
 
 if __name__ == '__main__':
     main()

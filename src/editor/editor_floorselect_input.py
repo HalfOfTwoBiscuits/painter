@@ -4,9 +4,10 @@ from .editor_floor_manager import EditorFloorManager
 import pygame as pg
 
 class EditFloorpacksControl(ArbitraryOptionsControl):
-    def __init__(self, menu_visual_obj, CREATE_OPTION_ID: str):
+    def __init__(self, menu_visual_obj, CREATE_OPTION_ID: str, EXIT_OPTION_ID: str):
         super().__init__(menu_visual_obj)
         self.__CREATE_OPTION = CREATE_OPTION_ID
+        self.__EXIT_OPTION = EXIT_OPTION_ID
 
     def select(self, number: int):
         '''If the 'Create' option was selected, create a new floorpack.
@@ -20,6 +21,11 @@ class EditFloorpacksControl(ArbitraryOptionsControl):
             # Create floorpack.
             SFXPlayer.play_sfx('menu')
             return 'CreateFloorpackState'
+        elif option_id == self.__EXIT_OPTION:
+            # Quit the editor if using it standalone.
+            # If using the combined game/editor, return to game/editor selection.
+            SFXPlayer.play_sfx('back')
+            return 3
 
         # Edit floorpack.
         SFXPlayer.play_sfx('start')
