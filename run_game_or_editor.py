@@ -20,7 +20,9 @@ def main():
                 initial_state = setup_state()
                 g = Game(initial_state, game_window)
                 exit_code = g.main()
-                if exit_code != 3: running = False
+                # An exit code of 3 means the ingame exit option was chosen.
+                # Continue running only in that case.
+                running = exit_code == 3
             case 2:
                 # Second option opens the editor
                 SFXPlayer.play_sfx('menu')
@@ -28,7 +30,7 @@ def main():
                 editor_window = setup_window(True)
                 e = Editor(initial_state, editor_window)
                 exit_code = e.main()
-                if exit_code != 3: running = False
+                running = exit_code == 3
 
 if __name__ == '__main__':
     main()
