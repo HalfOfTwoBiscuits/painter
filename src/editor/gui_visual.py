@@ -1,10 +1,11 @@
-from ..abstract_handlers import GUIVisualHandler, CentredFixedSizeGUIVisualHandler
+from pygame import Rect
+from ..abstract_handlers_gui import GUIVisualHandler, CentredFixedSizeGUIVisualHandler
 from .gui_handler import GUIHandler
 class FloorpackCreateVisual(CentredFixedSizeGUIVisualHandler):
     _GUI_WIDTH = 175
     _GUI_HEIGHT = 200
-    __FORM_DIMENSIONS = (0,0,175,150)
-    __CANCEL_DIMENSIONS = (0,150,175,50)
+    __FORM_DIMENSIONS = Rect(0,0,175,150)
+    __CANCEL_DIMENSIONS = Rect(0,150,175,50)
     
     @classmethod
     def init(cls, FIELD_ID: str, CANCEL_ID: str):
@@ -46,16 +47,16 @@ class EditorButtonsVisual(GUIVisualHandler):
         button_x, button_y = cls._centred_in_dimensions(width_per_button, gui_h, button_w, button_h)
 
         # Add resize, save, and exit buttons.
-        GUIHandler.add_button(RESIZE_ID, (button_x, button_y, button_w, button_h))
+        GUIHandler.add_button(RESIZE_ID, Rect(button_x, button_y, button_w, button_h))
         # Add the width-per-button to shift to the right.
-        GUIHandler.add_button(SAVE_ID, (button_x + width_per_button, button_y, button_w, button_h))
-        GUIHandler.add_button(EXIT_ID, (button_x + width_per_button * 2, button_y, button_w, button_h))
+        GUIHandler.add_button(SAVE_ID, Rect(button_x + width_per_button, button_y, button_w, button_h))
+        GUIHandler.add_button(EXIT_ID, Rect(button_x + width_per_button * 2, button_y, button_w, button_h))
 
 class ResizeMenuVisual(CentredFixedSizeGUIVisualHandler):
     _GUI_WIDTH = 175
     _GUI_HEIGHT = 250
-    __FORM_DIMENSIONS = (0,0,175,200)
-    __CANCEL_DIMENSIONS = (0,200,175,50)
+    __FORM_DIMENSIONS = Rect(0,0,175,200)
+    __CANCEL_DIMENSIONS = Rect(0,200,175,50)
 
     @classmethod
     def init(cls, WIDTH_FIELD_ID: str, HEIGHT_FIELD_ID: str, CANCEL_ID: str):

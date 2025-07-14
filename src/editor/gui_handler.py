@@ -29,7 +29,7 @@ class GUIHandler:
         cls.__container.set_position((x,y))
 
     @classmethod
-    def add_button(cls, id: str, location_rect: tuple[int], text: str=None):
+    def add_button(cls, id: str, location_rect, text: str=None):
         '''Add a button.'''
         if text is None: text = id
         gui.elements.UIButton(relative_rect=location_rect,
@@ -39,7 +39,7 @@ class GUIHandler:
                               container=cls.__container)
 
     @classmethod
-    def add_textinput(cls, id: str, location_rect: tuple[int], placeholder: str=None):
+    def add_textinput(cls, id: str, location_rect, placeholder: str=None):
         '''Add a text input field. Unused currently, a UIForm is used instead.'''
         gui.elements.UITextEntryLine(relative_rect=location_rect,
                                     placeholder_text=placeholder,
@@ -48,7 +48,7 @@ class GUIHandler:
                                     container=cls.__container)
 
     @classmethod
-    def add_form(cls, id: str, location_rect: tuple[int], questionaire: dict[str:str]):
+    def add_form(cls, id: str, location_rect, questionaire: dict[str:str]):
         '''Add a form. Based on the questionnaire values, fields and a submit
         button are pre-created.'''
         gui.elements.UIForm(relative_rect=location_rect,
