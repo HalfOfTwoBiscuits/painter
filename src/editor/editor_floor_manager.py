@@ -7,9 +7,9 @@ from .floor_data import FloorData
 class EditorFloorManager(FloorManager):
     @classmethod
     def create_floorpack(cls, name: str):
-        '''Create a YAML file in the resources/floors directory with the given name,
-        containing an empty list.
-        Store an empty floorpack by that name, and select it as the current one.
+        '''Create a floorpack with the given name,
+        containing one floor with the default 3x3 size and 0,0 starting position.
+        Select this floorpack as the current one, and the floor as the one being edited.
         Raises FileExistsError if there is already a floorpack with that name.'''
 
         floorpack_dir = FileUtility.path_to_resource_directory('floors')
@@ -20,24 +20,33 @@ class EditorFloorManager(FloorManager):
             # This is more foolproof however.
             raise FileExistsError
         
-        # Save an empty list to the file.
-        # (If the file were completely empty, it would need a special case)
-        with open(path_for_pack, 'x') as file:
-            yaml.dump([], file)
+        pack = [cls.__default_floor()]
 
-        cls._floor_packs[name] = []
+        # Save one default floor to the file.
+        with open(path_for_pack, 'x') as file:
+            yaml.dump(pack, file)
+
+        cls._floor_packs[name] = pack
         cls.select_floorpack(name)
+        cls.select_floor_to_edit(0)
 
     @classmethod
     def create_floor(cls):
         '''Create a 3x3 floor where the painter starts at 0,0.
         Insert it at the end of the current floorpack,
         and select it.'''
-        floor = FloorData(3,3)
-        floor.set_initial_painter_position((0,0))
+        floor = cls.__default_floor()
         pack = cls._floor_packs[cls._current_pack_id]
         pack.append(floor)
         cls.select_floor(len(pack) - 1)
+    
+    @classmethod
+    def __default_floor(cls):
+        '''Return the default floor for when a new one is created.
+        It's 3x3 and the painter starts at 0,0.'''
+        floor = FloorData(3,3)
+        floor.set_initial_painter_position((0,0))
+        return floor
 
     @classmethod
     def __move_floor(cls, from_index: int, to_index: int):

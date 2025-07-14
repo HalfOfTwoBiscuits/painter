@@ -114,7 +114,7 @@ class CreateFloorpackState(StateWithBespokeInput):
                 packname = event.ui_element.get_current_values()[cls.__FIELD_ID]
                 EditorFloorManager.create_floorpack(packname)
                 SFXPlayer.play_sfx('start')
-                return 'EditFloorsState'
+                return 'EditState'
             
 class EditState(StateWithBespokeInput):
     _VISUAL_HANDLERS = (FloorVisual, PainterVisual, EditorButtonsVisual)
