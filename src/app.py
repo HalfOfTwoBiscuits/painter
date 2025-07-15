@@ -5,8 +5,8 @@ from abc import ABC
 from .abstract_handlers import VisualHandler
 
 class App(ABC):
-    '''An instance of this class manages the main loop for the game,
-    editor, and unit tests.'''
+    '''Base class for the Game and Editor classes.
+    Contains logic for the main loop.'''
 
     # For frame rate limiting
     __clock = pg.time.Clock()
@@ -24,14 +24,16 @@ class App(ABC):
     def main(self):
         '''Run game loop.
         Allow returning an output:
-        True for successful unit test or False for unsucessful.'''
+        e.g. True for successful unit test or False for unsucessful.'''
         output = None
         while output is None: output = self.loop()
         return output
     
     async def online_main(self):
         '''A version of the main function intended to be used with a pygbag
-        web build. That web build doesn't currently work (see README.md)'''
+        web build. That web build doesn't currently work (see README.md).
+        Ignores exit codes. So, it wouldn't currently work with the run_game_or_editor.py
+        that allows you to boot either.'''
         while True:
             self.loop()
             # Await asynchronous processing of pygbag needed for web hosting
