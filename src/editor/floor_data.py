@@ -96,6 +96,14 @@ class CellGrid:
         False : There are still cells to paint'''
         #print (f'Checking if over: {self.__w * self.__h}, {len(self.get_full_cell_positions())}')
         return self.__w * self.__h == len(self.get_full_cell_positions()) + 1
+    
+    def prune_empty_cells(self):
+        '''When cells are not being used in gameplay,
+        data specifying an empty cell is equivalent to no Cell object existing.
+        Therefore, to save space in floorpack files, this method deletes
+        any data specifying empty cells.'''
+        self.__cells = {pos : cell for pos, cell in self.__cells.items() if cell.get_full()}
+
 
 class Cell:
     '''Class representing a cell that can be blank or coloured in.

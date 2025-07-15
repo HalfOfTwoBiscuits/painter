@@ -75,6 +75,10 @@ class EditorFloorManager(FloorManager):
         previously chosen by select_floor_to_edit().
         Does not actually write the floor data to the floorpack file:
         call save_floorpack() to do that.'''
+        # Remove data about empty cells: it has no effect on gameplay,
+        # and unnecessarily increases the size of the floorpack file.
+        grid = floor_data_obj.get_cell_grid()
+        grid.prune_empty_cells()
         cls._floor_packs[cls._current_pack_id][cls.__floor_index_being_edited] = floor_data_obj
 
     @classmethod
