@@ -1,9 +1,11 @@
 ## Painter
-This is a game project. In the game, your goal is to paint the whole floor. 
+This is a game project. In the game, your goal is to paint the whole floor.
+
 It was originally made for a college assignment. 
-The code I handed in for that assignment is on the 'main' branch,
-and the newest version with extra features is on the 'further-work-after-handin' branch.
+The code I handed in for that assignment is on the 'assignment-version' branch,
+the newest released version is on the main branch.
 You can download a Windows executable of either version from the 'releases' section.
+Other branches are current work-in-progress.
 
 ### Instructions
 Move by pressing the arrow keys. You'll leave paint behind you as you go. 
