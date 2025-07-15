@@ -12,8 +12,11 @@ import asyncio
 from src.game.game import Game
 from src.startup_utility import setup_state, setup_window
 
-if __name__ == '__main__':
-    InitialState = setup_state()
+def main():
+    initial_state = setup_state()
     window = setup_window()
-    g = Game(InitialState, window)
+    g = Game(initial_state, window)
     asyncio.run(g.online_main())
+
+if __name__ == '__main__':
+    main()
