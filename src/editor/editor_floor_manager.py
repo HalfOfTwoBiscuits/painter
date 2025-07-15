@@ -1,4 +1,3 @@
-import os
 import yaml
 from ..floor_manager import FloorManager
 from ..file_utility import FileUtility
@@ -11,21 +10,23 @@ class EditorFloorManager(FloorManager):
         containing one floor with the default 3x3 size and 0,0 starting position.
         Select this floorpack as the current one, and the floor as the one being edited.
         Raises FileExistsError if there is already a floorpack with that name.'''
-
         floorpack_dir = FileUtility.path_to_resource_directory('floors')
-        path_for_pack = os.path.normpath(floorpack_dir + os.sep + name + '.yaml')
+        # Call resolve() to ensure it is absolute.
+        path_for_pack = (floorpack_dir / (name + '.yaml')).resolve()
 
-        if os.path.exists(path_for_pack):
+        if path_for_pack.exists():
             # Equivalent check: if name in cls.get_floorpack_names().
             # This is more foolproof however.
             raise FileExistsError
         
         pack = [cls.__default_floor()]
-
+        # Call as_posix() for compatibility with pygbag.
+        path_for_pack = path_for_pack.as_posix()
         # Save one default floor to the file.
         with open(path_for_pack, 'x') as file:
             yaml.dump(pack, file)
 
+        print ('Saved')
         cls._floor_packs[name] = pack
         cls.select_floorpack(name)
         cls.select_floor_to_edit(0)
@@ -110,7 +111,7 @@ class EditorFloorManager(FloorManager):
         in order to have selected the floorpack, the file must exist.'''
 
         floorpack_dir = FileUtility.path_to_resource_directory('floors')
-        pack_path = os.path.normpath(floorpack_dir + os.sep + cls._current_pack_id + '.yaml')
+        pack_path = (floorpack_dir / (cls._current_pack_id + '.yaml')).resolve().as_posix()
 
         pack = cls._floor_packs[cls._current_pack_id]
         with open(pack_path, 'w') as file:
