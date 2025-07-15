@@ -25,7 +25,7 @@ class EditorButtonsVisual(GUIVisualHandler):
     __BUTTON_HEIGHT_FRAC = 4
 
     @classmethod
-    def init(cls, RESIZE_ID: str, SAVE_ID: str, EXIT_ID: str):
+    def init(cls, RESIZE_ID: str, SAVE_ID: str, EXIT_ID: str, TEST_ID: str):
         GUIHandler.clear_elements()
         # Find position and dimensions of UI container.
         win_w, win_h = cls._window_dimensions
@@ -36,8 +36,8 @@ class EditorButtonsVisual(GUIVisualHandler):
         gui_y += win_h - available_h
         GUIHandler.set_container(gui_x, gui_y, gui_w, gui_h)
 
-        # There are three buttons, so divide the width into three.
-        width_per_button = gui_w // 3
+        # There are four buttons, so divide the width into four.
+        width_per_button = gui_w // 4
 
         # Find dimensions of a button.
         button_w = int(width_per_button / cls.__BUTTON_WIDTH_FRAC)
@@ -46,11 +46,12 @@ class EditorButtonsVisual(GUIVisualHandler):
         # Centre a button in the dimensions available for it.
         button_x, button_y = cls._centred_in_dimensions(width_per_button, gui_h, button_w, button_h)
 
-        # Add resize, save, and exit buttons.
-        GUIHandler.add_button(RESIZE_ID, Rect(button_x, button_y, button_w, button_h))
-        # Add the width-per-button to shift to the right.
-        GUIHandler.add_button(SAVE_ID, Rect(button_x + width_per_button, button_y, button_w, button_h))
-        GUIHandler.add_button(EXIT_ID, Rect(button_x + width_per_button * 2, button_y, button_w, button_h))
+        # Add resize, test, save, and exit buttons.
+        ORDER = (RESIZE_ID, TEST_ID, SAVE_ID, EXIT_ID)
+        for id in ORDER:
+            GUIHandler.add_button(id, Rect(button_x, button_y, button_w, button_h))
+            # Add the width-per-button to shift to the right.
+            button_x += width_per_button
 
 class ResizeMenuVisual(CentredFixedSizeGUIVisualHandler):
     _GUI_WIDTH = 175

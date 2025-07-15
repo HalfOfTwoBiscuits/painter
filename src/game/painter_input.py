@@ -20,8 +20,8 @@ class PainterControl(KeyboardInputHandler):
         pg.K_ESCAPE : ('open_menu',)
     }
 
-    @staticmethod
-    def move(direction: int):
+    @classmethod
+    def move(cls, direction: int):
         '''Hook that responds to pressing the arrow keys by moving the painter.
         If the painter moved, it checks if the player won the floor,
         and if so, proceeds to the next one.'''
@@ -34,12 +34,15 @@ class PainterControl(KeyboardInputHandler):
         else:
             PainterVisual.shake()
             SFXPlayer.play_sfx('invalid')
-        
         if FloorPlayer.floor_is_over():
-            if FloorManager.floorpack_is_over():
-                return 'FloorpackOverState'
-            else:
-                return "FloorClearState"
+            return cls._state_after_win()
+
+    @staticmethod
+    def _state_after_win():
+        if FloorManager.floorpack_is_over():
+            return 'FloorpackOverState'
+        else:
+            return "FloorClearState"
 
     @staticmethod
     def undo():

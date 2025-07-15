@@ -1,14 +1,18 @@
 import pygame as pg
 import pygame_gui as gui
+from copy import deepcopy
 from ..abstract_states import State, GameContentSelectState, StateWithBespokeInput
 from ..audio_utility import SFXPlayer
 from ..game.menu_visual import MenuVisual
 from ..game.painter_visual import PainterVisual
 from ..game.floor_visual import FloorVisual
+from ..game.floor_player import FloorPlayer
 from .editor_floor_manager import EditorFloorManager
+from .gui_handler import GUIHandler
 from .editor_floorselect_input import EditFloorpacksControl, EditFloorsControl, MoveFloorControl, FloorDestinationControl, \
     SelectFloorToDeleteControl, ConfirmDeleteFloorControl
 from .gui_visual import FloorpackCreateVisual, EditorButtonsVisual, ResizeMenuVisual
+from .test_floor_input import PlaytestControl
 
 class EditFloorpacksState(GameContentSelectState):
     _TITLE = 'Select Floor Pack'
@@ -119,11 +123,12 @@ class CreateFloorpackState(StateWithBespokeInput):
 class EditState(StateWithBespokeInput):
     _VISUAL_HANDLERS = (FloorVisual, PainterVisual, EditorButtonsVisual)
     __RESIZE_ID = 'Resize'
+    __TEST_ID = 'Test'
     __SAVE_ID = 'Save'
     __EXIT_ID = 'Exit'
     @classmethod
     def enter(cls):
-        EditorButtonsVisual.init(cls.__RESIZE_ID, cls.__SAVE_ID, cls.__EXIT_ID)
+        EditorButtonsVisual.init(cls.__RESIZE_ID, cls.__SAVE_ID, cls.__EXIT_ID, cls.__TEST_ID)
         cls.__floor = EditorFloorManager.get_floor_being_edited()
         cls.__grid = cls.__floor.get_cell_grid()
         FloorVisual.new_floor(cls.__floor, editor=True)
@@ -140,6 +145,9 @@ class EditState(StateWithBespokeInput):
                 # so ResizeFloorState can access the right FloorData object.
                 EditorFloorManager.edit_floor(cls.__floor)
                 return 'ResizeFloorState'
+            elif event.ui_object_id.endswith(cls.__TEST_ID):
+                SFXPlayer.play_sfx('start')
+                return 'FloorPlaytestState'
             elif event.ui_object_id.endswith(cls.__SAVE_ID):
                 SFXPlayer.play_sfx('start')
                 EditorFloorManager.edit_floor(cls.__floor)
@@ -222,3 +230,16 @@ class ResizeFloorState(StateWithBespokeInput):
                 # Store changes and return to editing
                 EditorFloorManager.edit_floor(floor)
                 return 'EditState'
+            
+class FloorPlaytestState(State):
+    _INPUT_HANDLER = PlaytestControl
+    _VISUAL_HANDLERS = (FloorVisual, PainterVisual)
+
+    @staticmethod
+    def enter():
+        GUIHandler.clear_elements()
+        floor = deepcopy(EditorFloorManager.get_floor_being_edited())
+        FloorVisual.new_floor(floor)
+        FloorPlayer.new_floor(floor)
+        cell_dimens = FloorVisual.get_cell_dimens_no_line()
+        PainterVisual.new_floor(floor, cell_dimens)
