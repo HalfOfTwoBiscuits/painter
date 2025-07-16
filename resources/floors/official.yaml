@@ -146,3 +146,36 @@
   _FloorData__initial_painter_position: !!python/tuple
   - 1
   - 2
+- !!python/object:src.editor.floor_data.FloorData
+  _FloorData__grid: !!python/object:src.editor.floor_data.CellGrid
+    _CellGrid__cells:
+      ? !!python/tuple
+      - 0
+      - 1
+      : !!python/object:src.editor.floor_data.Cell
+        _Cell__filled: true
+      ? !!python/tuple
+      - 1
+      - 1
+      : !!python/object:src.editor.floor_data.Cell
+        _Cell__filled: true
+      ? !!python/tuple
+      - 1
+      - 2
+      : !!python/object:src.editor.floor_data.Cell
+        _Cell__filled: true
+      ? !!python/tuple
+      - 3
+      - 0
+      : !!python/object:src.editor.floor_data.Cell
+        _Cell__filled: true
+      ? !!python/tuple
+      - 4
+      - 3
+      : !!python/object:src.editor.floor_data.Cell
+        _Cell__filled: true
+    _CellGrid__h: 5
+    _CellGrid__w: 5
+  _FloorData__initial_painter_position: !!python/tuple
+  - 0
+  - 0

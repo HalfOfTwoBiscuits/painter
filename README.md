@@ -32,6 +32,7 @@ Your floors will be grouped into a floorpack. If you'd like everyone to play you
 - On starting a level, display which number it is and how many are left to go.
 
 - Add a 'Test' shortcut in the editor to help you test levels as you create them.
+  - Add a 'Check Possible' button that tells you if the floor is possible to paint or not.
 
 - Aesthetic options when creating levels:
   - Add the ability to change the colour of the paint.
@@ -57,6 +58,7 @@ Your floors will be grouped into a floorpack. If you'd like everyone to play you
 - Challenges to encourage finding alternative solutions to a level, such as: 'Wrap round the edge twice', 'Don't wrap round the edge', or 'Move left first'.
   - This might work just as supplementary material outside the game.
   - If it was a restriction ingame, the grid lines could change colour to indicate you should or shouldn't wrap round.
+  - Maybe the cleanest way is to represent all challenges by a position that you have to end the level in. Most alternative solutions would involve ending in a different cell.
   - There could be a challenge for every distinct way to paint a floor, not just ones that the creator deems less obvious.
 
 - Linux and MacOS executable version(s).
