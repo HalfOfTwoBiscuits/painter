@@ -12,6 +12,7 @@ from .gui_handler import GUIHandler
 from .editor_floorselect_input import EditFloorpacksControl, EditFloorsControl, MoveFloorControl, FloorDestinationControl, \
     SelectFloorToDeleteControl, ConfirmDeleteFloorControl
 from .gui_visual import FloorpackCreateVisual, EditorButtonsVisual, ResizeMenuVisual
+from .autofloor_visual import AutoFloorVisual
 from .test_floor_input import PlaytestControl
 
 class EditFloorpacksState(GameContentSelectState):
@@ -121,7 +122,7 @@ class CreateFloorpackState(StateWithBespokeInput):
                 return 'EditState'
             
 class EditState(StateWithBespokeInput):
-    _VISUAL_HANDLERS = (FloorVisual, PainterVisual, EditorButtonsVisual)
+    _VISUAL_HANDLERS = (FloorVisual, PainterVisual, EditorButtonsVisual, AutoFloorVisual)
     __RESIZE_ID = 'Resize'
     __TEST_ID = 'Test'
     __SAVE_ID = 'Save'
@@ -135,6 +136,7 @@ class EditState(StateWithBespokeInput):
         cell_dimens = FloorVisual.get_cell_dimens_no_line()
         PainterVisual.new_floor(cls.__floor, cell_dimens)
         cls.__changes_made = False
+        AutoFloorVisual.update(cls.__floor)
     
     @classmethod
     def process_bespoke_input(cls, event):
@@ -193,6 +195,7 @@ class EditState(StateWithBespokeInput):
                         SFXPlayer.play_sfx('start')
                         PainterVisual.go_to(cell_pos)
                         cls.__floor.set_initial_painter_position(cell_pos)
+                AutoFloorVisual.update(cls.__floor)
 
 class ResizeFloorState(StateWithBespokeInput):
     _VISUAL_HANDLERS = (FloorVisual, PainterVisual, ResizeMenuVisual)
