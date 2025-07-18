@@ -136,7 +136,6 @@ class EditState(StateWithBespokeInput):
         cell_dimens = FloorVisual.get_cell_dimens_no_line()
         PainterVisual.new_floor(cls.__floor, cell_dimens)
         cls.__changes_made = False
-        AutoFloorVisual.update(cls.__floor)
     
     @classmethod
     def process_bespoke_input(cls, event):
@@ -174,8 +173,14 @@ class EditState(StateWithBespokeInput):
                     top_y <= mouse_y <= top_y + cell_dimens:
                         cell_pos = (x,y)
                         break
-            # If it was, then check whether it was a left or right click.
-            if cell_pos is not None:
+
+            if cell_pos is None:
+                # If it wasn't, it might have been a click
+                # on the solution indicator to toggle solution count.
+                rect = AutoFloorVisual.get_toggle_rect()
+                if rect.collidepoint(mouse_x, mouse_y): AutoFloorVisual.toggle_solution_count(cls.__floor)
+            else:
+                # If it was, then check whether it was a left or right click.
                 match event.button:
                     case 1:
                         cell = cls.__grid[cell_pos]

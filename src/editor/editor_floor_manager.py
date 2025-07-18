@@ -3,6 +3,7 @@ import yaml
 from ..floor_manager import FloorManager
 from ..file_utility import FileUtility
 from .floor_data import FloorData
+from .autofloor_visual import AutoFloorVisual
 
 class EditorFloorManager(FloorManager):
     @classmethod
@@ -62,6 +63,7 @@ class EditorFloorManager(FloorManager):
         after being changed, that data can be passed to edit_floor()
         to put it at this index.'''
         cls.__floor_index_being_edited = index
+        AutoFloorVisual.update(cls.get_floor_being_edited())
     
     @classmethod
     def get_floor_being_edited(cls):

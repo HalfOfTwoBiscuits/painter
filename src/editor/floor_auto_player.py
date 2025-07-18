@@ -2,19 +2,54 @@ from ..game.floor_player import FloorPlayer
 from copy import deepcopy
 
 class FloorAutoPlayer(FloorPlayer):
+    @classmethod
+    def is_possible(cls, floor_obj) -> bool:
+        return cls.__traverse(floor_obj)
+    
+    @classmethod
+    def num_solutions(cls, floor_obj) -> int:
+        return cls.__traverse(floor_obj, find_all_solutions=True)
 
     @classmethod
-    def is_possible(cls, floor_obj):
-        print ('Call')
+    def __traverse(cls, floor_obj, find_all_solutions: bool=False) -> int | bool:
+        #print ('Call')
         cls.new_floor(deepcopy(floor_obj))
 
         successors = [] # Alternative moves not yet tried
-        output = None # Boolean return value
+        running = True
+        if find_all_solutions: num_solutions = 0
+        else: found_solution = False
 
-        while output is None:
-            print (cls._painter_pos, successors)
+        def reverse():
+            output = None
+            while output is None:
+                # Undo
+                if cls.undo() is None:
+                    # If nothing to undo, floor is impossible
+                    output = False
+                else:
+                    # Check for alternative moves
+                    # in previous list.
+                    if len(successors[-1]) == 0:
+                        # No alternate move, undo again
+                        del successors[-1]
+                    else:
+                        # Alternate move found, do it
+                        new_pos = successors[-1].pop()
+                        cls.move_painter(new_pos)
+                        output = True
+            return output
+
+        while running:
+            #print (cls._painter_pos, successors)
             if cls._grid.is_painted():
-                output = True
+                # Solution found, look for alternative moves
+                if find_all_solutions:
+                    num_solutions += 1
+                    running = reverse()
+                else:
+                    found_solution = True
+                    running = False
             else:
                 # List potential moves from here.
                 moves = cls.__valid_moves_from(cls._painter_pos)
@@ -27,26 +62,10 @@ class FloorAutoPlayer(FloorPlayer):
                     successors.append(moves)
                 else:
                     # Find alternate move
-                    undoing = True
-                    while undoing:
-                        # Undo
-                        if cls.undo() is None:
-                            # If nothing to undo, floor is impossible
-                            output = False
-                            undoing = False
-                        else:
-                            # Check for alternative moves
-                            # in previous list.
-                            if len(successors[-1]) == 0:
-                                # No alternate move, undo again
-                                del successors[-1]
-                            else:
-                                # Alternate move found, do it
-                                new_pos = successors[-1].pop()
-                                cls.move_painter(new_pos)
-                                undoing = False
-        print (output)
-        return output
+                    running = reverse()
+                    
+        #print (output)
+        return num_solutions if find_all_solutions else found_solution
 
     @classmethod
     def __adjacents_to(cls, pos: tuple[int]=None) -> set:
