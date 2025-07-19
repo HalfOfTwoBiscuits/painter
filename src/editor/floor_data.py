@@ -103,6 +103,9 @@ class CellGrid:
         Therefore, to save space in floorpack files, this method deletes
         any data specifying empty cells.'''
         self.__cells = {pos : cell for pos, cell in self.__cells.items() if cell.get_full()}
+    
+    def get_num_empty_cells(self):
+        return self.__w * self.__h - len(self.get_full_cell_positions())
 
 
 class Cell:

@@ -237,6 +237,7 @@ class ResizeFloorState(StateWithBespokeInput):
 
                 # Store changes and return to editing
                 EditorFloorManager.edit_floor(floor)
+                AutoFloorVisual.update(floor)
                 return 'EditState'
             
 class FloorPlaytestState(State):
