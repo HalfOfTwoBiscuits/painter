@@ -4,8 +4,9 @@ from copy import deepcopy
 class FloorAutoPlayer(FloorPlayer):
     # Maximums on number of empty cells.
     __USE_ONLY_HEURISTIC_ABOVE = 25
-    __USE_HEURISTIC_ABOVE = 12
     __NO_SOLUTIONCOUNT_ABOVE = 18
+
+    __MAX_DEGREE = 4
 
     @classmethod
     def is_possible(cls, floor_obj) -> bool:
@@ -15,9 +16,8 @@ class FloorAutoPlayer(FloorPlayer):
         if empty_cells > cls.__USE_ONLY_HEURISTIC_ABOVE:
             raise ValueError
         
-        if empty_cells > cls.__USE_HEURISTIC_ABOVE:
-            is_defo_possible = cls.is_possible_heuristic(floor_obj)
-            if is_defo_possible: return True
+        is_defo_possible = cls.is_possible_heuristic(floor_obj)
+        if is_defo_possible: return True
 
         return cls.__traverse(floor_obj)
     
@@ -50,6 +50,7 @@ class FloorAutoPlayer(FloorPlayer):
 
         half_num_cells = num_cells // 2
         #print (f'Half number of cells: {half_num_cells}')
+        if half_num_cells > cls.__MAX_DEGREE: return False
 
         for x in range(width):
             for y in range(height):

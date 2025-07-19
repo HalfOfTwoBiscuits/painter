@@ -26,7 +26,7 @@ class AutoFloorVisual(VisualHandler):
     # 1 : checking possibility with heuristic
     # 2 : definite checking of possiblility
     # 3 : checking number of solutions
-    __state = 2
+    __state = 1
 
     @classmethod
     def update(cls, floor_obj):
@@ -47,8 +47,8 @@ class AutoFloorVisual(VisualHandler):
     @classmethod
     def toggle_solution_count(cls, floor_obj):
         SFXPlayer.play_sfx('menu')
-        if cls.__state == 2: cls.__state = 3
-        else: cls.__state = 2
+        if cls.__state == 3: cls.__state = 1
+        else: cls.__state += 1
         cls.update(floor_obj)
 
     @classmethod
