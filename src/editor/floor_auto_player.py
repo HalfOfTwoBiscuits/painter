@@ -115,15 +115,6 @@ class FloorAutoPlayer(FloorPlayer):
                     
         #print (output)
         return num_solutions if find_all_solutions else found_solution
-
-    @classmethod
-    def __adjacents_to(cls, pos: tuple[int]=None) -> set:
-        DIRECTIONS = {1,-1,2,-2}
-        
-        return {
-            cls.painter_position_after_move(direc, start_pos=pos)
-            for direc in DIRECTIONS
-        }
     
     @classmethod
     def __empty_cells_only(cls, cell_positions: set[tuple[int]]):
@@ -136,7 +127,7 @@ class FloorAutoPlayer(FloorPlayer):
     
     @classmethod
     def __valid_moves_from(cls, pos: tuple[int]=None):
-        adjacents = cls.__adjacents_to(pos)
+        adjacents = cls.adjacents_to(pos)
         return cls.__empty_cells_only(adjacents)
     
     @classmethod

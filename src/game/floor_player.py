@@ -32,6 +32,21 @@ class FloorPlayer:
         #print (f'Moving to {x},{y}')
         return (x,y)
     
+    @classmethod
+    def adjacents_to(cls, pos: tuple[int]=None) -> set:
+        '''Returns the set of cells one move from the given position,
+        or if None, from the painter's current position.
+        Does not check if those cells are painted.
+        
+        Used ingame when checking if a mouse click is on a cell that can be moved to,
+        and in the editor when checking whether a floor is possible to solve.'''
+        DIRECTIONS = {1,-1,2,-2}
+        
+        return {
+            cls.painter_position_after_move(direc, start_pos=pos)
+            for direc in DIRECTIONS
+        }
+
     @staticmethod
     def __loop_round(co_ordinate: int, dimension: int):
         '''Given a x or y co-ordinate and the corresponding width or height of the grid,
