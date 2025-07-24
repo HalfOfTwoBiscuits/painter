@@ -92,8 +92,10 @@ class App(ABC):
     def _process_other_event(self, event):
         '''Respond to other events than keyboard presses
         or closing the game.
-        Overridden by the editor.'''
-        ...
+        Overridden by the editor to include GUI.'''
+        try: new_state_name = self._state.process_bespoke_input(event)
+        except AttributeError: pass
+        else: self._change_state(new_state_name)
     
     def _use_delta(self, dt: float):
         '''Respond to the delta time since the last frame.
