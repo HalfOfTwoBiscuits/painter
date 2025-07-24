@@ -2,9 +2,24 @@ import pygame as pg
 from abc import abstractmethod, ABC
 from .audio_utility import SFXPlayer
 
-class KeyboardInputHandler(ABC):
+class InputHandler(ABC):
+    '''Base for all input processing classes.'''
+
+    @staticmethod
+    @abstractmethod
+    def process_input(self, event):
+        '''Respond to a pygame event. Used for any event other than closing the game.
+
+        For some children an instance is created and for others the class is used,
+        so this is a staticmethod and self is passed in manually.'''
+        ...
+
+class KeyboardInputHandler(InputHandler, ABC):
     '''A base class for input handlers that specifies the
-    process_input() method to respond to key presses.'''
+    _process_keyboard_input() method to respond to key presses,
+    and calls that in process_input().
+    Child classes that want to process other input too
+    can override process_input().'''
 
     # Constant response to keys being pressed
     _ACTIONS = {}
@@ -12,7 +27,13 @@ class KeyboardInputHandler(ABC):
     _variable_actions = None
 
     @staticmethod
-    def process_input(self, key):
+    def process_input(self, event):
+        '''Delegate to _process_keyboard_input().
+        Can be overriden in order to process other input too.'''
+        return self._process_keyboard_input(self, event)
+    
+    @staticmethod
+    def _process_keyboard_input(self, event):
         '''Use the actions dictionary to determine
         what to do in response to a key being pressed.
         
@@ -22,19 +43,20 @@ class KeyboardInputHandler(ABC):
         All other elements in that tuple will be passed as arguments.
         
         The return value of that method, if any, is a string
-        identifier for a new state. Return it to the main loop.
-        
-        For some children an instance is created and for others the class is used,
-        so this is a staticmethod and self is passed in manually in the main loop.'''
+        identifier for a new state. Return it to the main loop.'''
+        if event.type == pg.KEYDOWN:
+            key = event.key
 
-        actions = self._variable_actions or self._ACTIONS
-        a = actions.get(key)
-        if a is not None:
-            method_name = a[0]
-            method_to_call = getattr(self, method_name)
-            arguments = a[1:]
-            state_change = method_to_call(*arguments)
-            return state_change
+            actions = self._variable_actions or self._ACTIONS
+            a = actions.get(key)
+            if a is not None:
+                method_name = a[0]
+                method_to_call = getattr(self, method_name)
+                arguments = a[1:]
+                state_change = method_to_call(*arguments)
+                return state_change
+            
+        return None
         
 class ArbitraryOptionsControl(KeyboardInputHandler, ABC):
     '''Base class for an input handler that uses the MenuVisual

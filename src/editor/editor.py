@@ -10,8 +10,7 @@ class Editor(App):
         size = window.get_size()
         GUIHandler.init(size)
 
-    def _process_other_event(self, e):
-        super()._process_other_event(e)
+    def _other_event_processing(self, e):
         GUIHandler.process_event(e)
 
     def _use_delta(self, dt):

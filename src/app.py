@@ -47,18 +47,19 @@ class App(ABC):
             if e.type == pg.QUIT:
                 # Closing the window ends the program
                 return True
-            if e.type == pg.KEYDOWN:
-                # Process input: make stuff actually happen
-                new_state = self._state.process_input(e.key)
-                # Returning a string will change to the state with that name,
-                # returning None will do nothing,
-                # returning another value will end the program
-                # and return that value as an exit code.
-                # e.g. for test cases: returning a boolean value indicates success/failure.
-                if new_state is not None:
-                    if not isinstance(new_state, str): return new_state
-                    self._change_state(new_state)
-            self._process_other_event(e)
+            
+            # Process input: make stuff actually happen
+            new_state = self._state.process_input(e)
+            # Returning a string will change to the state with that name,
+            # returning None will do nothing,
+            # returning another value will end the program
+            # and return that value as an exit code.
+            # e.g. for test cases: returning a boolean value indicates success/failure.
+            if new_state is not None:
+                if not isinstance(new_state, str): return new_state
+                self._change_state(new_state)
+
+            self._other_event_processing(e)
         
         # Draw graphics
         VisualHandler.start_draw()
@@ -89,13 +90,10 @@ class App(ABC):
             # for temporary states that do processing before moving on
             state_name = self._state.enter()
 
-    def _process_other_event(self, event):
-        '''Respond to other events than keyboard presses
-        or closing the game.
-        Overridden by the editor to include GUI.'''
-        try: new_state_name = self._state.process_bespoke_input(event)
-        except AttributeError: pass
-        else: self._change_state(new_state_name)
+    def _other_event_processing(self, event):
+        '''Additional processing to respond to any event other than closing the game.
+        Overridden by the editor in order to update the GUI.'''
+        ...
     
     def _use_delta(self, dt: float):
         '''Respond to the delta time since the last frame.

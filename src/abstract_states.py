@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 from .game.menu_visual import MenuVisual
 
 class State(ABC):
@@ -12,16 +12,16 @@ class State(ABC):
         ...
 
     @classmethod
-    def process_input(cls, key_pressed):
-        '''Respond to a key press. Delegates to InputHandler.process_input().
+    def process_input(cls, event):
+        '''Respond to any event other than closing the game.
+        Delegates to InputHandler.process_input().
         Return any string identifier of a new state to change to.'''
         i_handler = cls.get_input_handler()
         # get_input_handler() can return None for no input or True to end the program
-        if i_handler is True: return True
-        elif i_handler is None: return
+        if i_handler is True or i_handler is None: return i_handler
 
         # Input handler may be a class or an instance, so 'self' is passed manually
-        new_state = i_handler.process_input(i_handler, key_pressed)
+        new_state = i_handler.process_input(i_handler, event)
         return new_state
 
     @classmethod
@@ -57,17 +57,3 @@ class GameContentSelectState(State, ABC):
     @classmethod
     def get_input_handler(cls):
         return cls._menu_input_handler
-    
-class StateWithBespokeInput(State, ABC):
-
-    @classmethod
-    @abstractmethod
-    def process_bespoke_input(cls, event):
-        '''Serves the same purpose as process_input, but addresses
-        flexible sorts of input based on the event, rather than
-        just keyboard input using the predefined structure of
-        an input handler.
-        Will not be called for the usual pygame keypress events;
-        it responds to the events from pygame_gui in the editor
-        (and could hypothetically respond to other input)'''
-        ...
