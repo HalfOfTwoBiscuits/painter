@@ -1,6 +1,8 @@
 class FloorPlayer:
     '''Interface for the Painter's interactions with the floor.'''
 
+    __DIRECTIONS = [1,-1,2,-2]
+
     @classmethod
     def new_floor(cls, floor_obj):
         '''Initialise the position of the painter, the cell grid to move on,
@@ -33,19 +35,22 @@ class FloorPlayer:
         return (x,y)
     
     @classmethod
-    def adjacents_to(cls, pos: tuple[int]=None) -> set:
-        '''Returns the set of cells one move from the given position,
+    def adjacents_to(cls, pos: tuple[int]=None) -> list:
+        '''Returns the list of cells one move from the given position,
         or if None, from the painter's current position.
         Does not check if those cells are painted.
         
         Used ingame when checking if a mouse click is on a cell that can be moved to,
         and in the editor when checking whether a floor is possible to solve.'''
-        DIRECTIONS = {1,-1,2,-2}
         
-        return {
+        return [
             cls.painter_position_after_move(direc, start_pos=pos)
-            for direc in DIRECTIONS
-        }
+            for direc in cls.__DIRECTIONS
+        ]
+    
+    @classmethod
+    def get_directions(cls):
+        return cls.__DIRECTIONS
 
     @staticmethod
     def __loop_round(co_ordinate: int, dimension: int):
