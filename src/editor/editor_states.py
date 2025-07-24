@@ -162,17 +162,7 @@ class EditState(StateWithBespokeInput):
         elif event.type == pg.MOUSEBUTTONDOWN:
             # Get mouse click position, size of grid, and dimension of a cell.
             mouse_x, mouse_y = event.pos
-            cell_dimens = FloorVisual.get_cell_dimens_no_line()
-            grid_w, grid_h = cls.__grid.get_size()
-            cell_pos = None
-            # Iterate through the grid, checking if the click is within a cell.
-            for x in range(0, grid_w):
-                for y in range(0, grid_h):
-                    left_x, top_y = FloorVisual.topleft_for((x, y))
-                    if left_x <= mouse_x <= left_x + cell_dimens and \
-                    top_y <= mouse_y <= top_y + cell_dimens:
-                        cell_pos = (x,y)
-                        break
+            cell_pos = FloorVisual.get_coordinates_of_cell_clicked(mouse_x, mouse_y)
 
             if cell_pos is None:
                 # If it wasn't, it might have been a click
