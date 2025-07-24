@@ -5,8 +5,8 @@ so despite the web build not currently working, this file is named in that fashi
 To play the game use run_game.py'''
 # /// script
 # dependencies = [
-#   "PyYAML",
-#   "pygame-ce"
+#   "pygame-ce",
+#   "yaml",
 # ]
 import asyncio
 from src.game.game import Game
