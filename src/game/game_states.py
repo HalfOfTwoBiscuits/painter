@@ -1,4 +1,5 @@
 from ..abstract_states import State, GameContentSelectState
+from ..config import ExitOptionConfig
 from .painter_input import PainterControl
 from .pause_input import PauseMenuControl, RestartExitMenuControl, FloorClearMenuControl
 from .floorselect_input import LevelSelectControl, FloorpackSelectControl
@@ -85,10 +86,11 @@ class LevelSelectState(GameContentSelectState):
 
         # If there's only one floorpack, include an exit option.
         # If there's more than one, include a back option.
+        options = floornames
         if FloorManager.get_num_floorpacks() == 1:
-            options = floornames + [cls.__EXIT_OPTION]
+            if ExitOptionConfig.can_exit_game(): options.append(cls.__EXIT_OPTION)
         else:
-            options = floornames + [cls.__BACK_OPTION]
+            options.append(cls.__BACK_OPTION)
 
         cls._setup_menu_visual(options)
         cls._menu_input_handler = LevelSelectControl(cls._menu_visual, cls.__BACK_OPTION, cls.__EXIT_OPTION)
@@ -111,7 +113,8 @@ class FloorpackSelectState(GameContentSelectState):
             FloorManager.select_floorpack(packnames[0])
             return 'LevelSelectState'
         
-        options = packnames + [cls.__EXIT_OPTION]
+        options = packnames
+        if ExitOptionConfig.can_exit_game(): options.append(cls.__EXIT_OPTION)
         
         cls._setup_menu_visual(options)
         cls._menu_input_handler = FloorpackSelectControl(cls._menu_visual, cls.__EXIT_OPTION)

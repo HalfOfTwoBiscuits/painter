@@ -11,8 +11,10 @@ To play the game use run_game.py'''
 import asyncio
 from src.game.game import Game
 from src.startup_utility import setup_state, setup_window
+from src.config import ExitOptionConfig
 
 def main():
+    ExitOptionConfig.disable_exiting_game()
     initial_state = setup_state()
     window = setup_window()
     g = Game(initial_state, window)
