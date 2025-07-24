@@ -20,20 +20,30 @@ In menus, press the number key beside the option you want.
 If you get stuck, you can:
 - undo by pressing backspace
 - press escape or control
+
 By pressing escape or control, you can choose to start again, or paint a different floor instead.
 
-#### The level editor
+### The level editor
 You can also make your own floors to paint! In the level editor, you left-click to paint a cell, and right-click to set the starting position.
 Your floors will be grouped into a floorpack. If you'd like everyone to play your floorpack, consider making a pull request with the corresponding file from your resources/floors directory.
 
 ### To try the game...
-- On Windows, you can download the executable version from the 'releases' area on the right of the page.
+- You can visit [https://halfoftwobiscuits.github.io/painter/]. This doesn't include the level editor yet.
+- On Windows, you can download an executable version from the 'releases' area on the right of the page.
 - On any platform, you can clone this repository, and execute run_game.py, run_editor.py, or run_game_or_editor.py with Python.
 
 #### Ideas for future development...
 - On starting a level, display which number it is and how many are left to go.
 
+- Make both the game and editor controllable with either the mouse or keyboard.
+
+- Allow using the editor in the web build, and downloading level files.
+
 - Add a 'Test' shortcut in the editor to help you test levels as you create them.
+  - Done on the editor-QoL branch.
+
+- Add an indicator that tells you whether the level is possible or not.
+  - Done on the editor-QoL branch.
 
 - Aesthetic options when creating levels:
   - Add the ability to change the colour of the paint.
@@ -63,9 +73,6 @@ Your floors will be grouped into a floorpack. If you'd like everyone to play you
 
 - Linux and MacOS executable version(s).
   - In the level editor, an option that swaps the effects of the left and right mouse button, so that MacOS users can use all the features without a right click.
-
-- A web build. I was unsucessful in creating one with pygbag, and I'm unclear what the issue is, so maybe I'll ask?
-  - pygbag would also allow me to create a mobile build, though the controls would probably need a rework to allow that.
 
 ### Attribution
 Made using pygame-ce [https://pypi.org/project/pygame-ce/].
