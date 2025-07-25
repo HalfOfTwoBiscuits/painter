@@ -20,25 +20,25 @@
   _FloorData__grid: !!python/object:src.editor.floor_data.CellGrid
     _CellGrid__cells:
       ? !!python/tuple
-      - 1
       - 0
-      : !!python/object:src.editor.floor_data.Cell
-        _Cell__filled: true
-      ? !!python/tuple
-      - 1
       - 1
       : !!python/object:src.editor.floor_data.Cell
         _Cell__filled: true
       ? !!python/tuple
       - 1
+      - 1
+      : !!python/object:src.editor.floor_data.Cell
+        _Cell__filled: true
+      ? !!python/tuple
       - 2
+      - 1
       : !!python/object:src.editor.floor_data.Cell
         _Cell__filled: true
     _CellGrid__h: 3
     _CellGrid__w: 3
   _FloorData__initial_painter_position: !!python/tuple
-  - 0
   - 1
+  - 0
 - !!python/object:src.editor.floor_data.FloorData
   _FloorData__grid: !!python/object:src.editor.floor_data.CellGrid
     _CellGrid__cells:
@@ -56,8 +56,13 @@
   _FloorData__grid: !!python/object:src.editor.floor_data.CellGrid
     _CellGrid__cells:
       ? !!python/tuple
-      - 2
       - 0
+      - 1
+      : !!python/object:src.editor.floor_data.Cell
+        _Cell__filled: true
+      ? !!python/tuple
+      - 1
+      - 1
       : !!python/object:src.editor.floor_data.Cell
         _Cell__filled: true
       ? !!python/tuple
@@ -65,16 +70,11 @@
       - 1
       : !!python/object:src.editor.floor_data.Cell
         _Cell__filled: true
-      ? !!python/tuple
-      - 2
-      - 2
-      : !!python/object:src.editor.floor_data.Cell
-        _Cell__filled: true
-    _CellGrid__h: 3
-    _CellGrid__w: 4
+    _CellGrid__h: 4
+    _CellGrid__w: 3
   _FloorData__initial_painter_position: !!python/tuple
   - 1
-  - 1
+  - 2
 - !!python/object:src.editor.floor_data.FloorData
   _FloorData__grid: !!python/object:src.editor.floor_data.CellGrid
     _CellGrid__cells:
