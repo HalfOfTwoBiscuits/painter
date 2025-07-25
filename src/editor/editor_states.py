@@ -252,3 +252,4 @@ class FloorPlaytestState(State):
         FloorPlayer.new_floor(floor)
         cell_dimens = FloorVisual.get_cell_dimens_no_line()
         PainterVisual.new_floor(floor, cell_dimens)
+        if FloorPlayer.floor_is_over(): return PlaytestControl.state_after_win()

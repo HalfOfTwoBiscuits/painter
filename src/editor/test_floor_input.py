@@ -10,6 +10,6 @@ class PlaytestControl(PainterControl):
         return 'EditState'
     
     @staticmethod
-    def _state_after_win():
+    def state_after_win():
         '''Hook that causes a return to the editor after winning.'''
         return 'EditState'

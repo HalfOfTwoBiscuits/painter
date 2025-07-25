@@ -35,10 +35,10 @@ class PainterControl(KeyboardInputHandler):
             PainterVisual.shake()
             SFXPlayer.play_sfx('invalid')
         if FloorPlayer.floor_is_over():
-            return cls._state_after_win()
+            return cls.state_after_win()
 
     @staticmethod
-    def _state_after_win():
+    def state_after_win():
         if FloorManager.floorpack_is_over():
             return 'FloorpackOverState'
         else:

@@ -16,6 +16,7 @@ class NewFloorState(State):
         '''Get the next floor object and use the program to set it up.'''
         floor_obj = FloorManager.next_floor()
         cls.__start_floor(floor_obj)
+        if FloorPlayer.floor_is_over(): return PainterControl.state_after_win()
         return "GameplayState"
 
     @classmethod

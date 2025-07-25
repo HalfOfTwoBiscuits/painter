@@ -6,6 +6,7 @@ class FloorPlayer:
         '''Initialise the position of the painter, the cell grid to move on,
         and undo history.'''
         cls._painter_pos = floor_obj.get_initial_painter_position()
+        cls.__painter_dir = -2
         cls._grid = floor_obj.get_cell_grid()
         cls.__position_history = [] # Series of positions occupied
         cls.__direction_history = [] # Same length: history of directions faced
