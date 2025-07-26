@@ -76,22 +76,24 @@ class LevelSelectState(GameContentSelectState):
         If there's more than one floorpack, add to the menu a 'Back' option which
         will return to the floorpack select.'''
 
-        floornames = FloorManager.get_floor_names()
+        options = FloorManager.get_floor_names()
         
         # If there's only one floor, select it
-        if len(floornames) == 1:
+        if len(options) == 1:
             FloorManager.select_floor(0)
             return 'NewFloorState'
 
         # If there's only one floorpack, include an exit option.
         # If there's more than one, include a back option.
-        if FloorManager.get_num_floorpacks() == 1:
-            options = floornames + [cls.__EXIT_OPTION]
+        only_one_floorpack = FloorManager.get_num_floorpacks() == 1
+        if only_one_floorpack:
+            last_option = cls.__EXIT_OPTION
         else:
-            options = floornames + [cls.__BACK_OPTION]
+            last_option = cls.__BACK_OPTION
+        options.append(last_option)
 
         cls._setup_menu_visual(options)
-        cls._menu_input_handler = LevelSelectControl(cls._menu_visual, cls.__BACK_OPTION, cls.__EXIT_OPTION)
+        cls._menu_input_handler = LevelSelectControl(cls._menu_visual, last_option, only_one_floorpack)
 
 class FloorpackSelectState(GameContentSelectState):
     '''The player is choosing a floorpack to play.

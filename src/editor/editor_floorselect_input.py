@@ -1,42 +1,39 @@
-from ..abstract_handlers import KeyboardInputHandler, ArbitraryOptionsControl, FloorManagementControl
+from ..abstract_handlers import KeyboardInputHandler, ArbitraryOptionsControlWithBackButton
 from ..audio_utility import SFXPlayer
 from .editor_floor_manager import EditorFloorManager
 import pygame as pg
 
-class EditFloorpacksControl(ArbitraryOptionsControl):
+class EditFloorpacksControl(ArbitraryOptionsControlWithBackButton):
+    _STATE_AFTER_BACK = 3
+
     def __init__(self, menu_visual_obj, CREATE_OPTION_ID: str, EXIT_OPTION_ID: str):
-        super().__init__(menu_visual_obj)
+        super().__init__(menu_visual_obj, EXIT_OPTION_ID)
         self.__CREATE_OPTION = CREATE_OPTION_ID
-        self.__EXIT_OPTION = EXIT_OPTION_ID
 
     def select(self, number: int):
         '''If the 'Create' option was selected, create a new floorpack.
         Otherwise, set the floor manager to start from the selected floor,
         and switch to selecting a floor.'''
-
-        option_id = self._find_option_for_number(number)
-        if option_id is None: return
+        try: back_option_chosen = self._find_option_for_number(number)
+        except ValueError: return
+        if back_option_chosen: return self.back()
         
-        if option_id == self.__CREATE_OPTION:
+        if self._option_id == self.__CREATE_OPTION:
             # Create floorpack.
             SFXPlayer.play_sfx('menu')
             return 'CreateFloorpackState'
-        elif option_id == self.__EXIT_OPTION:
-            # Quit the editor if using it standalone.
-            # If using the combined game/editor, return to game/editor selection.
-            SFXPlayer.play_sfx('back')
-            return 3
 
         # Edit floorpack.
         SFXPlayer.play_sfx('start')
-        EditorFloorManager.select_floorpack(option_id)
+        EditorFloorManager.select_floorpack(self._option_id)
         return 'EditFloorsState'
 
-class EditFloorsControl(ArbitraryOptionsControl):
+class EditFloorsControl(ArbitraryOptionsControlWithBackButton):
+    _STATE_AFTER_BACK = 'EditFloorpacksState'
     def __init__(self, menu_visual_obj,
                 CREATE_OPTION_ID: str, MOVE_OPTION_ID: str, DELETE_OPTION_ID: str, BACK_OPTION_ID: str):
-        super().__init__(menu_visual_obj)
-        self.__BACK_OPTION = BACK_OPTION_ID
+        super().__init__(menu_visual_obj, BACK_OPTION_ID)
+
         self.__CREATE_OPTION = CREATE_OPTION_ID
         self.__MOVE_OPTION = MOVE_OPTION_ID
         self.__DELETE_OPTION = DELETE_OPTION_ID
@@ -47,83 +44,81 @@ class EditFloorsControl(ArbitraryOptionsControl):
         If the 'Reorder' option is selected, switch to re-ordering floors.
         If the 'Back' option is selected, return to the floorpack selection.'''
 
-        option_id = self._find_option_for_number(number)
-        if option_id is None: return
+        try: back_option_chosen = self._find_option_for_number(number)
+        except ValueError: return
+        if back_option_chosen: return self.back()
         
-        elif option_id == self.__BACK_OPTION:
-            # Return to floorpack selection
-            SFXPlayer.play_sfx('back')
-            return 'EditFloorpacksState'
-        elif option_id == self.__MOVE_OPTION:
-            # Reorder floors
-            SFXPlayer.play_sfx('menu')
-            return 'SelectFloorToMoveState'
-        elif option_id == self.__DELETE_OPTION:
-            # Delete a floor
-            SFXPlayer.play_sfx('menu')
-            return 'SelectFloorToDeleteState'
-        
-        SFXPlayer.play_sfx('start')
-        if option_id == self.__CREATE_OPTION:
-            # Create floor
-            EditorFloorManager.create_floor()
-            # TEMPORARY.
-            # Should go to edit, then save option in there will keep the floor.
-            EditorFloorManager.save_floorpack()
-            return 'EditFloorsState'
-        else:
-            # Load floor
-            floor_index = EditorFloorManager.index_from_floor_name(option_id)
-            EditorFloorManager.select_floor_to_edit(floor_index)
+        match self._option_id:
+            case self.__MOVE_OPTION:
+                # Reorder floors
+                SFXPlayer.play_sfx('menu')
+                return 'SelectFloorToMoveState'
+            case self.__DELETE_OPTION:
+                # Delete a floor
+                SFXPlayer.play_sfx('menu')
+                return 'SelectFloorToDeleteState'
+            case self.__CREATE_OPTION:
+                # Create floor
+                SFXPlayer.play_sfx('start')
+                EditorFloorManager.create_floor()
+                return 'EditState'
+            case _:
+                # Load floor
+                SFXPlayer.play_sfx('start')
+                # TEMPORARY.
+                # Should go to edit, then save option in there will keep the floor.
+                EditorFloorManager.save_floorpack()
+                return 'EditFloorsState'
 
-        # Begin editing
-        return 'EditState'
-
-class MoveFloorControl(FloorManagementControl):
+class MoveFloorControl(ArbitraryOptionsControlWithBackButton):
+    _STATE_AFTER_BACK = 'EditFloorsState'
         
     def select(self, number: int):
         '''If the back option was selected, go back to selecting a floor to edit.
         Otherwise, proceed to selecting the new index for the floor.'''
-        try: cancelling = self._check_for_back_option(number)
+        try: back_option_chosen = self._find_option_for_number(number)
         except ValueError: return
-        if cancelling: return self.back()
-
+        if back_option_chosen: return self.back()
+ 
         SFXPlayer.play_sfx('menu')
         floor_index = EditorFloorManager.index_from_floor_name(self._option_id)
         EditorFloorManager.select_floor_to_move(floor_index)
         return 'SelectFloorDestinationState'
 
-class FloorDestinationControl(MoveFloorControl):
-    
+class FloorDestinationControl(ArbitraryOptionsControlWithBackButton):
+    _STATE_AFTER_BACK = 'SelectFloorToMoveState'
+
     def __init__(self, menu_visual_obj, BACK_OPTION_ID: str, CANCEL_OPTION_ID: str):
-        super().__init__(menu_visual_obj, CANCEL_OPTION_ID)
-        self.__BACK_OPTION = BACK_OPTION_ID
+        super().__init__(menu_visual_obj, BACK_OPTION_ID)
+        self.__CANCEL_OPTION = CANCEL_OPTION_ID
 
     def select(self, number: int):
         '''If the back options was selected, go back to selecting a floor to edit.
         Otherwise, move the previously selected floor to the new location.'''
-        try: cancelling = self._check_for_back_option(number)
+
+        try: back_option_chosen = self._find_option_for_number(number)
         except ValueError: return
-        if self._option_id == self.__BACK_OPTION:
+        if back_option_chosen: return self.back()
+
+        if self._option_id == self.__CANCEL_OPTION:
             SFXPlayer.play_sfx('back')
-            return 'SelectFloorToMoveState'
-        elif not cancelling:
+        else:
             SFXPlayer.play_sfx('move')
             if self._option_id == 'End': floor_index = EditorFloorManager.get_num_floors()
             else: floor_index = EditorFloorManager.index_from_floor_name(self._option_id)
             EditorFloorManager.move_selected_floor(floor_index)
             EditorFloorManager.save_floorpack()
 
-        return self.back()
+        return 'EditFloorsState'
     
-class SelectFloorToDeleteControl(FloorManagementControl):
-
+class SelectFloorToDeleteControl(ArbitraryOptionsControlWithBackButton):
+    _STATE_AFTER_BACK = 'EditFloorsState'
     def select(self, number: int):
-        try: cancelling = self._check_for_back_option(number)
+        try: back_option_chosen = self._find_option_for_number(number)
         except ValueError: return
-        if cancelling: return self.back()
-        SFXPlayer.play_sfx('menu')
+        if back_option_chosen: return self.back()
 
+        SFXPlayer.play_sfx('menu')
         floor_index = EditorFloorManager.index_from_floor_name(self._option_id)
         EditorFloorManager.select_floor_to_delete(floor_index)
         return 'ConfirmDeleteFloorState'

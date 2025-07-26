@@ -90,14 +90,14 @@ class ArbitraryOptionsControl(KeyboardInputHandler, ABC):
 
     def _find_option_for_number(self, number: int):
         '''If the number given corresponds to an option, 
-        return the string used to describe it on the menu.
-        If it doesn't then play an 'invalid' sfx.'''
+        store the ID used for it on the menu as the _option_id attribute.
+        If there is no corresponding option then play an 'invalid' sfx
+        and raise ValueError.'''
         try:
-            option_id = self._menu.option_for_number(number)
+            self._option_id = self._menu.option_for_number(number)
         except ValueError:
             SFXPlayer.play_sfx('invalid')
-        else:
-            return option_id
+            raise ValueError
         
     def nextpage(self):
         '''Go to the next page on the menu'''
@@ -108,36 +108,28 @@ class ArbitraryOptionsControl(KeyboardInputHandler, ABC):
         self._menu.prev_page()
 
 class ArbitraryOptionsControlWithBackButton(ArbitraryOptionsControl, ABC):
+
+    _STATE_AFTER_BACK = None
+
     def __init__(self, menu_visual_obj, BACK_OPTION_ID: str):
         super().__init__(menu_visual_obj)
-        self._BACK_OPTION = BACK_OPTION_ID
+        self.__BACK_OPTION = BACK_OPTION_ID
         self.__class__._variable_actions[pg.K_BACKSPACE] = ('back',)
         self.__class__._variable_actions[pg.K_ESCAPE] = ('back',)
 
-    def _check_for_back_option(self, number: int):
-        '''If the back option was selected, return True.
-        If another option was selected, return False.
-        If the selection was invalid, raise ValueError.
-        Store option ID for later reference so find_option_for_number
-        doesn't have to be called again.'''
+    def _find_option_for_number(self, number: int) -> bool:
+        '''Like the base _find_option_for_number but also returns
+        a boolean for whether the back option was chosen.
+        True : back option chosen, False : another option was chosen.
+        Will raise ValueError if there is no corresponding option.'''
 
-        # Small optimisation: make _find_option_for_number raise ValueError.
-        self._option_id = self._find_option_for_number(number)
-        if self._option_id is None: raise ValueError
-        elif self._option_id == self._BACK_OPTION:
-            SFXPlayer.play_sfx('back')
-            return True
-        return False
+        super()._find_option_for_number(number)
+        return self._option_id == self.__BACK_OPTION
     
-    @staticmethod
-    @abstractmethod
-    def back():
-        ...
-
-class FloorManagementControl(ArbitraryOptionsControlWithBackButton, ABC):
-    @staticmethod
-    def back():
-        return 'EditFloorsState'
+    @classmethod
+    def back(cls) -> str | int:
+        SFXPlayer.play_sfx('back')
+        return cls._STATE_AFTER_BACK
 
 class VisualHandler:
     '''Has access to the window surface to draw graphics onto,
