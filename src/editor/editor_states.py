@@ -17,7 +17,7 @@ from .autofloor_visual import AutoFloorVisual
 from .test_floor_input import PlaytestControl
 
 class EditFloorpacksState(GameContentSelectState):
-    _TITLE = 'Select Floor Pack'
+    _TITLE = 'Select Pack To Edit'
     __CREATE_OPTION = 'Create New'
     __EXIT_OPTION = 'Exit Editor'
 
