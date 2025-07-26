@@ -11,14 +11,10 @@ class LevelSelectControl(ArbitraryOptionsControlWithBackButton):
         super().__init__(menu_visual_obj, back_option_id)
         self.__class__.__back_option_is_exit_game = is_only_one_floorpack
 
-    def select(self, number: int):
-        '''If the 'Back' option was selected, return to the floorpack select.
-        Otherwise, set the floor manager to start from the selected floor,
+    def _choose_option(self):
+        '''If a floor was selected,
+        set the floor manager to start from that floor,
         and switch to the gameplay state.'''
-
-        try: back_option_chosen = self._find_option_for_number(number)
-        except ValueError: return
-        if back_option_chosen: return self.back()
         
         floor_index = FloorManager.index_from_floor_name(self._option_id)
         # Select the floor and go to gameplay.
@@ -34,19 +30,17 @@ class LevelSelectControl(ArbitraryOptionsControlWithBackButton):
     
 class FloorpackSelectControl(ArbitraryOptionsControlWithBackButton):
     '''Input handler for floorpack selection.'''
-    # Choosing the exit option will quit the game,
+
+    # If the back option is selected, quit the game,
     # or if using both game and editor, go back to game/editor choice.
     _STATE_AFTER_BACK = 3
 
     def __init__(self, menu_visual_obj, EXIT_OPTION_ID: str):
         super().__init__(menu_visual_obj, EXIT_OPTION_ID)
 
-    def select(self, number: int):
+    def _choose_option(self):
         '''Set the floor manager to use the selected floorpack,
         and switch to the floor select state.'''
-        try: back_option_chosen = self._find_option_for_number(number)
-        except ValueError: return
-        if back_option_chosen: return self.back()
 
         # Select the floorpack corresponding to the option.
         FloorManager.select_floorpack(self._option_id)

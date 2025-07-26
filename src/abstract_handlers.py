@@ -82,10 +82,23 @@ class ArbitraryOptionsControl(KeyboardInputHandler, ABC):
         self.__class__._variable_actions = actions
 
     @abstractmethod
-    def select(self, number: int):
+    def select_keyboard(self, number: int):
         '''Hook for when a number key 1-9 is pressed.
-        Selects the menu option corresponding to that number,
-        if there is one.'''
+        Selects the menu option corresponding to that number, if there is one.
+        Should call _choose_option()'''
+        ...
+
+    @abstractmethod
+    def select_mouse(self):
+        '''Hook for when an option is clicked with the mouse.
+        The option ID is, at this point, already stored in the _option_id attribute.
+        Should call _choose_option().'''
+        ...
+
+    @abstractmethod
+    def _choose_option(self):
+        '''Hook for when an option is selected and its ID has been stored.
+        Should be called in select().'''
         ...
 
     def _find_option_for_number(self, number: int):
@@ -107,6 +120,26 @@ class ArbitraryOptionsControl(KeyboardInputHandler, ABC):
         '''Go to the previous page on the menu'''
         self._menu.prev_page()
 
+    @staticmethod
+    def process_input(self, event):
+        '''In addition to using _process_keyboard_input() to respond to number keys
+        being pressed to select options, allow clicking options to select them
+        or clicking the top area of the menu to change page.'''
+        if event.type == pg.MOUSEBUTTONDOWN:
+            x, y = event.pos
+            try:
+                menu_response = self._menu.option_for_mouse_location(x,y)
+            except ValueError: pass
+            else:
+                match menu_response:
+                    case 1: self.prevpage()
+                    case 2: self.nextpage()
+                    case _:
+                        self._option_id = menu_response
+                        return self._choose_option()
+        else: return self._process_keyboard_input(self, event)
+
+
 class ArbitraryOptionsControlWithBackButton(ArbitraryOptionsControl, ABC):
 
     _STATE_AFTER_BACK = None
@@ -117,6 +150,16 @@ class ArbitraryOptionsControlWithBackButton(ArbitraryOptionsControl, ABC):
         self.__class__._variable_actions[pg.K_BACKSPACE] = ('back',)
         self.__class__._variable_actions[pg.K_ESCAPE] = ('back',)
 
+    def select_keyboard(self, number: int):
+        try: back_option_chosen = self._find_option_for_number(number)
+        except ValueError: return
+        if back_option_chosen: return self.back()
+        return self._choose_option()
+    
+    def select_mouse(self):
+        if self._option_id == self.__BACK_OPTION: return self.back()
+        return self._choose_option()
+    
     def _find_option_for_number(self, number: int) -> bool:
         '''Like the base _find_option_for_number but also returns
         a boolean for whether the back option was chosen.

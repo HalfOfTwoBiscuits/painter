@@ -72,8 +72,11 @@ class MenuVisual(VisualHandler):
         # to find the position of the topleft and bottom.
         win_width, win_height = self.__class__._window_dimensions
         self.__left_edge = (win_width - self.__width) // 2
+        self.__right_edge = self.__width + self.__left_edge
         self.__top_edge = (win_height - self.__height) // 2
         self.__bottom_edge = self.__height + self.__top_edge
+        self.__x_centre = self.__left_edge + self.__width // 2
+        self.__top_of_options = self.__top_edge + self.__row_height * self.__extra_rows
 
     def __prepend_key(self, option: str, index: int):
         '''Add the key pressed to select the option to the front of it.
@@ -116,20 +119,23 @@ class MenuVisual(VisualHandler):
         if self.__is_multi_page:
             self.__draw_menu_row(self.__arrows_string, self.__top_edge + self.__row_height, heading=True)
 
-        # Find the options being shown on the current page
-        cur_options = self.__options[self.__first_option_index(self.__page_index):
-                                     self.__first_option_index(self.__page_index + 1)]
+        cur_options = self.__option_names_on_current_page()
 
         # Iterate over options, incrementing top_y by row_height from top to bottom of the menu
         # If we are on the last page and there are fewer options left than OPTIONS_PER_PAGE
         # then zip() will truncate the range of y positions.
         for index, option_info in enumerate(zip(cur_options,
-            range(self.__top_edge + self.__row_height * self.__extra_rows,
+            range(self.__top_of_options,
                   self.__bottom_edge, self.__row_height))):
 
             option, top_y = option_info
             full_option = self.__prepend_key(option, index)
             self.__draw_menu_row(full_option, top_y)
+
+    def __option_names_on_current_page(self) -> list:
+        '''Slice the list of option names to return the options on the current page.'''
+        return self.__options[self.__first_option_index(self.__page_index):
+                              self.__first_option_index(self.__page_index + 1)]
 
     def __first_option_index(self, page_index: int):
         '''Return the index of the first option on the given page index.'''
@@ -137,7 +143,7 @@ class MenuVisual(VisualHandler):
     
     def __draw_menu_row(self, content: str, top: int, heading: bool=False):
         '''Render the given content string, with padding separating it from
-        the left edge of the menu and from the given y position for the top.
+        the left edge of the menu and from the given y position for the top of the row.
         If heading is True, use the larger font and centre the text.'''
 
         # Find topleft corner of the option
@@ -165,22 +171,56 @@ class MenuVisual(VisualHandler):
 
         if 1 <= number_pressed <= self.__class__.__OPTIONS_PER_PAGE:
             try:
-                index_increment = number_pressed - 1
-                # Multiply __OPTIONS_PER_PAGE by the page index to find how many along we already are,
-                # and add number_pressed - 1
-                option_index = index_increment + self.__first_option_index(self.__page_index)
-                try:
-                    id = self.__option_ids[option_index]
-                    if id is None: raise IndexError
-                except IndexError:
-                    return self.__options[option_index]
-                else:
-                    return id
-            
+                return self.__id_for(number_pressed)
             # Raise error if the number isn't within 1 to __OPTIONS_PER_PAGE
             # or the resulting index is past the final option
             except IndexError: raise ValueError        
         else: raise ValueError
+
+    def __id_for(self, num: int) -> str:
+        '''Return the ID used for the option with the given number on the current page.
+        By default, this is the text displayed for the option,
+        but if an option_ids list was specified on initialisation,
+        a string value at the same index in that list will be preferred.
+        Raises IndexError if the number doesn't currently correspond to an option.'''
+        
+        index = num - 1 + self.__first_option_index(self.__page_index)
+
+        try:
+            id = self.__option_ids[index]
+            if id is None: raise IndexError
+        except IndexError:
+            return self.__options[index]
+        else:
+            return id
+        
+    def option_for_mouse_location(self, mouse_x: int, mouse_y: int) -> str | int | None:
+        '''If the given mouse position is on an option, return the string ID for the option.
+        If the menu has more than one page, and the mouse is in the area with the title and arrows,
+        return 1 for the left hand side of the menu and 2 for the right hand side.
+        If neither of these conditions are met then raise ValueError.'''
+
+        # If within the menu:
+        if self.__left_edge < mouse_x < self.__right_edge \
+        and self.__top_edge < mouse_y < self.__bottom_edge:
+            
+            # If there are multiple pages and the user clicked above the options,
+            # return 1 for the left side and 2 for the right.
+            if self.__is_multi_page and mouse_y < self.__top_of_options:
+                return mouse_x < self.__x_centre and 1 or 2
+            
+            # Otherwise, check if the click was on an option
+            else:
+                # The number that would have been pressed for the option can be found by dividing
+                # the distance from the top of the options by the height of a row.
+                y_distance_from_top_of_options = mouse_y - self.__top_of_options
+                option_num = y_distance_from_top_of_options // self.__row_height + 1
+                # If there is an option onscreen with that number, return its ID.
+                try:
+                    return self.__id_for(option_num)
+                except IndexError: print (f'Invalid option {option_num} clicked!')
+        
+        raise ValueError
 
     def next_page(self):
         '''Increment the page number to show later options.
