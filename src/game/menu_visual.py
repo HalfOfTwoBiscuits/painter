@@ -2,6 +2,7 @@ import pygame as pg
 from math import ceil
 from ..abstract_handlers import VisualHandler
 from ..file_utility import FileUtility
+from ..audio_utility import SFXPlayer
 
 class MenuVisual(VisualHandler):
     '''A visual for menus where the player chooses a numbered option.
@@ -31,6 +32,7 @@ class MenuVisual(VisualHandler):
         self.__option_ids = option_ids
         self.__page_index = 0
         self.__num_pages = ceil(len(options) / self.__class__.__OPTIONS_PER_PAGE)
+        self.__is_multi_page = self.__num_pages > 1
 
         # Find the width required for the longest line in the menu
         # and height required for the tallest.
@@ -52,12 +54,19 @@ class MenuVisual(VisualHandler):
         # Add padding to width to find the menu width
         self.__width = option_width + self.__class__.__PADDING_PX * 2 + self.__class__.__SIDE_PADDING * 2
 
+        # Find string containing ASCII arrows with space between them,
+        # indicating multiple pages. Amount of space between depends on menu width
+        if self.__is_multi_page:
+            self.__arrows_string = self.__arrows_at_edges(self.__width)
+
         # Add padding to height to find height of a row in the menu
         self.__row_height = option_height + self.__class__.__PADDING_PX * 2
 
-        # Find total height: height of all options on a page, plus one for the title
+        # Find total height: height of all options on a page,
+        # plus one for the title, and another one for the arrows if there's more than one page.
+        self.__extra_rows = self.__is_multi_page and 2 or 1
         options_on_page = self.get_options_per_page()
-        self.__height = self.__row_height * (options_on_page + 1)
+        self.__height = self.__row_height * (options_on_page + self.__extra_rows)
 
         # Get window dimensions and subtract the width and height needed,
         # to find the position of the topleft and bottom.
@@ -78,10 +87,20 @@ class MenuVisual(VisualHandler):
         add the page number and total number of pages in brackets.'''
 
         output = title
-        if self.__num_pages > 1:
+        if self.__is_multi_page:
             page_num = self.__page_index + 1
             output += f' ({page_num}/{self.__num_pages})'
         return output
+    
+    def __arrows_at_edges(self, menu_width: int):
+        '''Given the width of the menu, return a string with ASCII arrows
+        separated by space so that they would be at the left and right edges of the width.
+        This string is used to draw a graphic indicating the user can change pages.
+        The user can change pages by clicking the graphic or using the arrow keys.'''
+        LEFT_ARROW = '<-'
+        RIGHT_ARROW = '->'
+        ARROW_WIDTH, _ = self.__class__.__TITLE_FONT.size(LEFT_ARROW)
+        return LEFT_ARROW + ' ' * (menu_width // ARROW_WIDTH - 1) + RIGHT_ARROW
 
     def draw(self):
         # Draw background rect
@@ -91,7 +110,11 @@ class MenuVisual(VisualHandler):
         
         # Draw title
         full_title = self.__append_page_info(self.__title)
-        self.__draw_menu_row(full_title, self.__top_edge, is_title=True)
+        self.__draw_menu_row(full_title, self.__top_edge, heading=True)
+
+        # Draw arrows: clicked to change page
+        if self.__is_multi_page:
+            self.__draw_menu_row(self.__arrows_string, self.__top_edge + self.__row_height, heading=True)
 
         # Find the options being shown on the current page
         cur_options = self.__options[self.__first_option_index(self.__page_index):
@@ -101,7 +124,8 @@ class MenuVisual(VisualHandler):
         # If we are on the last page and there are fewer options left than OPTIONS_PER_PAGE
         # then zip() will truncate the range of y positions.
         for index, option_info in enumerate(zip(cur_options,
-            range(self.__top_edge + self.__row_height, self.__bottom_edge, self.__row_height))):
+            range(self.__top_edge + self.__row_height * self.__extra_rows,
+                  self.__bottom_edge, self.__row_height))):
 
             option, top_y = option_info
             full_option = self.__prepend_key(option, index)
@@ -111,21 +135,20 @@ class MenuVisual(VisualHandler):
         '''Return the index of the first option on the given page index.'''
         return page_index * self.__class__.__OPTIONS_PER_PAGE
     
-    def __draw_menu_row(self, content: str, top: int, is_title: bool=False):
+    def __draw_menu_row(self, content: str, top: int, heading: bool=False):
         '''Render the given content string, with padding separating it from
         the left edge of the menu and from the given y position for the top.
-        If is_title is True, use the larger font.
-        Underneath, draw a line.'''
+        If heading is True, use the larger font and centre the text.'''
 
         # Find topleft corner of the option
         left = self.__left_edge + self.__class__.__PADDING_PX
         top += self.__class__.__PADDING_PX
 
         # Select font to use
-        font = is_title and self.__class__.__TITLE_FONT or self.__class__.__FONT
+        font = heading and self.__class__.__TITLE_FONT or self.__class__.__FONT
 
         # If title, centre
-        if is_title:
+        if heading:
             text_w, _ = font.size(content)
             left += (self.__width - text_w) // 2     
 
@@ -163,13 +186,17 @@ class MenuVisual(VisualHandler):
         '''Increment the page number to show later options.
         Does nothing if the menu is on the last page.'''
         if self.__page_index + 1 < self.__num_pages:
+            SFXPlayer.play_sfx('move')
             self.__page_index += 1
+        else: SFXPlayer.play_sfx('invalid')
 
     def prev_page(self):
         '''Decrement the page number to show earlier options.
         Does nothing if the menu is on the first page.'''
         if self.__page_index > 0:
+            SFXPlayer.play_sfx('move')
             self.__page_index -= 1
+        else: SFXPlayer.play_sfx('invalid')
 
     def get_options_per_page(self):
         '''Return the number of options per page, either the __OPTIONS_PER_PAGE constant

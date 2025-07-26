@@ -101,12 +101,10 @@ class ArbitraryOptionsControl(KeyboardInputHandler, ABC):
         
     def nextpage(self):
         '''Go to the next page on the menu'''
-        SFXPlayer.play_sfx('move')
         self._menu.next_page()
     
     def prevpage(self):
         '''Go to the previous page on the menu'''
-        SFXPlayer.play_sfx('move')
         self._menu.prev_page()
 
 class ArbitraryOptionsControlWithBackButton(ArbitraryOptionsControl, ABC):
