@@ -65,10 +65,9 @@ class EditFloorsControl(ArbitraryOptionsControlWithBackButton):
             case _:
                 # Load floor
                 SFXPlayer.play_sfx('start')
-                # TEMPORARY.
-                # Should go to edit, then save option in there will keep the floor.
-                EditorFloorManager.save_floorpack()
-                return 'EditFloorsState'
+                floor_index = EditorFloorManager.index_from_floor_name(self._option_id)
+                EditorFloorManager.select_floor_to_edit(floor_index)
+                return 'EditState'
 
 class MoveFloorControl(ArbitraryOptionsControlWithBackButton):
     _STATE_AFTER_BACK = 'EditFloorsState'

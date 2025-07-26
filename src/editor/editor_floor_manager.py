@@ -35,11 +35,11 @@ class EditorFloorManager(FloorManager):
     def create_floor(cls):
         '''Create a 3x3 floor where the painter starts at 0,0.
         Insert it at the end of the current floorpack,
-        and select it.'''
+        and select it to be edited.'''
         floor = cls.__default_floor()
         pack = cls._floor_packs[cls._current_pack_id]
         pack.append(floor)
-        cls.select_floor(len(pack) - 1)
+        cls.select_floor_to_edit(len(pack) - 1)
     
     @classmethod
     def __default_floor(cls):
