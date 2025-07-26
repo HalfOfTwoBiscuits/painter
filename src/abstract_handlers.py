@@ -73,7 +73,7 @@ class ArbitraryOptionsControl(KeyboardInputHandler, ABC):
             # Get key code for the given number key, from 1 to NUM_OPTIONS.
             # When that key is pressed, call select() with the number
             # to choose the option.
-            pg.key.key_code(str(num)) : ('select', num)
+            pg.key.key_code(str(num)) : ('select_keyboard', num)
             for num in range(1, NUM_OPTIONS + 1)
         }
 
