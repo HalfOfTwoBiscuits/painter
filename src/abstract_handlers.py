@@ -77,8 +77,8 @@ class MenuControl(KeyboardInputHandler, ABC):
             except ValueError: pass
             else:
                 match menu_response:
-                    case 1: menu_visual_obj.next_page()
-                    case 2: menu_visual_obj.prev_page()
+                    case 1: menu_visual_obj.prev_page()
+                    case 2: menu_visual_obj.next_page()
                     case _:
                         return self._select_mouse(self, *menu_response)
         else: return self._process_keyboard_input(self, event)
