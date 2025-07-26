@@ -136,7 +136,7 @@ class ArbitraryOptionsControl(KeyboardInputHandler, ABC):
                     case 2: self.nextpage()
                     case _:
                         self._option_id = menu_response
-                        return self._choose_option()
+                        return self.select_mouse()
         else: return self._process_keyboard_input(self, event)
 
 
