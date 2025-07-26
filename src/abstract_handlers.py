@@ -34,6 +34,13 @@ class KeyboardInputHandler(InputHandler, ABC):
     
     @staticmethod
     def _process_keyboard_input(self, event):
+        '''If the event is a keypress, delegate to _process_keypress().'''
+        if event.type == pg.KEYDOWN:
+            return self._process_keypress(self, event.key)
+        return None
+    
+    @staticmethod
+    def _process_keypress(self, key):
         '''Use the actions dictionary to determine
         what to do in response to a key being pressed.
         
@@ -44,21 +51,65 @@ class KeyboardInputHandler(InputHandler, ABC):
         
         The return value of that method, if any, is a string
         identifier for a new state. Return it to the main loop.'''
-        if event.type == pg.KEYDOWN:
-            key = event.key
 
-            actions = self._variable_actions or self._ACTIONS
-            a = actions.get(key)
-            if a is not None:
-                method_name = a[0]
-                method_to_call = getattr(self, method_name)
-                arguments = a[1:]
-                state_change = method_to_call(*arguments)
-                return state_change
-            
-        return None
-        
-class ArbitraryOptionsControl(KeyboardInputHandler, ABC):
+        actions = self._variable_actions or self._ACTIONS
+        a = actions.get(key)
+        if a is not None:
+            method_name = a[0]
+            method_to_call = getattr(self, method_name)
+            arguments = a[1:]
+            state_change = method_to_call(*arguments)
+            return state_change
+
+class MenuControl(KeyboardInputHandler, ABC):
+    '''Class that specifies a static method used to
+    respond to clicking on a menu with the mouse.'''
+
+    @staticmethod
+    def _process_input_with_mouse(self, event, menu_visual_obj):
+        '''Allow clicking options to select them
+        or clicking the top area of the menu to change page.
+        Delegates to select_mouse().'''
+        if event.type == pg.MOUSEBUTTONDOWN:
+            x, y = event.pos
+            try:
+                menu_response = menu_visual_obj.option_for_mouse_location(x, y)
+            except ValueError: pass
+            else:
+                match menu_response:
+                    case 1: menu_visual_obj.next_page()
+                    case 2: menu_visual_obj.prev_page()
+                    case _:
+                        return self._select_mouse(self, *menu_response)
+        else: return self._process_keyboard_input(self, event)
+    
+    @staticmethod
+    @abstractmethod
+    def _select_mouse(self, number: int, option_id: str):
+        '''Hook for when an option is clicked with the mouse.'''
+        ...
+
+class FixedOptionsControl(MenuControl, ABC):
+    '''Base class for an input handler that prompts the user
+    to choose between a number of fixed options.
+    Since the option that corresponds to a keypress is known,
+    input is usually handled independently of the menu graphic:
+    except when selecting an option with the mouse,
+    which is where this class comes in.'''
+
+    @classmethod
+    def store_menu(cls, menu_visual_obj):
+        cls.__menu = menu_visual_obj
+
+    @staticmethod
+    def process_input(cls, event):
+        return cls._process_input_with_mouse(cls, event, cls.__menu)
+    
+    @staticmethod
+    def _select_mouse(cls, num: int, _):
+        return cls._process_keypress(cls, pg.key.key_code(str(num)))
+
+class ArbitraryOptionsControl(MenuControl, ABC):
     '''Base class for an input handler that uses the MenuVisual
     to prompt the user to choose from an arbitrary list of options.'''
     _menu = None
@@ -89,16 +140,10 @@ class ArbitraryOptionsControl(KeyboardInputHandler, ABC):
         ...
 
     @abstractmethod
-    def select_mouse(self):
-        '''Hook for when an option is clicked with the mouse.
-        The option ID is, at this point, already stored in the _option_id attribute.
-        Should call _choose_option().'''
-        ...
-
-    @abstractmethod
     def _choose_option(self):
-        '''Hook for when an option is selected and its ID has been stored.
-        Should be called in select().'''
+        '''Method to call when an option is selected and its ID has been stored.
+        Contains the option-selecting code that is common between select_keyboard()
+        and select_mouse().'''
         ...
 
     def _find_option_for_number(self, number: int):
@@ -111,7 +156,14 @@ class ArbitraryOptionsControl(KeyboardInputHandler, ABC):
         except ValueError:
             SFXPlayer.play_sfx('invalid')
             raise ValueError
-        
+
+    @staticmethod
+    def process_input(self, event):
+        '''In addition to using _process_keyboard_input() to respond to number keys
+        being pressed to select options, allow clicking options to select them
+        or clicking the top area of the menu to change page.'''
+        return self._process_input_with_mouse(self, event, self._menu)
+
     def nextpage(self):
         '''Go to the next page on the menu'''
         self._menu.next_page()
@@ -119,26 +171,6 @@ class ArbitraryOptionsControl(KeyboardInputHandler, ABC):
     def prevpage(self):
         '''Go to the previous page on the menu'''
         self._menu.prev_page()
-
-    @staticmethod
-    def process_input(self, event):
-        '''In addition to using _process_keyboard_input() to respond to number keys
-        being pressed to select options, allow clicking options to select them
-        or clicking the top area of the menu to change page.'''
-        if event.type == pg.MOUSEBUTTONDOWN:
-            x, y = event.pos
-            try:
-                menu_response = self._menu.option_for_mouse_location(x,y)
-            except ValueError: pass
-            else:
-                match menu_response:
-                    case 1: self.prevpage()
-                    case 2: self.nextpage()
-                    case _:
-                        self._option_id = menu_response
-                        return self.select_mouse()
-        else: return self._process_keyboard_input(self, event)
-
 
 class ArbitraryOptionsControlWithBackButton(ArbitraryOptionsControl, ABC):
 
@@ -156,7 +188,9 @@ class ArbitraryOptionsControlWithBackButton(ArbitraryOptionsControl, ABC):
         if back_option_chosen: return self.back()
         return self._choose_option()
     
-    def select_mouse(self):
+    @staticmethod
+    def _select_mouse(self, _, option_id: str):
+        self._option_id = option_id
         if self._option_id == self.__BACK_OPTION: return self.back()
         return self._choose_option()
     

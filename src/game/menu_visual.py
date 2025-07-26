@@ -194,8 +194,9 @@ class MenuVisual(VisualHandler):
         else:
             return id
         
-    def option_for_mouse_location(self, mouse_x: int, mouse_y: int) -> str | int | None:
-        '''If the given mouse position is on an option, return the string ID for the option.
+    def option_for_mouse_location(self, mouse_x: int, mouse_y: int) -> tuple | int | None:
+        '''If the given mouse position is on an option,
+        return a tuple with the number pressed to select it, and the string ID for the option.
         If the menu has more than one page, and the mouse is in the area with the title and arrows,
         return 1 for the left hand side of the menu and 2 for the right hand side.
         If neither of these conditions are met then raise ValueError.'''
@@ -217,7 +218,7 @@ class MenuVisual(VisualHandler):
                 option_num = y_distance_from_top_of_options // self.__row_height + 1
                 # If there is an option onscreen with that number, return its ID.
                 try:
-                    return self.__id_for(option_num)
+                    return (option_num, self.__id_for(option_num))
                 except IndexError: print (f'Invalid option {option_num} clicked!')
         
         raise ValueError

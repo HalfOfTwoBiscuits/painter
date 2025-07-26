@@ -1,11 +1,11 @@
 import pygame as pg
-from ..abstract_handlers import KeyboardInputHandler
+from ..abstract_handlers import FixedOptionsControl
 from ..audio_utility import SFXPlayer
 from .painter_visual import PainterVisual
 from .floor_player import FloorPlayer
 from ..floor_manager import FloorManager
     
-class RestartExitMenuControl(KeyboardInputHandler):
+class RestartExitMenuControl(FixedOptionsControl):
     '''A menu with the ability to exit or restart the floor.
     The exit option will go to the floor select
         - unless there is only one floor, in which case it goes to the floorpack select

@@ -1,4 +1,4 @@
-from ..abstract_states import State, GameContentSelectState
+from ..abstract_states import State, FixedOptionsSelectState, GameContentSelectState
 from .painter_input import PainterControl
 from .pause_input import PauseMenuControl, RestartExitMenuControl, FloorClearMenuControl
 from .floorselect_input import LevelSelectControl, FloorpackSelectControl
@@ -46,20 +46,18 @@ class GameplayState(State):
     _INPUT_HANDLER = PainterControl
     _VISUAL_HANDLERS = (FloorVisual, PainterVisual)
 
-class PauseMenuState(State):
+class PauseMenuState(FixedOptionsSelectState):
     '''The player is playing a floor and has pressed CTRL to pause.
     They can choose to continue, restart the floor, or return to the level select.'''
 
-    __TITLE = 'Menu'
-    __OPTION_NAMES = ['Continue', 'Restart', 'Exit']
+    _OPTIONS = ['Continue', 'Restart', 'Exit']
     _INPUT_HANDLER = PauseMenuControl
-    __visual_handlers = None
-    
+
     @classmethod
-    def get_visual_handlers(cls):
-        if cls.__visual_handlers is None:
-            cls.__visual_handlers = (FloorVisual, PainterVisual, MenuVisual(cls.__TITLE, cls.__OPTION_NAMES))
-        return cls.__visual_handlers
+    def enter(cls):
+        cls._setup_menu_visual()
+        PauseMenuControl.store_menu(cls._menu_visual)
+        cls._visual_handlers = (FloorVisual, PainterVisual, cls._menu_visual)
 
 class LevelSelectState(GameContentSelectState):
     '''The player is choosing a floor to play from a floorpack.
@@ -118,30 +116,32 @@ class FloorpackSelectState(GameContentSelectState):
         cls._setup_menu_visual(options)
         cls._menu_input_handler = FloorpackSelectControl(cls._menu_visual, cls.__EXIT_OPTION)
     
-class FloorClearState(State):
+class FloorClearState(FixedOptionsSelectState):
     '''The player has painted the floor and is choosing whether to
     continue or return to the level select.'''
 
     _TITLE = 'Well done!'
-    _OPTION_NAMES = ['Next Floor', 'Restart', 'Exit']
+    _OPTIONS = ['Next Floor', 'Restart', 'Exit']
     _INPUT_HANDLER = FloorClearMenuControl
-    _visual_handlers = None
     
     @classmethod
-    def get_visual_handlers(cls):
-        if cls._visual_handlers is None:
-            cls._visual_handlers = (FloorVisual, MenuVisual(cls._TITLE, cls._OPTION_NAMES))
-        return cls._visual_handlers
+    def enter(cls):
+        cls._setup_menu_visual()
+        FloorClearMenuControl.store_menu(cls._menu_visual)
+        cls._visual_handlers = (FloorVisual, cls._menu_visual)
     
 class FloorpackOverState(FloorClearState):
     '''The player has painted the last floor in the pack,
     and can only choose to return to the floor select.'''
     
     _INPUT_HANDLER = RestartExitMenuControl
-    _OPTION_NAMES = ['Restart', 'Exit']
-    _visual_handlers = None
+    _OPTIONS = ['Restart', 'Exit']
 
     @classmethod
     def enter(cls):
         if FloorManager.get_num_floors() == FloorManager.get_num_floorpacks() == 1:
             return 'SingleFloorClearState'
+        
+        cls._setup_menu_visual()
+        RestartExitMenuControl.store_menu(cls._menu_visual)
+        cls._visual_handlers = (FloorVisual, cls._menu_visual)
