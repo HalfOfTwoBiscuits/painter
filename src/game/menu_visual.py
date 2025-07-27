@@ -1,8 +1,8 @@
 import pygame as pg
 from math import ceil
 from ..abstract_handlers import VisualHandler
-from ..file_utility import FileUtility
 from ..audio_utility import SFXPlayer
+from .font import FontManager
 
 class MenuVisual(VisualHandler):
     '''A visual for menus where the player chooses a numbered option.
@@ -15,16 +15,6 @@ class MenuVisual(VisualHandler):
 
     __TEXT_COL = pg.Color(0,0,0)
     __BG_COL = pg.Color(200,200,200)
-    
-    # Font data
-    __FONT_DIRNAME = 'font'
-    __FONT_FILENAME = 'Gorilla_Black'
-
-    __FONT_PATH = FileUtility.path_to_resource(__FONT_DIRNAME, __FONT_FILENAME)
-
-    pg.font.init()
-    __FONT = pg.font.Font(__FONT_PATH, 17)
-    __TITLE_FONT = pg.font.Font(__FONT_PATH, 20)
 
     def __init__(self, title: str, options: list[str], option_ids: list[str]=[]):
         self.__title = title
@@ -39,7 +29,7 @@ class MenuVisual(VisualHandler):
 
         # Use the width and height of the title as a starting point.
         title_w_highest_page_num = self.__append_page_info(title)
-        option_width, option_height = self.__class__.__TITLE_FONT.size(title_w_highest_page_num)
+        option_width, option_height = FontManager.get_heading_font().size(title_w_highest_page_num)
 
         # Iterate over options to check if any are wider or taller
         for index, o in enumerate(options):
@@ -47,7 +37,7 @@ class MenuVisual(VisualHandler):
             full_o = self.__prepend_key(o, index)
 
             # If an option is the widest or tallest so far, update width/height
-            w, h = self.__class__.__FONT.size(full_o)
+            w, h = FontManager.get_font().size(full_o)
             if w > option_width: option_width = w
             if h > option_height: option_height = h
 
@@ -102,7 +92,7 @@ class MenuVisual(VisualHandler):
         The user can change pages by clicking the graphic or using the arrow keys.'''
         LEFT_ARROW = '<-'
         RIGHT_ARROW = '->'
-        ARROW_WIDTH, _ = self.__class__.__TITLE_FONT.size(LEFT_ARROW)
+        ARROW_WIDTH, _ = FontManager.get_heading_font().size(LEFT_ARROW)
         return LEFT_ARROW + ' ' * (menu_width // ARROW_WIDTH - 1) + RIGHT_ARROW
 
     def draw(self):
@@ -151,7 +141,7 @@ class MenuVisual(VisualHandler):
         top += self.__class__.__PADDING_PX
 
         # Select font to use
-        font = heading and self.__class__.__TITLE_FONT or self.__class__.__FONT
+        font = heading and FontManager.get_heading_font() or FontManager.get_font()
 
         # If title, centre
         if heading:
