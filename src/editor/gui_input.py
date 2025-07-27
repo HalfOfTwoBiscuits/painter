@@ -120,6 +120,7 @@ class FloorpackCreateControl(KeyboardInputHandler):
         pg.K_BACKSPACE : ('back_if_unfocussed',),
         pg.K_UP : ('focus',),
         pg.K_DOWN : ('focus',),
+        pg.K_TAB : ('focus',),
     }
 
     @classmethod
@@ -175,6 +176,7 @@ class ResizeFloorControl(KeyboardInputHandler):
         pg.K_BACKSPACE : ('back_if_unfocussed',),
         pg.K_UP : ('focus',),
         pg.K_DOWN : ('focus',),
+        pg.K_TAB : ('focus',),
     }
 
     @classmethod
@@ -183,7 +185,6 @@ class ResizeFloorControl(KeyboardInputHandler):
         cls.__HEIGHT_FIELD_ID = HEIGHT_FIELD_ID
         cls.__CANCEL_ID = CANCEL_ID
         cls.__SUBMIT_ID = SUBMIT_ID
-        cls.focus()
     
     @staticmethod
     def process_input(cls, event):
