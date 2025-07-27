@@ -23,7 +23,8 @@ class FloorData:
         '''Change the dimensions of the floor to the new width and height.
         If the grid shrinks so that the painter's initial position no longer exists,
         move the initial position up and to the left as needed to be on-grid again.'''
-
+        old_w, old_h = self.__grid.get_size()
+        new_width, new_height = self.__enforce_size(new_width, new_height, old_w, old_h)
         full_cells = self.__grid.get_full_cell_positions()
         # Replace CellGrid instance.
         self.__grid = CellGrid(new_width, new_height)
@@ -37,6 +38,20 @@ class FloorData:
         painter_x = min(painter_x, new_width - 1)
         painter_y = min(painter_y, new_height - 1)
         self.set_initial_painter_position((painter_x, painter_y))
+
+    def __enforce_size(self, width: int, height: int, default_w: int, default_h: int):
+        '''Clamp the given width and height between 1 and 8,
+        and disallow both width and height being 1.
+        If the width is None, fall back on the default width, same with height.'''
+
+        MIN_DIMENS = 1
+        MAX_DIMENS = 8
+        if width is None: width = default_w
+        else: width = min(max(MIN_DIMENS, width),MAX_DIMENS)
+        if height is None: height = default_h
+        else: height = min(max(MIN_DIMENS,height),MAX_DIMENS)
+        if width == height == 1: width = 2
+        return (width, height)
 
 class CellGrid:
     '''Class representing a grid of cells, the main part of a level.

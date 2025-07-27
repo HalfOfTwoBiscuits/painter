@@ -118,14 +118,15 @@ class EditControl(KeyboardInputHandler):
         if cell_pos is not None:
             cell = cls.__grid[cell_pos]
             if cell.get_full():
+                # Unpaint cell
                 SFXPlayer.play_sfx('back')
                 cell.revert()
-            else:
-                if cell_pos == cls.__floor.get_initial_painter_position():
-                    SFXPlayer.play_sfx('invalid')
-                else:
+            elif cls.__grid.get_num_empty_cells() > 2 and \
+            cell_pos != cls.__floor.get_initial_painter_position():
+                    # Paint cell
                     SFXPlayer.play_sfx('move')
                     cell.start_filled()
+            else: SFXPlayer.play_sfx('invalid')
 
     @classmethod
     def move_painter(cls, cell_pos: tuple=None):
