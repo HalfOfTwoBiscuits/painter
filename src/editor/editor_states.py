@@ -103,17 +103,19 @@ class CreateFloorpackState(State):
     _VISUAL_HANDLERS = (FloorpackCreateVisual,)
     _INPUT_HANDLER = FloorpackCreateControl
 
-    __FIELD_ID = 'New Floorpack Name'
+    __FIELD_ID = 'New_Floorpack_Name'
     __CANCEL_ID = 'Cancel'
+    __SUBMIT_ID = 'Create'
 
     @classmethod
     def enter(cls):
-        FloorpackCreateVisual.init(cls.__FIELD_ID, cls.__CANCEL_ID)
-        FloorpackCreateControl.init(cls.__FIELD_ID, cls.__CANCEL_ID)
+        FloorpackCreateVisual.init(cls.__FIELD_ID, cls.__CANCEL_ID, cls.__SUBMIT_ID)
+        FloorpackCreateControl.init(cls.__FIELD_ID, cls.__CANCEL_ID, cls.__SUBMIT_ID)
             
 class EditState(State):
     _INPUT_HANDLER = EditControl
     _VISUAL_HANDLERS = (FloorVisual, PainterVisual, EditorButtonsVisual, AutoFloorVisual)
+    # (R) (T) (S) (E) ?
     __RESIZE_ID = 'Resize'
     __TEST_ID = 'Test'
     __SAVE_ID = 'Save'
@@ -130,11 +132,12 @@ class ResizeFloorState(State):
     __WIDTH_FIELD_ID = 'Width'
     __HEIGHT_FIELD_ID = 'Height'
     __CANCEL_ID = 'Cancel'
+    __SUBMIT_ID = 'Resize'
 
     @classmethod
     def enter(cls):
-        ResizeMenuVisual.init(cls.__WIDTH_FIELD_ID, cls.__HEIGHT_FIELD_ID, cls.__CANCEL_ID)
-        ResizeFloorControl.init(cls.__WIDTH_FIELD_ID, cls.__HEIGHT_FIELD_ID, cls.__CANCEL_ID)
+        ResizeMenuVisual.init(cls.__WIDTH_FIELD_ID, cls.__HEIGHT_FIELD_ID, cls.__CANCEL_ID, cls.__SUBMIT_ID)
+        ResizeFloorControl.init(cls.__WIDTH_FIELD_ID, cls.__HEIGHT_FIELD_ID, cls.__CANCEL_ID, cls.__SUBMIT_ID)
 
 class FloorPlaytestState(State):
     _INPUT_HANDLER = PlaytestControl

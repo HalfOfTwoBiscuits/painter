@@ -70,7 +70,7 @@ class MenuControl(KeyboardInputHandler, ABC):
         '''Allow clicking options to select them
         or clicking the top area of the menu to change page.
         Delegates to select_mouse().'''
-        if event.type == pg.MOUSEBUTTONDOWN:
+        if event.type == pg.MOUSEBUTTONUP:
             x, y = event.pos
             try:
                 menu_response = menu_visual_obj.option_for_mouse_location(x, y)

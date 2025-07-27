@@ -5,6 +5,7 @@ class GUIHandler:
         cls.__window_size = window_size
         cls.__ui = gui.UIManager(window_size)
         cls.__container = gui.elements.UIAutoResizingContainer((0,0,0,0))
+        cls.__element_lookup = {}
 
     @classmethod
     def clear_elements(cls):
@@ -31,7 +32,8 @@ class GUIHandler:
     @classmethod
     def add_button(cls, id: str, location_rect, text: str=None):
         '''Add a button.'''
-        if text is None: text = id
+        if text is None: text = id.replace('_',' ')
+        cls.__element_lookup[id] = \
         gui.elements.UIButton(relative_rect=location_rect,
                               text=text,
                               object_id=id,
@@ -39,20 +41,30 @@ class GUIHandler:
                               container=cls.__container)
 
     @classmethod
-    def add_textinput(cls, id: str, location_rect, placeholder: str=None):
-        '''Add a text input field. Unused currently, a UIForm is used instead.'''
-        gui.elements.UITextEntryLine(relative_rect=location_rect,
+    def add_textinput(cls, id: str, location_rect, label: str=None, placeholder: str=None):
+        '''Add a text input field and label beside it.'''
+        label = label or id.replace('_',' ')
+        x, y, w, h = location_rect
+        LABEL_HEIGHT = cls.get_label_height()
+        gui.elements.UILabel((x, y, w, LABEL_HEIGHT),label,
+                             manager=cls.__ui, container=cls.__container)
+        y += LABEL_HEIGHT
+
+        cls.__element_lookup[id] = \
+        gui.elements.UITextEntryLine(relative_rect=(x,y,w,h),
                                     placeholder_text=placeholder,
                                     object_id=id,
                                     manager=cls.__ui,
                                     container=cls.__container)
-
+        
     @classmethod
-    def add_form(cls, id: str, location_rect, questionaire: dict[str:str]):
-        '''Add a form. Based on the questionnaire values, fields and a submit
-        button are pre-created.'''
-        gui.elements.UIForm(relative_rect=location_rect,
-                            questionnaire=questionaire,
-                            object_id=id,
-                            manager=cls.__ui,
-                            container=cls.__container)
+    def get_elem(cls, id: str):
+        return cls.__element_lookup[id]
+    
+    @classmethod
+    def get_label_height(cls):
+        return 30
+    
+    @classmethod
+    def set_focus(cls, elem_id: str):
+        cls.__ui.set_focus_set(cls.get_elem(elem_id))
