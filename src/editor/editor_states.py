@@ -1,8 +1,6 @@
-import pygame as pg
-import pygame_gui as gui
 from copy import deepcopy
+
 from ..abstract_states import State, GameContentSelectState
-from ..audio_utility import SFXPlayer
 from ..game.menu_visual import MenuVisual
 from ..game.painter_visual import PainterVisual
 from ..game.floor_visual import FloorVisual
@@ -14,7 +12,7 @@ from .editor_floorselect_input import EditFloorpacksControl, EditFloorsControl, 
 from .gui_visual import FloorpackCreateVisual, EditorButtonsVisual, ResizeMenuVisual
 from .gui_input import EditControl, FloorpackCreateControl, ResizeFloorControl
 from .autofloor_visual import AutoFloorVisual
-from .test_floor_input import PlaytestControl
+from .playtest_handlers import PlaytestControl, ReturnToEditorButtonVisual
 
 class EditFloorpacksState(GameContentSelectState):
     _TITLE = 'Select Pack To Edit'
@@ -141,7 +139,7 @@ class ResizeFloorState(State):
 
 class FloorPlaytestState(State):
     _INPUT_HANDLER = PlaytestControl
-    _VISUAL_HANDLERS = (FloorVisual, PainterVisual)
+    _VISUAL_HANDLERS = (FloorVisual, PainterVisual, ReturnToEditorButtonVisual)
 
     @staticmethod
     def enter():

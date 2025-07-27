@@ -1,12 +1,12 @@
-from ..abstract_states import State, FixedOptionsSelectState, GameContentSelectState
+from ..abstract_states import State, FixedOptionsSelectState, GameContentSelectState#
+from ..floor_manager import FloorManager
 from .painter_input import PainterControl
 from .pause_input import PauseMenuControl, RestartExitMenuControl, FloorClearMenuControl
 from .floorselect_input import LevelSelectControl, FloorpackSelectControl
 from .painter_visual import PainterVisual
 from .floor_visual import FloorVisual
-from .menu_visual import MenuVisual
+from .menu_button_visual import MenuButtonVisual
 from .floor_player import FloorPlayer
-from ..floor_manager import FloorManager
 
 class NewFloorState(State):
     '''The player has chosen to start a new floor.
@@ -44,7 +44,7 @@ class GameplayState(State):
     '''The player is painting the floor in gameplay.'''
 
     _INPUT_HANDLER = PainterControl
-    _VISUAL_HANDLERS = (FloorVisual, PainterVisual)
+    _VISUAL_HANDLERS = (FloorVisual, PainterVisual, MenuButtonVisual)
 
 class PauseMenuState(FixedOptionsSelectState):
     '''The player is playing a floor and has pressed CTRL to pause.

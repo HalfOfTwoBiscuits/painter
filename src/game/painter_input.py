@@ -5,6 +5,7 @@ from ..floor_manager import FloorManager
 from .painter_visual import PainterVisual
 from .floor_player import FloorPlayer
 from .floor_visual import FloorVisual
+from .menu_button_visual import MenuButtonVisual
 
 class PainterControl(KeyboardInputHandler):
     '''Input handler for when playing a level.
@@ -21,12 +22,17 @@ class PainterControl(KeyboardInputHandler):
         pg.K_ESCAPE : ('open_menu',)
     }
 
+    _BUTTON_VISUAL = MenuButtonVisual
+
     @staticmethod
     def process_input(cls, event):
-        if event.type == pg.MOUSEBUTTONDOWN:
+        if event.type == pg.MOUSEBUTTONUP:
             x, y = event.pos
             clicked_pos = FloorVisual.get_coordinates_of_cell_clicked(x, y)
-            if clicked_pos is not None:
+            if clicked_pos is None:
+                rect = cls._BUTTON_VISUAL.get_button_rect()
+                if rect.collidepoint(x,y): return cls.open_menu()
+            else:
                 adj_cells = FloorPlayer.adjacents_to()
                 index_of_pos = None
                 for index, pos in enumerate(adj_cells):
