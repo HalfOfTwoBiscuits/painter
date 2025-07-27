@@ -4,24 +4,25 @@ from ..direction_utility import DirectionUtility
 from ..game.floor_visual import FloorVisual
 
 class CursorVisual(VisualHandler):
-    __CORNER_RADIUS = 10
-    __MARGIN = 10
-    __WIDTH = 10
     __COL = pg.Color(0,200,0)
     @classmethod
     def init(cls, floor_obj):
         cls.__cursor_pos = None
         cls.__w, cls.__h = floor_obj.get_cell_grid().get_size()
-        cls.__dimens = FloorVisual.get_cell_dimens_no_line() - cls.__MARGIN * 2
+        cell_dimens = FloorVisual.get_cell_dimens_no_line()
+        cls.__margin = cell_dimens // 12
+        cls.__width = cell_dimens // 14
+        cls.__corner_radius = cell_dimens // 8
+        cls.__dimens = cell_dimens - cls.__margin * 2
 
     @classmethod
     def draw(cls):
         if cls.__cursor_pos is not None:
             x, y = FloorVisual.topleft_for(cls.__cursor_pos)
-            x += cls.__MARGIN
-            y += cls.__MARGIN
+            x += cls.__margin
+            y += cls.__margin
             rect = pg.Rect(x,y,cls.__dimens,cls.__dimens)
-            pg.draw.rect(cls._window, cls.__COL, rect, width=cls.__WIDTH, border_radius=cls.__CORNER_RADIUS)
+            pg.draw.rect(cls._window, cls.__COL, rect, width=cls.__width, border_radius=cls.__corner_radius)
 
     @classmethod
     def move_cursor(cls, direction: int):
