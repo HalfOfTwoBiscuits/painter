@@ -1,7 +1,7 @@
 import pygame as pg
-from .abstract_handlers import KeyboardInputHandler
+from .abstract_handlers import FixedOptionsControl
 
-class StartupMenuControl(KeyboardInputHandler):
+class StartupMenuControl(FixedOptionsControl):
     '''A menu with the ability to boot the game or level editor.
     Uses numeric exit codes. 1: game, 2: editor, 3: quit.'''
     
