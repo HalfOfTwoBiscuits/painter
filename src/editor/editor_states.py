@@ -12,6 +12,7 @@ from .editor_floorselect_input import EditFloorpacksControl, EditFloorsControl, 
 from .gui_visual import FloorpackCreateVisual, EditorButtonsVisual, ResizeMenuVisual
 from .gui_input import EditControl, FloorpackCreateControl, ResizeFloorControl
 from .autofloor_visual import AutoFloorVisual
+from .cursor_visual import CursorVisual
 from .playtest_handlers import PlaytestControl, ReturnToEditorButtonVisual
 
 class EditFloorpacksState(GameContentSelectState):
@@ -112,7 +113,7 @@ class CreateFloorpackState(State):
             
 class EditState(State):
     _INPUT_HANDLER = EditControl
-    _VISUAL_HANDLERS = (FloorVisual, PainterVisual, EditorButtonsVisual, AutoFloorVisual)
+    _VISUAL_HANDLERS = (FloorVisual, PainterVisual, EditorButtonsVisual, AutoFloorVisual, CursorVisual)
     # (R) (T) (S) (E) ?
     __RESIZE_ID = 'Resize'
     __TEST_ID = 'Test'
@@ -123,6 +124,7 @@ class EditState(State):
     def enter(cls):
         EditorButtonsVisual.init(cls.__RESIZE_ID, cls.__SAVE_ID, cls.__EXIT_ID, cls.__TEST_ID)
         EditControl.init(cls.__RESIZE_ID, cls.__SAVE_ID, cls.__EXIT_ID, cls.__TEST_ID)
+        CursorVisual.init(EditorFloorManager.get_floor_being_edited())
 
 class ResizeFloorState(State):
     _VISUAL_HANDLERS = (FloorVisual, PainterVisual, ResizeMenuVisual)

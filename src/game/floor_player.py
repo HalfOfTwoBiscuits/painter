@@ -1,3 +1,5 @@
+from ..direction_utility import DirectionUtility
+
 class FloorPlayer:
     '''Interface for the Painter's interactions with the floor.'''
 
@@ -25,14 +27,7 @@ class FloorPlayer:
         x, y = cls._painter_pos or start_pos
         grid_w, grid_h = cls._grid.get_size()
 
-        if abs(direction) == 1:
-            x += direction
-            x = cls.__loop_round(x, grid_w)
-        else:
-            y += direction // 2
-            y = cls.__loop_round(y, grid_h)
-        #print (f'Moving to {x},{y}')
-        return (x,y)
+        return DirectionUtility.pos_after_move(x,y,grid_w,grid_h,direction)
     
     @classmethod
     def adjacents_to(cls, pos: tuple[int]=None) -> list:
@@ -51,15 +46,6 @@ class FloorPlayer:
     @classmethod
     def get_directions(cls):
         return cls.__DIRECTIONS
-
-    @staticmethod
-    def __loop_round(co_ordinate: int, dimension: int):
-        '''Given a x or y co-ordinate and the corresponding width or height of the grid,
-        check if the co-ordinate is outside the grid and if so, loop round to the other side.
-        Return the new co-ordinate.'''
-        if co_ordinate >= dimension: co_ordinate = 0
-        elif co_ordinate < 0: co_ordinate = dimension - 1
-        return co_ordinate
     
     @classmethod
     def move_painter(cls, new_pos: tuple, direction: int=-2):

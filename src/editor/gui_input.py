@@ -8,6 +8,7 @@ from ..game.painter_visual import PainterVisual
 from .editor_floor_manager import EditorFloorManager
 from .autofloor_visual import AutoFloorVisual
 from .gui_handler import GUIHandler
+from .cursor_visual import CursorVisual
 
 class EditControl(KeyboardInputHandler):
     _ACTIONS = {
@@ -19,6 +20,12 @@ class EditControl(KeyboardInputHandler):
         pg.K_ESCAPE : ('exit',),
         pg.K_BACKSPACE : ('exit',),
         pg.K_a : ('toggle_autosolve',),
+        pg.K_RIGHT : ('move_cursor',1),
+        pg.K_LEFT : ('move_cursor',-1),
+        pg.K_DOWN : ('move_cursor',2),
+        pg.K_UP : ('move_cursor',-2),
+        pg.K_1 : ('paint',),
+        pg.K_2 : ('move_painter',),
     }
 
     @classmethod
@@ -61,23 +68,11 @@ class EditControl(KeyboardInputHandler):
                 # If it was, then check whether it was a left or right click.
                 match event.button:
                     case 1:
-                        cell = cls.__grid[cell_pos]
                         # Left clicks toggle whether the cell starts painted.
-                        if cell.get_full():
-                            SFXPlayer.play_sfx('back')
-                            cell.revert()
-                        else:
-                            if cell_pos == cls.__floor.get_initial_painter_position():
-                                SFXPlayer.play_sfx('invalid')
-                            else:
-                                SFXPlayer.play_sfx('move')
-                                cell.start_filled()
+                        cls.paint(cell_pos)
                     case 3:
                         # Right clicks set the painter's initial position.
-                        # Initial cell cannot start painted.
-                        SFXPlayer.play_sfx('start')
-                        PainterVisual.go_to(cell_pos)
-                        cls.__floor.set_initial_painter_position(cell_pos)
+                        cls.move_painter(cell_pos)
                 AutoFloorVisual.update(cls.__floor)
         else:
             return cls._process_keyboard_input(cls, event)
@@ -112,6 +107,33 @@ class EditControl(KeyboardInputHandler):
     @classmethod
     def toggle_autosolve(cls):
         AutoFloorVisual.toggle_solution_count(cls.__floor)
+
+    @classmethod
+    def move_cursor(cls, direction: int):
+        CursorVisual.move_cursor(direction)
+    
+    @classmethod
+    def paint(cls, cell_pos: tuple=None):
+        cell_pos = cell_pos or CursorVisual.get_pos()
+        if cell_pos is not None:
+            cell = cls.__grid[cell_pos]
+            if cell.get_full():
+                SFXPlayer.play_sfx('back')
+                cell.revert()
+            else:
+                if cell_pos == cls.__floor.get_initial_painter_position():
+                    SFXPlayer.play_sfx('invalid')
+                else:
+                    SFXPlayer.play_sfx('move')
+                    cell.start_filled()
+
+    @classmethod
+    def move_painter(cls, cell_pos: tuple=None):
+        cell_pos = cell_pos or CursorVisual.get_pos()
+        if cell_pos is not None:
+            SFXPlayer.play_sfx('start')
+            PainterVisual.go_to(cell_pos)
+            cls.__floor.set_initial_painter_position(cell_pos)
 
 class FloorpackCreateControl(KeyboardInputHandler):
     _ACTIONS = {
