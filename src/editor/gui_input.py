@@ -9,6 +9,7 @@ from .editor_floor_manager import EditorFloorManager
 from .autofloor_visual import AutoFloorVisual
 from .gui_handler import GUIHandler
 from .cursor_visual import CursorVisual
+from .gui_visual import EditorButtonsVisual
 
 class EditControl(KeyboardInputHandler):
     _ACTIONS = {
@@ -73,6 +74,7 @@ class EditControl(KeyboardInputHandler):
                     case 3:
                         # Right clicks set the painter's initial position.
                         cls.move_painter(cell_pos)
+                EditorButtonsVisual.set_savebutton_text(just_saved=False)
                 AutoFloorVisual.update(cls.__floor)
         else:
             return cls._process_keyboard_input(cls, event)
@@ -94,6 +96,7 @@ class EditControl(KeyboardInputHandler):
         SFXPlayer.play_sfx('start')
         EditorFloorManager.edit_floor(cls.__floor)
         EditorFloorManager.save_floorpack()
+        EditorButtonsVisual.set_savebutton_text(just_saved=True)
 
     @classmethod
     def exit(cls):

@@ -32,7 +32,7 @@ class EditorButtonsVisual(GUIVisualHandler):
     __BUTTON_HEIGHT_FRAC = 4
 
     @classmethod
-    def init(cls, RESIZE_ID: str, SAVE_ID: str, EXIT_ID: str, TEST_ID: str):
+    def init(cls, RESIZE_ID: str, SAVE_ID: str, EXIT_ID: str, TEST_ID: str, SAVED_TEXT: str):
         GUIHandler.clear_elements()
         # Find position and dimensions of UI container.
         win_w, win_h = cls._window_dimensions
@@ -59,6 +59,15 @@ class EditorButtonsVisual(GUIVisualHandler):
             GUIHandler.add_button(id, Rect(button_x, button_y, button_w, button_h))
             # Add the width-per-button to shift to the right.
             button_x += width_per_button
+        
+        cls.__SAVE_ID = SAVE_ID
+        cls.__SAVED_TEXT = SAVED_TEXT
+
+    @classmethod
+    def set_savebutton_text(cls, just_saved: bool=True):
+        new_text = just_saved and cls.__SAVED_TEXT or cls.__SAVE_ID
+        save_button = GUIHandler.get_elem(cls.__SAVE_ID)
+        save_button.set_text(new_text)
 
 class ResizeMenuVisual(CentredFixedSizeGUIVisualHandler):
     _GUI_WIDTH = 175

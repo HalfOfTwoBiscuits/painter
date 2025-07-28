@@ -118,11 +118,12 @@ class EditState(State):
     __RESIZE_ID = 'Resize'
     __TEST_ID = 'Test'
     __SAVE_ID = 'Save'
+    __SAVED_TEXT = 'Floor saved!'
     __EXIT_ID = 'Exit'
 
     @classmethod
     def enter(cls):
-        EditorButtonsVisual.init(cls.__RESIZE_ID, cls.__SAVE_ID, cls.__EXIT_ID, cls.__TEST_ID)
+        EditorButtonsVisual.init(cls.__RESIZE_ID, cls.__SAVE_ID, cls.__EXIT_ID, cls.__TEST_ID, cls.__SAVED_TEXT)
         EditControl.init(cls.__RESIZE_ID, cls.__SAVE_ID, cls.__EXIT_ID, cls.__TEST_ID)
         CursorVisual.init(EditorFloorManager.get_floor_being_edited())
 
