@@ -14,7 +14,8 @@ class FileUtility:
     __EXTENTIONS = {
         'sfx' : '.ogg',
         'font' : '.ttf',
-        'floors' : '.yaml'
+        'floors' : '.yaml',
+        'gui_theme' : '.json',
     }
     
     @classmethod

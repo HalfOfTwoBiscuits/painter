@@ -88,6 +88,7 @@ class ResizeMenuVisual(CentredFixedSizeGUIVisualHandler):
     @classmethod
     def init(cls, WIDTH_FIELD_ID: str, HEIGHT_FIELD_ID: str, CANCEL_ID: str, SUBMIT_ID):
         cls._setup_container()
+        GUIHandler.add_bg()
 
         # Add submit and cancel buttons
         GUIHandler.add_button(SUBMIT_ID, cls.__SUBMIT_RECT)
