@@ -1,5 +1,4 @@
 from .abstract_states import FixedOptionsSelectState
-from .game.menu_visual import MenuVisual
 from .startup_utility_handler import StartupMenuControl
 
 class StartupUtilityState(FixedOptionsSelectState):
