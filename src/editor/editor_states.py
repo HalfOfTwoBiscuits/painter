@@ -10,7 +10,8 @@ from .gui_handler import GUIHandler
 from .editor_floorselect_input import EditFloorpacksControl, EditFloorsControl, MoveFloorControl, FloorDestinationControl, \
     SelectFloorToDeleteControl, ConfirmDeleteFloorControl
 from .gui_visual import FloorpackCreateVisual, EditorButtonsVisual, ResizeMenuVisual
-from .gui_input import EditControl, FloorpackCreateControl, ResizeFloorControl
+from .edit_input import EditControl
+from .gui_input import FloorpackCreateControl, ResizeFloorControl
 from .autofloor_visual import AutoFloorVisual
 from .cursor_visual import CursorVisual
 from .playtest_handlers import PlaytestControl, ReturnToEditorButtonVisual
