@@ -90,7 +90,6 @@ class EditControl(KeyboardInputHandler):
                         # Right clicks set the painter's initial position.
                         cls.set_initial_pos(cell_pos)
                 EditorButtonsVisual.set_savebutton_text(just_saved=False)
-                AutoFloorVisual.update(cls.__floor)
         else:
             return cls._process_keyboard_input(cls, event)
 
@@ -140,11 +139,13 @@ class EditControl(KeyboardInputHandler):
                 # Unpaint cell
                 SFXPlayer.play_sfx('back')
                 cell.revert()
+                AutoFloorVisual.update(cls.__floor)
             elif cls.__grid.get_num_empty_cells() > 2 and \
             cell_pos != cls.__floor.get_initial_painter_position():
                     # Paint cell
                     SFXPlayer.play_sfx('move')
                     cell.start_filled()
+                    AutoFloorVisual.update(cls.__floor)
             else: SFXPlayer.play_sfx('invalid')
 
     @classmethod
@@ -154,3 +155,4 @@ class EditControl(KeyboardInputHandler):
             SFXPlayer.play_sfx('start')
             PainterVisual.go_to(cell_pos)
             cls.__floor.set_initial_painter_position(cell_pos)
+            AutoFloorVisual.update(cls.__floor)
