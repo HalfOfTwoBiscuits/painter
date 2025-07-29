@@ -1,4 +1,4 @@
-from src.startup_utility import GameAndEditor
+from src.game_and_editor import GameAndEditor
 
 def main():
     a = GameAndEditor()
