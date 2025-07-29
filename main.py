@@ -11,15 +11,12 @@ To play the game use run_game.py'''
 #   "i18n"
 # ]
 import asyncio
-from src.editor.editor import Editor
-from src.startup_utility import setup_state, setup_window
+from src.game_and_editor import GameAndEditor
 from src.config import ExitOptionConfig
 
 def main():
     ExitOptionConfig.disable_exiting_game()
-    initial_state = setup_state(True)
-    window = setup_window(True)
-    e = Editor(initial_state, window)
+    e = GameAndEditor()
     asyncio.run(e.online_main())
 
 if __name__ == '__main__':

@@ -10,35 +10,42 @@ class GameAndEditor(App):
         and store them for later use.'''
         STARTUP_INITIAL_STATE = 'StartupUtilityState'
 
-        self.__game_window = setup_window()
-        self.__s = StartupMenu(STARTUP_INITIAL_STATE, self.__game_window)
+        game_window = setup_window()
+        self.__s = StartupMenu(STARTUP_INITIAL_STATE, game_window)
 
         game_initial_state = setup_state()
-        self.__g = Game(game_initial_state, self.__game_window)
+        self.__g = Game(game_initial_state, game_window)
 
         editor_initial_state = setup_state(editor=True)
         editor_window = setup_window(True)
         self.__e = Editor(editor_initial_state, editor_window)
 
+        self.__app = self.__s
+        self.__starting_up = True
+
     def loop(self):
         '''Overrides the usual main loop to delegate to the
         main loops of the StartupMenu, Game, and Editor.
         Forms a menu where the user chooses one to boot.'''
-        exit_code = self.__s.main()
+        exit_code = self.__app.loop()
         match exit_code:
-            case 3 | True:
-                # Exit option or closing the window will exit
-                return False
+            case True:
+                # Closing the window will exit
+                return True
+            case 3:
+                # Choosing ingame exit option will exit
+                # or return to game/editor selection.
+                if self.__starting_up: return True
+                else:
+                    self.__app = self.__s
+                    self.__starting_up = True
             case 1:
                 # First option opens the game
                 SFXPlayer.play_sfx('menu')
-                exit_code = self.__g.main()
-                # An exit code of 3 means the ingame exit option was chosen.
-                # That means we should continue running, to ask whether to boot
-                # the editor or close the window.
-                if exit_code != 3: return True
+                self.__app = self.__g
+                self.__starting_up = False
             case 2:
                 # Second option opens the editor
                 SFXPlayer.play_sfx('menu')
-                exit_code = self.__e.main()
-                if exit_code != 3: return True
+                self.__app = self.__e
+                self.__starting_up = False
