@@ -14,20 +14,34 @@ from .editor_floor_manager import EditorFloorManager
 
 class EditControl(KeyboardInputHandler):
     _ACTIONS = {
-        pg.K_RETURN : ('save',),
-        pg.K_s : ('save',),
-        pg.K_t : ('playtest',),
         pg.K_r : ('resize',),
+        pg.K_1 : ('resize',),
+        pg.K_LCTRL : ('resize',),
+        pg.K_RCTRL : ('resize',),
+
+        pg.K_t : ('playtest',),
+        pg.K_2 : ('playtest',),
+
+        pg.K_s : ('save',),
+        pg.K_3 : ('save',),
+
         pg.K_e : ('exit',),
+        pg.K_4 : ('exit',),
         pg.K_ESCAPE : ('exit',),
-        pg.K_BACKSPACE : ('exit',),
+
         pg.K_a : ('toggle_autosolve',),
+        pg.K_5 : ('toggle_autosolve',),
+
         pg.K_RIGHT : ('move_cursor',1),
         pg.K_LEFT : ('move_cursor',-1),
         pg.K_DOWN : ('move_cursor',2),
         pg.K_UP : ('move_cursor',-2),
-        pg.K_1 : ('paint',),
-        pg.K_2 : ('move_painter',),
+
+        pg.K_SPACE : ('paint',),
+        pg.K_BACKSPACE : ('paint',),
+        pg.K_RETURN : ('set_initial_pos',),
+        pg.K_LSHIFT : ('set_initial_pos',),
+        pg.K_RSHIFT : ('set_initial_pos',),
     }
 
     @classmethod
@@ -74,7 +88,7 @@ class EditControl(KeyboardInputHandler):
                         cls.paint(cell_pos)
                     case 3:
                         # Right clicks set the painter's initial position.
-                        cls.move_painter(cell_pos)
+                        cls.set_initial_pos(cell_pos)
                 EditorButtonsVisual.set_savebutton_text(just_saved=False)
                 AutoFloorVisual.update(cls.__floor)
         else:
@@ -82,6 +96,7 @@ class EditControl(KeyboardInputHandler):
 
     @classmethod
     def resize(cls):
+        SFXPlayer.play_sfx('menu')
         # Store current changes to the floor,
         # so ResizeFloorState can access the right FloorData object.
         EditorFloorManager.edit_floor(cls.__floor)
@@ -133,7 +148,7 @@ class EditControl(KeyboardInputHandler):
             else: SFXPlayer.play_sfx('invalid')
 
     @classmethod
-    def move_painter(cls, cell_pos: tuple=None):
+    def set_initial_pos(cls, cell_pos: tuple=None):
         cell_pos = cell_pos or CursorVisual.get_pos()
         if cell_pos is not None:
             SFXPlayer.play_sfx('start')

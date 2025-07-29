@@ -68,6 +68,8 @@ class FloorpackCreateControl(KeyboardInputHandler):
 class ResizeFloorControl(KeyboardInputHandler):
     _ACTIONS = {
         pg.K_RETURN : ('submit',),
+        pg.K_LCTRL : ('back',),
+        pg.K_RCTRL : ('back',),
         pg.K_ESCAPE : ('back',),
         pg.K_BACKSPACE : ('back_if_unfocussed',),
         pg.K_UP : ('focus',),
