@@ -7,18 +7,20 @@ To play the game use run_game.py'''
 # dependencies = [
 #   "pygame-ce",
 #   "yaml",
+#   "pygame_gui",
+#   "i18n"
 # ]
 import asyncio
-from src.game.game import Game
+from src.editor.editor import Editor
 from src.startup_utility import setup_state, setup_window
 from src.config import ExitOptionConfig
 
 def main():
     ExitOptionConfig.disable_exiting_game()
-    initial_state = setup_state()
-    window = setup_window()
-    g = Game(initial_state, window)
-    asyncio.run(g.online_main())
+    initial_state = setup_state(True)
+    window = setup_window(True)
+    e = Editor(initial_state, window)
+    asyncio.run(e.online_main())
 
 if __name__ == '__main__':
     main()

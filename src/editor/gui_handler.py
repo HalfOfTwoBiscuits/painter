@@ -1,3 +1,4 @@
+import pygame as pg
 import pygame_gui as gui
 
 from ..file_utility import FileUtility
@@ -17,7 +18,7 @@ class GUIHandler:
     @classmethod
     def __init_elements(cls):
         cls.__ui = gui.UIManager(cls.__window_size, theme_path=cls.__gui_theme_path)
-        cls.__container = gui.elements.UIAutoResizingContainer((0,0,0,0), manager=cls.__ui)
+        cls.__container = gui.core.UIContainer(pg.Rect(0,0,0,0), manager=cls.__ui)
         cls.__container_size = (0,0)
 
 
@@ -42,7 +43,7 @@ class GUIHandler:
     @classmethod
     def add_bg(cls):
         w, h = cls.__container_size
-        gui.elements.UIPanel((0,0,w,h), manager=cls.__ui, container=cls.__container)
+        gui.elements.UIPanel(pg.Rect(0,0,w,h), manager=cls.__ui, container=cls.__container)
 
     @classmethod
     def add_button(cls, id: str, location_rect, text: str=None):
@@ -61,12 +62,12 @@ class GUIHandler:
         label = label or id.replace('_',' ')
         x, y, w, h = location_rect
         LABEL_HEIGHT = cls.get_label_height()
-        gui.elements.UILabel((x, y, w, LABEL_HEIGHT),label,
+        gui.elements.UILabel(pg.Rect(x, y, w, LABEL_HEIGHT),label,
                              manager=cls.__ui, container=cls.__container)
         y += LABEL_HEIGHT
 
         cls.__element_lookup[id] = \
-        gui.elements.UITextEntryLine(relative_rect=(x,y,w,h),
+        gui.elements.UITextEntryLine(relative_rect=pg.Rect(x,y,w,h),
                                     placeholder_text=placeholder,
                                     object_id=id,
                                     manager=cls.__ui,
