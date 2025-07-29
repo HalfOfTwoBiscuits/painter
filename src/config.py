@@ -14,5 +14,4 @@ class ExitOptionConfig:
     
     @classmethod
     def can_exit_game(cls):
-        print (cls.__can_exit_game)
         return cls.__can_exit_game
