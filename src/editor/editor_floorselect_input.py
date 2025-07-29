@@ -6,11 +6,11 @@ import pygame as pg
 class EditFloorpacksControl(ArbitraryOptionsControlWithBackButton):
     # If the back option is selected, quit the game,
     # or if using both game and editor, go back to game/editor choice.
-    _STATE_AFTER_BACK = 3
 
-    def __init__(self, menu_visual_obj, CREATE_OPTION_ID: str, EXIT_OPTION_ID: str):
-        super().__init__(menu_visual_obj, EXIT_OPTION_ID)
+    def __init__(self, menu_visual_obj, CREATE_OPTION_ID: str, exit_option_id: str):
+        super().__init__(menu_visual_obj, exit_option_id)
         self.__CREATE_OPTION = CREATE_OPTION_ID
+        self.__class__.__can_go_back = exit_option_id is not None
 
     def _choose_option(self):
         '''If the 'Create' option was selected, create a new floorpack.
@@ -26,6 +26,12 @@ class EditFloorpacksControl(ArbitraryOptionsControlWithBackButton):
         SFXPlayer.play_sfx('start')
         EditorFloorManager.select_floorpack(self._option_id)
         return 'EditFloorsState'
+    
+    @classmethod
+    def back(cls):
+        if cls.__can_go_back:
+            SFXPlayer.play_sfx('back')
+            return 3
 
 class EditFloorsControl(ArbitraryOptionsControlWithBackButton):
     # If the back option is selected, go back to editing floorpacks.

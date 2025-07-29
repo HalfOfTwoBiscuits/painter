@@ -1,5 +1,5 @@
 from ..abstract_states import State, GameContentSelectState
-from ..config import ExitOptionConfig
+from ..config import OnlineConfig
 from ..abstract_states import State, FixedOptionsSelectState, GameContentSelectState
 from ..floor_manager import FloorManager
 from .painter_input import PainterControl
@@ -88,7 +88,7 @@ class LevelSelectState(GameContentSelectState):
         last_option = None
         only_one_floorpack = FloorManager.get_num_floorpacks() == 1
         if only_one_floorpack:
-            if ExitOptionConfig.can_exit_game():
+            if OnlineConfig.can_exit(in_startup_menu=False):
                 last_option = cls.__EXIT_OPTION
                 options.append(cls.__EXIT_OPTION)
         else:
@@ -117,7 +117,8 @@ class FloorpackSelectState(GameContentSelectState):
             return 'LevelSelectState'
         
         options = packnames
-        if ExitOptionConfig.can_exit_game(): options.append(cls.__EXIT_OPTION)
+        if OnlineConfig.can_exit(in_startup_menu=False):
+            options.append(cls.__EXIT_OPTION)
         
         cls._setup_menu_visual(options)
         cls._menu_input_handler = FloorpackSelectControl(cls._menu_visual, cls.__EXIT_OPTION)

@@ -1,6 +1,7 @@
 from copy import deepcopy
 
 from ..abstract_states import State, GameContentSelectState
+from ..config import OnlineConfig
 from ..game.menu_visual import MenuVisual
 from ..game.painter_visual import PainterVisual
 from ..game.floor_visual import FloorVisual
@@ -27,9 +28,14 @@ class EditFloorpacksState(GameContentSelectState):
         # TODO: make this method generic in a parent. Maybe for the ingame floor select too.
         # FLOOR_MANAGER and INPUT_HANDLER_CLASS and OTHER_OPTIONS can be class constants.
         packnames = EditorFloorManager.get_floorpack_names()
-        options = packnames + [cls.__CREATE_OPTION, cls.__EXIT_OPTION]
+        options = packnames
+        options.append(cls.__CREATE_OPTION)
+        exit_option = None
+        if OnlineConfig.can_exit(in_startup_menu=False):
+            options.append(cls.__EXIT_OPTION)
+            exit_option = cls.__EXIT_OPTION
         cls._setup_menu_visual(options)
-        cls._menu_input_handler = EditFloorpacksControl(cls._menu_visual, cls.__CREATE_OPTION, cls.__EXIT_OPTION)
+        cls._menu_input_handler = EditFloorpacksControl(cls._menu_visual, cls.__CREATE_OPTION, exit_option)
 
 class EditFloorsState(GameContentSelectState):
     _TITLE = 'Select Floor To Edit'
