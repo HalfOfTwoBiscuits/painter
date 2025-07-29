@@ -61,38 +61,40 @@ class EditControl(KeyboardInputHandler):
 
     @staticmethod
     def process_input(cls, event):
-        if event.type == gui.UI_BUTTON_PRESSED:
-            # On UI button press, resize floors, save, or exit.
-            if event.ui_object_id.endswith(cls.__RESIZE_ID):
-                return cls.resize()
-            elif event.ui_object_id.endswith(cls.__TEST_ID):
-                return cls.playtest()
-            elif event.ui_object_id.endswith(cls.__SAVE_ID):
-                cls.save()
-            elif event.ui_object_id.endswith(cls.__EXIT_ID):
-                return cls.exit()
-        elif event.type == pg.MOUSEBUTTONDOWN:
-            # Get mouse click position, size of grid, and dimension of a cell.
-            mouse_x, mouse_y = event.pos
-            cell_pos = FloorVisual.get_coordinates_of_cell_clicked(mouse_x, mouse_y)
+        match event.type:
+            case gui.UI_BUTTON_PRESSED:
+                # On UI button press, resize floors, save, or exit.
+                id = event.ui_object_id
+                if id.endswith(cls.__RESIZE_ID):
+                    return cls.resize()
+                elif id.endswith(cls.__TEST_ID):
+                    return cls.playtest()
+                elif id.endswith(cls.__SAVE_ID):
+                    cls.save()
+                elif id.endswith(cls.__EXIT_ID):
+                    return cls.exit()
+            case pg.MOUSEBUTTONDOWN:
+                # Get mouse click position, size of grid, and dimension of a cell.
+                mouse_x, mouse_y = event.pos
+                cell_pos = FloorVisual.get_coordinates_of_cell_clicked(mouse_x, mouse_y)
 
-            if cell_pos is None:
-                # If it wasn't, it might have been a click
-                # on the solution indicator to toggle solution count.
-                rect = AutoFloorVisual.get_toggle_rect()
-                if rect.collidepoint(mouse_x, mouse_y): cls.toggle_autosolve()
-            else:
-                # If it was, then check whether it was a left or right click.
-                match event.button:
-                    case 1:
-                        # Left clicks toggle whether the cell starts painted.
-                        cls.paint(cell_pos)
-                    case 3:
-                        # Right clicks set the painter's initial position.
-                        cls.set_initial_pos(cell_pos)
-                EditorButtonsVisual.set_savebutton_text(just_saved=False)
-        else:
-            return cls._process_keyboard_input(cls, event)
+                if cell_pos is None:
+                    # If it wasn't, it might have been a click
+                    # on the solution indicator to toggle solution count.
+                    rect = AutoFloorVisual.get_toggle_rect()
+                    if rect.collidepoint(mouse_x, mouse_y): cls.toggle_autosolve()
+                else:
+                    # If it was, then check whether it was a left or right click.
+                    match event.button:
+                        case 1:
+                            # Left clicks toggle whether the cell starts painted.
+                            cls.paint(cell_pos)
+                        case 3:
+                            # Right clicks set the painter's initial position.
+                            cls.set_initial_pos(cell_pos)
+                    EditorButtonsVisual.set_savebutton_text(just_saved=False)
+            case _:
+                return cls._process_keyboard_input(cls, event)
 
     @classmethod
     def resize(cls):

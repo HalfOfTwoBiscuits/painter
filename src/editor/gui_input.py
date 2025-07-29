@@ -71,6 +71,7 @@ class ResizeFloorControl(KeyboardInputHandler):
         pg.K_LCTRL : ('back',),
         pg.K_RCTRL : ('back',),
         pg.K_ESCAPE : ('back',),
+        pg.K_r : ('back',),
         pg.K_BACKSPACE : ('back_if_unfocussed',),
         pg.K_UP : ('focus',),
         pg.K_DOWN : ('focus',),
