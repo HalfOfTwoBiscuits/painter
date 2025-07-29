@@ -3,20 +3,27 @@ from ..abstract_handlers_gui import GUIVisualHandler, CentredFixedSizeGUIVisualH
 from .gui_handler import GUIHandler
 class FloorpackCreateVisual(CentredFixedSizeGUIVisualHandler):
     _GUI_WIDTH = 175
-    _GUI_HEIGHT = 200
-    __FORM_DIMENSIONS = Rect(0,0,175,150)
-    __CANCEL_DIMENSIONS = Rect(0,150,175,50)
+    __FIELD_HEIGHT = 50
+    __BUTTON_HEIGHT = 50
+    __LABEL_HEIGHT = GUIHandler.get_label_height()
+    __FULL_FIELD_HEIGHT = __FIELD_HEIGHT + __LABEL_HEIGHT
+    
+    _GUI_HEIGHT = __FULL_FIELD_HEIGHT + __BUTTON_HEIGHT * 2
+
+    __FIELD_RECT = Rect(0,0,_GUI_WIDTH,__FIELD_HEIGHT)
+    __SUBMIT_RECT = Rect(0,__FULL_FIELD_HEIGHT,_GUI_WIDTH,__BUTTON_HEIGHT)
+    __CANCEL_RECT = Rect(0,__FULL_FIELD_HEIGHT + __BUTTON_HEIGHT,_GUI_WIDTH,__BUTTON_HEIGHT)
     
     @classmethod
-    def init(cls, FIELD_ID: str, CANCEL_ID: str):
+    def init(cls, FIELD_ID: str, CANCEL_ID: str, SUBMIT_ID: str):
         cls._setup_container()
 
-        # Add cancel button
-        GUIHandler.add_button(CANCEL_ID, cls.__CANCEL_DIMENSIONS)
+        # Add submit and cancel buttons
+        GUIHandler.add_button(SUBMIT_ID, cls.__SUBMIT_RECT)
+        GUIHandler.add_button(CANCEL_ID, cls.__CANCEL_RECT)
 
-        # Add form with text field, label, and submit button
-        # Don't seem to be able to specify submit button text as 'Create'
-        GUIHandler.add_form('frm', cls.__FORM_DIMENSIONS, {FIELD_ID : "short_text"})
+        # Add text input
+        GUIHandler.add_textinput(FIELD_ID, cls.__FIELD_RECT)
 
 class EditorButtonsVisual(GUIVisualHandler):
     __MARGIN_PX = 4
@@ -25,7 +32,7 @@ class EditorButtonsVisual(GUIVisualHandler):
     __BUTTON_HEIGHT_FRAC = 4
 
     @classmethod
-    def init(cls, RESIZE_ID: str, SAVE_ID: str, EXIT_ID: str, TEST_ID: str):
+    def init(cls, RESIZE_ID: str, SAVE_ID: str, EXIT_ID: str, TEST_ID: str, SAVED_TEXT: str):
         GUIHandler.clear_elements()
         # Find position and dimensions of UI container.
         win_w, win_h = cls._window_dimensions
@@ -52,20 +59,40 @@ class EditorButtonsVisual(GUIVisualHandler):
             GUIHandler.add_button(id, Rect(button_x, button_y, button_w, button_h))
             # Add the width-per-button to shift to the right.
             button_x += width_per_button
+        
+        cls.__SAVE_ID = SAVE_ID
+        cls.__SAVED_TEXT = SAVED_TEXT
+
+    @classmethod
+    def set_savebutton_text(cls, just_saved: bool=True):
+        new_text = just_saved and cls.__SAVED_TEXT or cls.__SAVE_ID
+        save_button = GUIHandler.get_elem(cls.__SAVE_ID)
+        save_button.set_text(new_text)
 
 class ResizeMenuVisual(CentredFixedSizeGUIVisualHandler):
     _GUI_WIDTH = 175
-    _GUI_HEIGHT = 250
-    __FORM_DIMENSIONS = Rect(0,0,175,200)
-    __CANCEL_DIMENSIONS = Rect(0,200,175,50)
+
+    __FIELD_HEIGHT = 50
+    __BUTTON_HEIGHT = 50
+    __LABEL_HEIGHT = GUIHandler.get_label_height()
+    __FULL_FIELD_HEIGHT = __FIELD_HEIGHT + __LABEL_HEIGHT
+
+    __WIDTH_FIELD_RECT = Rect(0,0,_GUI_WIDTH,__FIELD_HEIGHT)
+    __HEIGHT_FIELD_RECT = Rect(0,__FULL_FIELD_HEIGHT,_GUI_WIDTH,__FIELD_HEIGHT)
+
+    __SUBMIT_RECT = Rect(0,__FULL_FIELD_HEIGHT * 2,_GUI_WIDTH,__BUTTON_HEIGHT)
+    __CANCEL_RECT = Rect(0,__FULL_FIELD_HEIGHT * 2 + __BUTTON_HEIGHT,_GUI_WIDTH,__BUTTON_HEIGHT)
+
+    _GUI_HEIGHT = __FULL_FIELD_HEIGHT * 2 + __BUTTON_HEIGHT * 2
 
     @classmethod
-    def init(cls, WIDTH_FIELD_ID: str, HEIGHT_FIELD_ID: str, CANCEL_ID: str):
-       cls._setup_container()
+    def init(cls, WIDTH_FIELD_ID: str, HEIGHT_FIELD_ID: str, CANCEL_ID: str, SUBMIT_ID):
+        cls._setup_container()
 
-       # Add cancel button
-       GUIHandler.add_button(CANCEL_ID, cls.__CANCEL_DIMENSIONS)
+        # Add submit and cancel buttons
+        GUIHandler.add_button(SUBMIT_ID, cls.__SUBMIT_RECT)
+        GUIHandler.add_button(CANCEL_ID, cls.__CANCEL_RECT)
 
-       # Add form with inputs for width and height, and submit button.
-       GUIHandler.add_form('frm', cls.__FORM_DIMENSIONS, 
-                           {WIDTH_FIELD_ID : 'integer', HEIGHT_FIELD_ID : 'integer'})
+        # Add text inputs
+        GUIHandler.add_textinput(WIDTH_FIELD_ID, cls.__WIDTH_FIELD_RECT)
+        GUIHandler.add_textinput(HEIGHT_FIELD_ID, cls.__HEIGHT_FIELD_RECT)

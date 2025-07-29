@@ -2,6 +2,7 @@ import yaml
 from ..floor_manager import FloorManager
 from ..file_utility import FileUtility
 from .floor_data import FloorData
+from .autofloor_visual import AutoFloorVisual
 
 class EditorFloorManager(FloorManager):
     @classmethod
@@ -35,11 +36,11 @@ class EditorFloorManager(FloorManager):
     def create_floor(cls):
         '''Create a 3x3 floor where the painter starts at 0,0.
         Insert it at the end of the current floorpack,
-        and select it.'''
+        and select it to be edited.'''
         floor = cls.__default_floor()
         pack = cls._floor_packs[cls._current_pack_id]
         pack.append(floor)
-        cls.select_floor(len(pack) - 1)
+        cls.select_floor_to_edit(len(pack) - 1)
     
     @classmethod
     def __default_floor(cls):
@@ -63,6 +64,7 @@ class EditorFloorManager(FloorManager):
         after being changed, that data can be passed to edit_floor()
         to put it at this index.'''
         cls.__floor_index_being_edited = index
+        AutoFloorVisual.update(cls.get_floor_being_edited())
     
     @classmethod
     def get_floor_being_edited(cls):
@@ -76,6 +78,10 @@ class EditorFloorManager(FloorManager):
         previously chosen by select_floor_to_edit().
         Does not actually write the floor data to the floorpack file:
         call save_floorpack() to do that.'''
+        # Remove data about empty cells: it has no effect on gameplay,
+        # and unnecessarily increases the size of the floorpack file.
+        grid = floor_data_obj.get_cell_grid()
+        grid.prune_empty_cells()
         cls._floor_packs[cls._current_pack_id][cls.__floor_index_being_edited] = floor_data_obj
 
     @classmethod

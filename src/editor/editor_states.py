@@ -1,8 +1,6 @@
-import pygame as pg
-import pygame_gui as gui
 from copy import deepcopy
-from ..abstract_states import State, GameContentSelectState, StateWithBespokeInput
-from ..audio_utility import SFXPlayer
+
+from ..abstract_states import State, GameContentSelectState
 from ..game.menu_visual import MenuVisual
 from ..game.painter_visual import PainterVisual
 from ..game.floor_visual import FloorVisual
@@ -12,10 +10,14 @@ from .gui_handler import GUIHandler
 from .editor_floorselect_input import EditFloorpacksControl, EditFloorsControl, MoveFloorControl, FloorDestinationControl, \
     SelectFloorToDeleteControl, ConfirmDeleteFloorControl
 from .gui_visual import FloorpackCreateVisual, EditorButtonsVisual, ResizeMenuVisual
-from .test_floor_input import PlaytestControl
+from .edit_input import EditControl
+from .gui_input import FloorpackCreateControl, ResizeFloorControl
+from .autofloor_visual import AutoFloorVisual
+from .cursor_visual import CursorVisual
+from .playtest_handlers import PlaytestControl, ReturnToEditorButtonVisual
 
 class EditFloorpacksState(GameContentSelectState):
-    _TITLE = 'Select Floor Pack'
+    _TITLE = 'Select Pack To Edit'
     __CREATE_OPTION = 'Create New'
     __EXIT_OPTION = 'Exit Editor'
 
@@ -97,143 +99,51 @@ class ConfirmDeleteFloorState(State):
             cls.__visual_handlers = (MenuVisual(cls.__TITLE, cls.__OPTION_NAMES),)
         return cls.__visual_handlers
 
-class CreateFloorpackState(StateWithBespokeInput):
+class CreateFloorpackState(State):
     _VISUAL_HANDLERS = (FloorpackCreateVisual,)
+    _INPUT_HANDLER = FloorpackCreateControl
 
-    __FIELD_ID = 'New Floorpack Name'
+    __FIELD_ID = 'New_Floorpack_Name'
     __CANCEL_ID = 'Cancel'
+    __SUBMIT_ID = 'Create'
 
     @classmethod
     def enter(cls):
-        FloorpackCreateVisual.init(cls.__FIELD_ID, cls.__CANCEL_ID)
-
-    @classmethod
-    def process_bespoke_input(cls, event):
-        match event.type:
-            case gui.UI_BUTTON_PRESSED:
-                if event.ui_object_id.endswith(cls.__CANCEL_ID):
-                    SFXPlayer.play_sfx('back')
-                    return 'EditFloorpacksState'
-            case gui.UI_FORM_SUBMITTED:
-                packname = event.ui_element.get_current_values()[cls.__FIELD_ID]
-                EditorFloorManager.create_floorpack(packname)
-                SFXPlayer.play_sfx('start')
-                return 'EditState'
+        FloorpackCreateVisual.init(cls.__FIELD_ID, cls.__CANCEL_ID, cls.__SUBMIT_ID)
+        FloorpackCreateControl.init(cls.__FIELD_ID, cls.__CANCEL_ID, cls.__SUBMIT_ID)
             
-class EditState(StateWithBespokeInput):
-    _VISUAL_HANDLERS = (FloorVisual, PainterVisual, EditorButtonsVisual)
+class EditState(State):
+    _INPUT_HANDLER = EditControl
+    _VISUAL_HANDLERS = (FloorVisual, PainterVisual, EditorButtonsVisual, AutoFloorVisual, CursorVisual)
+    # (R) (T) (S) (E) ?
     __RESIZE_ID = 'Resize'
     __TEST_ID = 'Test'
     __SAVE_ID = 'Save'
+    __SAVED_TEXT = 'Floor saved!'
     __EXIT_ID = 'Exit'
+
     @classmethod
     def enter(cls):
-        EditorButtonsVisual.init(cls.__RESIZE_ID, cls.__SAVE_ID, cls.__EXIT_ID, cls.__TEST_ID)
-        cls.__floor = EditorFloorManager.get_floor_being_edited()
-        cls.__grid = cls.__floor.get_cell_grid()
-        FloorVisual.new_floor(cls.__floor, editor=True)
-        cell_dimens = FloorVisual.get_cell_dimens_no_line()
-        PainterVisual.new_floor(cls.__floor, cell_dimens)
-        cls.__changes_made = False
-    
-    @classmethod
-    def process_bespoke_input(cls, event):
-        if event.type == gui.UI_BUTTON_PRESSED:
-            # On UI button press, resize floors, save, or exit.
-            if event.ui_object_id.endswith(cls.__RESIZE_ID):
-                # Store current changes to the floor,
-                # so ResizeFloorState can access the right FloorData object.
-                EditorFloorManager.edit_floor(cls.__floor)
-                return 'ResizeFloorState'
-            elif event.ui_object_id.endswith(cls.__TEST_ID):
-                SFXPlayer.play_sfx('start')
-                return 'FloorPlaytestState'
-            elif event.ui_object_id.endswith(cls.__SAVE_ID):
-                SFXPlayer.play_sfx('start')
-                EditorFloorManager.edit_floor(cls.__floor)
-                EditorFloorManager.save_floorpack()
-            elif event.ui_object_id.endswith(cls.__EXIT_ID):
-                if cls.__changes_made:
-                    # Unused currently. __changes_made is never set.
-                    return 'ConfirmExitState'
-                else: 
-                    return 'EditFloorsState'
-        elif event.type == pg.MOUSEBUTTONDOWN:
-            # Get mouse click position, size of grid, and dimension of a cell.
-            mouse_x, mouse_y = event.pos
-            cell_dimens = FloorVisual.get_cell_dimens_no_line()
-            grid_w, grid_h = cls.__grid.get_size()
-            cell_pos = None
-            # Iterate through the grid, checking if the click is within a cell.
-            for x in range(0, grid_w):
-                for y in range(0, grid_h):
-                    left_x, top_y = FloorVisual.topleft_for((x, y))
-                    if left_x <= mouse_x <= left_x + cell_dimens and \
-                    top_y <= mouse_y <= top_y + cell_dimens:
-                        cell_pos = (x,y)
-                        break
-            # If it was, then check whether it was a left or right click.
-            if cell_pos is not None:
-                match event.button:
-                    case 1:
-                        cell = cls.__grid[cell_pos]
-                        # Left clicks toggle whether the cell starts painted.
-                        if cell.get_full():
-                            SFXPlayer.play_sfx('back')
-                            cell.revert()
-                        else:
-                            if cell_pos == cls.__floor.get_initial_painter_position():
-                                SFXPlayer.play_sfx('invalid')
-                            else:
-                                SFXPlayer.play_sfx('move')
-                                cell.start_filled()
-                    case 3:
-                        # Right clicks set the painter's initial position.
-                        # Initial cell cannot start painted.
-                        SFXPlayer.play_sfx('start')
-                        PainterVisual.go_to(cell_pos)
-                        cls.__floor.set_initial_painter_position(cell_pos)
+        EditorButtonsVisual.init(cls.__RESIZE_ID, cls.__SAVE_ID, cls.__EXIT_ID, cls.__TEST_ID, cls.__SAVED_TEXT)
+        EditControl.init(cls.__RESIZE_ID, cls.__SAVE_ID, cls.__EXIT_ID, cls.__TEST_ID)
+        CursorVisual.init(EditorFloorManager.get_floor_being_edited())
 
-class ResizeFloorState(StateWithBespokeInput):
+class ResizeFloorState(State):
     _VISUAL_HANDLERS = (FloorVisual, PainterVisual, ResizeMenuVisual)
+    _INPUT_HANDLER = ResizeFloorControl
     __WIDTH_FIELD_ID = 'Width'
     __HEIGHT_FIELD_ID = 'Height'
     __CANCEL_ID = 'Cancel'
+    __SUBMIT_ID = 'Resize'
 
     @classmethod
     def enter(cls):
-        ResizeMenuVisual.init(cls.__WIDTH_FIELD_ID, cls.__HEIGHT_FIELD_ID, cls.__CANCEL_ID)
+        ResizeMenuVisual.init(cls.__WIDTH_FIELD_ID, cls.__HEIGHT_FIELD_ID, cls.__CANCEL_ID, cls.__SUBMIT_ID)
+        ResizeFloorControl.init(cls.__WIDTH_FIELD_ID, cls.__HEIGHT_FIELD_ID, cls.__CANCEL_ID, cls.__SUBMIT_ID)
 
-    @classmethod
-    def process_bespoke_input(cls, event):
-        match event.type:
-            case gui.UI_BUTTON_PRESSED:
-                # Cancel
-                if event.ui_object_id.endswith(cls.__CANCEL_ID):
-                    SFXPlayer.play_sfx('back')
-                    return 'EditState'
-            case gui.UI_FORM_SUBMITTED:
-                SFXPlayer.play_sfx('destroy')
-
-                # Get new width and height from the form
-                data = event.ui_element.get_current_values()
-                new_width = data[cls.__WIDTH_FIELD_ID]
-                new_height = data[cls.__HEIGHT_FIELD_ID]
-
-                # Change size of the current floor grid.
-                floor = EditorFloorManager.get_floor_being_edited()
-                floor.resize(new_width, new_height)
-                FloorVisual.new_floor(floor, editor=True)
-                cell_dimens = FloorVisual.get_cell_dimens_no_line()
-                PainterVisual.new_floor(floor, cell_dimens)
-
-                # Store changes and return to editing
-                EditorFloorManager.edit_floor(floor)
-                return 'EditState'
-            
 class FloorPlaytestState(State):
     _INPUT_HANDLER = PlaytestControl
-    _VISUAL_HANDLERS = (FloorVisual, PainterVisual)
+    _VISUAL_HANDLERS = (FloorVisual, PainterVisual, ReturnToEditorButtonVisual)
 
     @staticmethod
     def enter():
