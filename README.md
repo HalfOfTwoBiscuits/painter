@@ -32,33 +32,27 @@ Your floors will be grouped into a floorpack. If you'd like everyone to play you
 - On Windows, you can download an executable version from the 'releases' area on the right of the page.
 - On any platform, you can clone this repository, and execute run_game.py, run_editor.py, or run_game_or_editor.py with Python.
 
+### Mouse and keyboard controls
+The game was originally designed with the keyboard in mind, and the level editor with the mouse.
+However, I've tried to make them both accessible with either.
+
+In the game, you can move by clicking an adjacent square to go to.
+In the editor, you can press the arrow keys to make a cursor appear. You can then move the cursor with the arrow keys, press space to paint the square which the cursor is over, and press shift to move the painter to that square.
+
+Any feedback about the controls, or other accessibility feedback, is welcome.
+
 #### Ideas for future development...
 - On starting a level, display which number it is and how many are left to go.
 
-- Make both the game and editor controllable with either the mouse or keyboard.
-
-- Allow using the editor in the web build, and downloading level files.
-
-- Add a 'Test' shortcut in the editor to help you test levels as you create them.
-  - Done on the editor-QoL branch.
-
-- Add an indicator that tells you whether the level is possible or not.
-  - Done on the editor-QoL branch.
+- Allow using the editor in the web build, and upload/download of level files.
 
 - Aesthetic options when creating levels:
   - Add the ability to change the colour of the paint.
   - Right click the painter's starting position to change the direction the graphic initially faces.
   - Allow giving individual floors a name, not just floorpacks. This would also make it easier to keep track of what you're doing when re-ordering them.
 
-- Enforce a minimum and maximum size for a floor.
-  - My logic for determining the pixel dimensions of the grid could be made more space-efficient to allow bigger levels.
+- My logic for determining the pixel dimensions of the grid could be made more space-efficient to allow bigger levels.
   - This also might make it easier to tell what's on the grid and what isn't.
-
-- Improve the usability of the input fields in the editor.
-  - Increase contrast, and make them more aesthetically consistent with the rest of the menus.
-  - Start with the cursor in the first field.
-  - Allow keyboard navigation between the fields.
-  - Allow pressing keys to submit or cancel.
 
 - The level re-ordering menu might be more intuitive if you dragged the levels into place with the mouse.
 
@@ -70,14 +64,13 @@ Your floors will be grouped into a floorpack. If you'd like everyone to play you
   - This might work just as supplementary material outside the game.
   - If it was a restriction ingame, the grid lines could change colour to indicate you should or shouldn't wrap round.
   - There could be a challenge for every distinct way to paint a floor, not just ones that the creator deems less obvious.
+  - The cleanest way to implement this might be specific positions to end the level on. Presumably, most alternate solutions end in a different square: that's why I didn't require a certain end position all the time.
 
 - Linux and MacOS executable version(s).
-  - In the level editor, an option that swaps the effects of the left and right mouse button, so that MacOS users can use all the features without a right click.
+  - In the level editor, an option that swaps the effects of the left and right mouse button, so that MacOS users can reposition the painter using the mouse.
 
 ### Attribution
-Made using pygame-ce [https://pypi.org/project/pygame-ce/].
-Level data stored using YAML and PyYAML [https://pypi.org/project/PyYAML/]
-I attempted to create a web build with pygbag,
-following [https://pygame-web.github.io/wiki/publishing/github.io/],
-but it doesn't currently work.
-Executable build(s) created with pyinstaller [https://pypi.org/project/pyinstaller/].
+- Made using pygame-ce [https://pypi.org/project/pygame-ce/].
+- Level data stored using YAML and PyYAML [https://pypi.org/project/PyYAML/]
+- Web build(s) created with Pygbag [https://github.com/pygame-web/pygbag]
+- Executable build(s) created with pyinstaller [https://pypi.org/project/pyinstaller/].
