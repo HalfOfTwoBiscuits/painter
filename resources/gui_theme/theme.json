@@ -1,0 +1,34 @@
+{
+    "button":
+    {
+        "colours":
+        {
+            "normal_bg": "Gainsboro",
+            "hovered_bg": "Ivory",
+            "normal_text": "Black",
+            "hovered_text": "Navy"
+        }
+    },
+    "label":
+    {
+        "colours":
+        {
+            "normal_text": "Ivory"
+        }
+    },
+    "text_entry_line":
+    {
+        "colours":
+        {
+            "dark_bg": "SlateGray",
+            "normal_text": "White",
+            "selected_bg": "Ivory",
+            "selected_text": "Navy"
+        }
+    },
+    "panel": {
+        "colours": {
+            "dark_bg": "Black"
+        }
+    }
+}

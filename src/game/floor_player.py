@@ -1,17 +1,21 @@
+from ..direction_utility import DirectionUtility
+
 class FloorPlayer:
     '''Interface for the Painter's interactions with the floor.'''
+
+    __DIRECTIONS = [1,-1,2,-2]
 
     @classmethod
     def new_floor(cls, floor_obj):
         '''Initialise the position of the painter, the cell grid to move on,
         and undo history.'''
-        cls.__painter_pos = floor_obj.get_initial_painter_position()
-        cls.__grid = floor_obj.get_cell_grid()
+        cls._painter_pos = floor_obj.get_initial_painter_position()
+        cls._grid = floor_obj.get_cell_grid()
         cls.__position_history = [] # Series of positions occupied
         cls.__direction_history = [] # Same length: history of directions faced
 
     @classmethod
-    def painter_position_after_move(cls, direction: int):
+    def painter_position_after_move(cls, direction: int, start_pos: tuple[int]=None):
         '''The direction argument indicates a direction to move.
         1 : Right, -1 : Left
         2 : Down, -2 : Up
@@ -20,29 +24,31 @@ class FloorPlayer:
         moving in that direction once.'''
 
         # Calculate new position of the painter after moving
-        x, y = cls.__painter_pos
-        grid_w, grid_h = cls.__grid.get_size()
+        x, y = cls._painter_pos or start_pos
+        grid_w, grid_h = cls._grid.get_size()
 
-        if abs(direction) == 1:
-            x += direction
-            x = cls.__loop_round(x, grid_w)
-        else:
-            y += direction // 2
-            y = cls.__loop_round(y, grid_h)
-        #print (f'Moving to {x},{y}')
-        return (x,y)
-    
-    @staticmethod
-    def __loop_round(co_ordinate: int, dimension: int):
-        '''Given a x or y co-ordinate and the corresponding width or height of the grid,
-        check if the co-ordinate is outside the grid and if so, loop round to the other side.
-        Return the new co-ordinate.'''
-        if co_ordinate >= dimension: co_ordinate = 0
-        elif co_ordinate < 0: co_ordinate = dimension - 1
-        return co_ordinate
+        return DirectionUtility.pos_after_move(x,y,grid_w,grid_h,direction)
     
     @classmethod
-    def move_painter(cls, new_pos: tuple, direction: int):
+    def adjacents_to(cls, pos: tuple[int]=None) -> list:
+        '''Returns the list of cells one move from the given position,
+        or if None, from the painter's current position.
+        Does not check if those cells are painted.
+        
+        Used ingame when checking if a mouse click is on a cell that can be moved to,
+        and in the editor when checking whether a floor is possible to solve.'''
+        
+        return [
+            cls.painter_position_after_move(direc, start_pos=pos)
+            for direc in cls.__DIRECTIONS
+        ]
+    
+    @classmethod
+    def get_directions(cls):
+        return cls.__DIRECTIONS
+    
+    @classmethod
+    def move_painter(cls, new_pos: tuple, direction: int=-2):
         '''Move the painter to the new position.
 
         Returns a boolean for whether the move worked.
@@ -53,11 +59,11 @@ class FloorPlayer:
 
         try:
             # Raise ValueError if the position is not on the grid or is full.
-            new_cell = cls.__grid[new_pos]
+            new_cell = cls._grid[new_pos]
             if new_cell.get_full(): raise ValueError
 
             # Paint the old position.
-            old_cell = cls.__grid[cls.__painter_pos]
+            old_cell = cls._grid[cls._painter_pos]
             old_cell.paint()
         except ValueError:
             # The move is not possible.
@@ -65,9 +71,9 @@ class FloorPlayer:
             return False
         else:
             # Move painter, add old position to history
-            cls.__position_history.append(cls.__painter_pos)
+            cls.__position_history.append(cls._painter_pos)
             cls.__direction_history.append(direction)
-            cls.__painter_pos = new_pos
+            cls._painter_pos = new_pos
             cls.__painter_dir = direction
             return True
         
@@ -81,9 +87,9 @@ class FloorPlayer:
 
         prev_pos = cls.__position_history.pop()
 
-        prev_cell = cls.__grid[prev_pos]
+        prev_cell = cls._grid[prev_pos]
         prev_cell.revert()
-        cls.__painter_pos = prev_pos
+        cls._painter_pos = prev_pos
 
         prev_dir = cls.__direction_history.pop()
 
@@ -104,7 +110,7 @@ class FloorPlayer:
             # If the painter moved, repeatedly call undo()
             # until all moves are undone. 
             while cls.undo(): pass
-            return cls.__painter_pos, cls.__painter_dir
+            return cls._painter_pos, cls.__painter_dir
         else:
             return None
         
@@ -117,12 +123,12 @@ class FloorPlayer:
         If it would return True, also paint the square the painter is on,
         so the graphics will show the entire floor being painted.'''
 
-        done = cls.__grid.is_painted()
+        done = cls._grid.is_painted()
         if done:
-            cls.__grid[cls.__painter_pos].paint()
+            cls._grid[cls._painter_pos].paint()
             # Add this final cell to position history:
             # when choosing to play the floor again,
             # it needs to be unpainted as well.
-            cls.__position_history.append(cls.__painter_pos)
+            cls.__position_history.append(cls._painter_pos)
             cls.__direction_history.append(cls.__painter_dir)
         return done

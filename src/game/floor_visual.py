@@ -149,3 +149,16 @@ class FloorVisual(VisualHandler):
     def get_cell_dimens_no_line(cls):
         '''Return the dimension of a cell minus the pixels used for the line.'''
         return cls.__cell_dimens - cls.__LINE_SIZE
+    
+    @classmethod
+    def get_coordinates_of_cell_clicked(cls, mouse_x: int, mouse_y: int) -> tuple | None:
+        cell_dimens = cls.get_cell_dimens_no_line()
+        grid_w, grid_h = cls.__grid.get_size()
+        # Iterate through the grid, checking if the click is within a cell.
+        for x in range(0, grid_w):
+            for y in range(0, grid_h):
+                left_x, top_y = FloorVisual.topleft_for((x, y))
+                if left_x <= mouse_x <= left_x + cell_dimens and \
+                top_y <= mouse_y <= top_y + cell_dimens:
+                    return (x,y)
+        return None

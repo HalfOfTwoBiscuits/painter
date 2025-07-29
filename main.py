@@ -5,15 +5,20 @@ so despite the web build not currently working, this file is named in that fashi
 To play the game use run_game.py'''
 # /// script
 # dependencies = [
-#   "PyYAML",
-#   "pygame-ce"
+#   "pygame-ce",
+#   "yaml",
 # ]
 import asyncio
 from src.game.game import Game
 from src.startup_utility import setup_state, setup_window
+from src.config import ExitOptionConfig
+
+def main():
+    ExitOptionConfig.disable_exiting_game()
+    initial_state = setup_state()
+    window = setup_window()
+    g = Game(initial_state, window)
+    asyncio.run(g.online_main())
 
 if __name__ == '__main__':
-    InitialState = setup_state()
-    window = setup_window()
-    g = Game(InitialState, window)
-    asyncio.run(g.online_main())
+    main()

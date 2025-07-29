@@ -1,7 +1,8 @@
 import pygame as pg
 from math import ceil
 from ..abstract_handlers import VisualHandler
-from ..file_utility import FileUtility
+from ..audio_utility import SFXPlayer
+from .font import FontManager
 
 class MenuVisual(VisualHandler):
     '''A visual for menus where the player chooses a numbered option.
@@ -14,16 +15,6 @@ class MenuVisual(VisualHandler):
 
     __TEXT_COL = pg.Color(0,0,0)
     __BG_COL = pg.Color(200,200,200)
-    
-    # Font data
-    __FONT_DIRNAME = 'font'
-    __FONT_FILENAME = 'Gorilla_Black'
-
-    __FONT_PATH = FileUtility.path_to_resource(__FONT_DIRNAME, __FONT_FILENAME)
-
-    pg.font.init()
-    __FONT = pg.font.Font(__FONT_PATH, 17)
-    __TITLE_FONT = pg.font.Font(__FONT_PATH, 20)
 
     def __init__(self, title: str, options: list[str], option_ids: list[str]=[]):
         self.__title = title
@@ -31,13 +22,14 @@ class MenuVisual(VisualHandler):
         self.__option_ids = option_ids
         self.__page_index = 0
         self.__num_pages = ceil(len(options) / self.__class__.__OPTIONS_PER_PAGE)
+        self.__is_multi_page = self.__num_pages > 1
 
         # Find the width required for the longest line in the menu
         # and height required for the tallest.
 
         # Use the width and height of the title as a starting point.
         title_w_highest_page_num = self.__append_page_info(title)
-        option_width, option_height = self.__class__.__TITLE_FONT.size(title_w_highest_page_num)
+        option_width, option_height = FontManager.get_heading_font().size(title_w_highest_page_num)
 
         # Iterate over options to check if any are wider or taller
         for index, o in enumerate(options):
@@ -45,26 +37,36 @@ class MenuVisual(VisualHandler):
             full_o = self.__prepend_key(o, index)
 
             # If an option is the widest or tallest so far, update width/height
-            w, h = self.__class__.__FONT.size(full_o)
+            w, h = FontManager.get_font().size(full_o)
             if w > option_width: option_width = w
             if h > option_height: option_height = h
 
         # Add padding to width to find the menu width
         self.__width = option_width + self.__class__.__PADDING_PX * 2 + self.__class__.__SIDE_PADDING * 2
 
+        # Find string containing ASCII arrows with space between them,
+        # indicating multiple pages. Amount of space between depends on menu width
+        if self.__is_multi_page:
+            self.__arrows_string = self.__arrows_at_edges(self.__width)
+
         # Add padding to height to find height of a row in the menu
         self.__row_height = option_height + self.__class__.__PADDING_PX * 2
 
-        # Find total height: height of all options on a page, plus one for the title
+        # Find total height: height of all options on a page,
+        # plus one for the title, and another one for the arrows if there's more than one page.
+        self.__extra_rows = self.__is_multi_page and 2 or 1
         options_on_page = self.get_options_per_page()
-        self.__height = self.__row_height * (options_on_page + 1)
+        self.__height = self.__row_height * (options_on_page + self.__extra_rows)
 
         # Get window dimensions and subtract the width and height needed,
         # to find the position of the topleft and bottom.
         win_width, win_height = self.__class__._window_dimensions
         self.__left_edge = (win_width - self.__width) // 2
+        self.__right_edge = self.__width + self.__left_edge
         self.__top_edge = (win_height - self.__height) // 2
         self.__bottom_edge = self.__height + self.__top_edge
+        self.__x_centre = self.__left_edge + self.__width // 2
+        self.__top_of_options = self.__top_edge + self.__row_height * self.__extra_rows
 
     def __prepend_key(self, option: str, index: int):
         '''Add the key pressed to select the option to the front of it.
@@ -78,10 +80,20 @@ class MenuVisual(VisualHandler):
         add the page number and total number of pages in brackets.'''
 
         output = title
-        if self.__num_pages > 1:
+        if self.__is_multi_page:
             page_num = self.__page_index + 1
             output += f' ({page_num}/{self.__num_pages})'
         return output
+    
+    def __arrows_at_edges(self, menu_width: int):
+        '''Given the width of the menu, return a string with ASCII arrows
+        separated by space so that they would be at the left and right edges of the width.
+        This string is used to draw a graphic indicating the user can change pages.
+        The user can change pages by clicking the graphic or using the arrow keys.'''
+        LEFT_ARROW = '<-'
+        RIGHT_ARROW = '->'
+        ARROW_WIDTH, _ = FontManager.get_heading_font().size(LEFT_ARROW)
+        return LEFT_ARROW + ' ' * (menu_width // ARROW_WIDTH - 1) + RIGHT_ARROW
 
     def draw(self):
         # Draw background rect
@@ -91,41 +103,48 @@ class MenuVisual(VisualHandler):
         
         # Draw title
         full_title = self.__append_page_info(self.__title)
-        self.__draw_menu_row(full_title, self.__top_edge, is_title=True)
+        self.__draw_menu_row(full_title, self.__top_edge, heading=True)
 
-        # Find the options being shown on the current page
-        cur_options = self.__options[self.__first_option_index(self.__page_index):
-                                     self.__first_option_index(self.__page_index + 1)]
+        # Draw arrows: clicked to change page
+        if self.__is_multi_page:
+            self.__draw_menu_row(self.__arrows_string, self.__top_edge + self.__row_height, heading=True)
+
+        cur_options = self.__option_names_on_current_page()
 
         # Iterate over options, incrementing top_y by row_height from top to bottom of the menu
         # If we are on the last page and there are fewer options left than OPTIONS_PER_PAGE
         # then zip() will truncate the range of y positions.
         for index, option_info in enumerate(zip(cur_options,
-            range(self.__top_edge + self.__row_height, self.__bottom_edge, self.__row_height))):
+            range(self.__top_of_options,
+                  self.__bottom_edge, self.__row_height))):
 
             option, top_y = option_info
             full_option = self.__prepend_key(option, index)
             self.__draw_menu_row(full_option, top_y)
 
+    def __option_names_on_current_page(self) -> list:
+        '''Slice the list of option names to return the options on the current page.'''
+        return self.__options[self.__first_option_index(self.__page_index):
+                              self.__first_option_index(self.__page_index + 1)]
+
     def __first_option_index(self, page_index: int):
         '''Return the index of the first option on the given page index.'''
         return page_index * self.__class__.__OPTIONS_PER_PAGE
     
-    def __draw_menu_row(self, content: str, top: int, is_title: bool=False):
+    def __draw_menu_row(self, content: str, top: int, heading: bool=False):
         '''Render the given content string, with padding separating it from
-        the left edge of the menu and from the given y position for the top.
-        If is_title is True, use the larger font.
-        Underneath, draw a line.'''
+        the left edge of the menu and from the given y position for the top of the row.
+        If heading is True, use the larger font and centre the text.'''
 
         # Find topleft corner of the option
         left = self.__left_edge + self.__class__.__PADDING_PX
         top += self.__class__.__PADDING_PX
 
         # Select font to use
-        font = is_title and self.__class__.__TITLE_FONT or self.__class__.__FONT
+        font = heading and FontManager.get_heading_font() or FontManager.get_font()
 
         # If title, centre
-        if is_title:
+        if heading:
             text_w, _ = font.size(content)
             left += (self.__width - text_w) // 2     
 
@@ -142,34 +161,73 @@ class MenuVisual(VisualHandler):
 
         if 1 <= number_pressed <= self.__class__.__OPTIONS_PER_PAGE:
             try:
-                index_increment = number_pressed - 1
-                # Multiply __OPTIONS_PER_PAGE by the page index to find how many along we already are,
-                # and add number_pressed - 1
-                option_index = index_increment + self.__first_option_index(self.__page_index)
-                try:
-                    id = self.__option_ids[option_index]
-                    if id is None: raise IndexError
-                except IndexError:
-                    return self.__options[option_index]
-                else:
-                    return id
-            
+                return self.__id_for(number_pressed)
             # Raise error if the number isn't within 1 to __OPTIONS_PER_PAGE
             # or the resulting index is past the final option
             except IndexError: raise ValueError        
         else: raise ValueError
 
+    def __id_for(self, num: int) -> str:
+        '''Return the ID used for the option with the given number on the current page.
+        By default, this is the text displayed for the option,
+        but if an option_ids list was specified on initialisation,
+        a string value at the same index in that list will be preferred.
+        Raises IndexError if the number doesn't currently correspond to an option.'''
+        
+        index = num - 1 + self.__first_option_index(self.__page_index)
+
+        try:
+            id = self.__option_ids[index]
+            if id is None: raise IndexError
+        except IndexError:
+            return self.__options[index]
+        else:
+            return id
+        
+    def option_for_mouse_location(self, mouse_x: int, mouse_y: int) -> tuple | int | None:
+        '''If the given mouse position is on an option,
+        return a tuple with the number pressed to select it, and the string ID for the option.
+        If the menu has more than one page, and the mouse is in the area with the title and arrows,
+        return 1 for the left hand side of the menu and 2 for the right hand side.
+        If neither of these conditions are met then raise ValueError.'''
+
+        # If within the menu:
+        if self.__left_edge < mouse_x < self.__right_edge \
+        and self.__top_edge < mouse_y < self.__bottom_edge:
+            
+            # If there are multiple pages and the user clicked above the options,
+            # return 1 for the left side and 2 for the right.
+            if self.__is_multi_page and mouse_y < self.__top_of_options:
+                return mouse_x < self.__x_centre and 1 or 2
+            
+            # Otherwise, check if the click was on an option
+            else:
+                # The number that would have been pressed for the option can be found by dividing
+                # the distance from the top of the options by the height of a row.
+                y_distance_from_top_of_options = mouse_y - self.__top_of_options
+                option_num = y_distance_from_top_of_options // self.__row_height + 1
+                # If there is an option onscreen with that number, return its ID.
+                try:
+                    return (option_num, self.__id_for(option_num))
+                except IndexError: print (f'Invalid option {option_num} clicked!')
+        
+        raise ValueError
+
     def next_page(self):
         '''Increment the page number to show later options.
         Does nothing if the menu is on the last page.'''
         if self.__page_index + 1 < self.__num_pages:
+            SFXPlayer.play_sfx('move')
             self.__page_index += 1
+        else: SFXPlayer.play_sfx('invalid')
 
     def prev_page(self):
         '''Decrement the page number to show earlier options.
         Does nothing if the menu is on the first page.'''
         if self.__page_index > 0:
+            SFXPlayer.play_sfx('move')
             self.__page_index -= 1
+        else: SFXPlayer.play_sfx('invalid')
 
     def get_options_per_page(self):
         '''Return the number of options per page, either the __OPTIONS_PER_PAGE constant

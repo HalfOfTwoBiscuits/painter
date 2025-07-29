@@ -2,9 +2,24 @@ import pygame as pg
 from abc import abstractmethod, ABC
 from .audio_utility import SFXPlayer
 
-class KeyboardInputHandler(ABC):
+class InputHandler(ABC):
+    '''Base for all input processing classes.'''
+
+    @staticmethod
+    @abstractmethod
+    def process_input(self, event):
+        '''Respond to a pygame event. Used for any event other than closing the game.
+
+        For some children an instance is created and for others the class is used,
+        so this is a staticmethod and self is passed in manually.'''
+        ...
+
+class KeyboardInputHandler(InputHandler, ABC):
     '''A base class for input handlers that specifies the
-    process_input() method to respond to key presses.'''
+    _process_keyboard_input() method to respond to key presses,
+    and calls that in process_input().
+    Child classes that want to process other input too
+    can override process_input().'''
 
     # Constant response to keys being pressed
     _ACTIONS = {}
@@ -12,7 +27,20 @@ class KeyboardInputHandler(ABC):
     _variable_actions = None
 
     @staticmethod
-    def process_input(self, key):
+    def process_input(self, event):
+        '''Delegate to _process_keyboard_input().
+        Can be overriden in order to process other input too.'''
+        return self._process_keyboard_input(self, event)
+    
+    @staticmethod
+    def _process_keyboard_input(self, event):
+        '''If the event is a keypress, delegate to _process_keypress().'''
+        if event.type == pg.KEYDOWN:
+            return self._process_keypress(self, event.key)
+        return None
+    
+    @staticmethod
+    def _process_keypress(self, key):
         '''Use the actions dictionary to determine
         what to do in response to a key being pressed.
         
@@ -22,10 +50,7 @@ class KeyboardInputHandler(ABC):
         All other elements in that tuple will be passed as arguments.
         
         The return value of that method, if any, is a string
-        identifier for a new state. Return it to the main loop.
-        
-        For some children an instance is created and for others the class is used,
-        so this is a staticmethod and self is passed in manually in the main loop.'''
+        identifier for a new state. Return it to the main loop.'''
 
         actions = self._variable_actions or self._ACTIONS
         a = actions.get(key)
@@ -35,8 +60,56 @@ class KeyboardInputHandler(ABC):
             arguments = a[1:]
             state_change = method_to_call(*arguments)
             return state_change
-        
-class ArbitraryOptionsControl(KeyboardInputHandler, ABC):
+
+class MenuControl(KeyboardInputHandler, ABC):
+    '''Class that specifies a static method used to
+    respond to clicking on a menu with the mouse.'''
+
+    @staticmethod
+    def _process_input_with_mouse(self, event, menu_visual_obj):
+        '''Allow clicking options to select them
+        or clicking the top area of the menu to change page.
+        Delegates to select_mouse().'''
+        if event.type == pg.MOUSEBUTTONUP:
+            x, y = event.pos
+            try:
+                menu_response = menu_visual_obj.option_for_mouse_location(x, y)
+            except ValueError: pass
+            else:
+                match menu_response:
+                    case 1: menu_visual_obj.prev_page()
+                    case 2: menu_visual_obj.next_page()
+                    case _:
+                        return self._select_mouse(self, *menu_response)
+        else: return self._process_keyboard_input(self, event)
+    
+    @staticmethod
+    @abstractmethod
+    def _select_mouse(self, number: int, option_id: str):
+        '''Hook for when an option is clicked with the mouse.'''
+        ...
+
+class FixedOptionsControl(MenuControl, ABC):
+    '''Base class for an input handler that prompts the user
+    to choose between a number of fixed options.
+    Since the option that corresponds to a keypress is known,
+    input is usually handled independently of the menu graphic:
+    except when selecting an option with the mouse,
+    which is where this class comes in.'''
+
+    @classmethod
+    def store_menu(cls, menu_visual_obj):
+        cls.__menu = menu_visual_obj
+
+    @staticmethod
+    def process_input(cls, event):
+        return cls._process_input_with_mouse(cls, event, cls.__menu)
+    
+    @staticmethod
+    def _select_mouse(cls, num: int, _):
+        return cls._process_keypress(cls, pg.key.key_code(str(num)))
+
+class ArbitraryOptionsControl(MenuControl, ABC):
     '''Base class for an input handler that uses the MenuVisual
     to prompt the user to choose from an arbitrary list of options.'''
     _menu = None
@@ -51,7 +124,7 @@ class ArbitraryOptionsControl(KeyboardInputHandler, ABC):
             # Get key code for the given number key, from 1 to NUM_OPTIONS.
             # When that key is pressed, call select() with the number
             # to choose the option.
-            pg.key.key_code(str(num)) : ('select', num)
+            pg.key.key_code(str(num)) : ('select_keyboard', num)
             for num in range(1, NUM_OPTIONS + 1)
         }
 
@@ -60,64 +133,80 @@ class ArbitraryOptionsControl(KeyboardInputHandler, ABC):
         self.__class__._variable_actions = actions
 
     @abstractmethod
-    def select(self, number: int):
+    def select_keyboard(self, number: int):
         '''Hook for when a number key 1-9 is pressed.
-        Selects the menu option corresponding to that number,
-        if there is one.'''
+        Selects the menu option corresponding to that number, if there is one.
+        Should call _choose_option()'''
+        ...
+
+    @abstractmethod
+    def _choose_option(self):
+        '''Method to call when an option is selected and its ID has been stored.
+        Contains the option-selecting code that is common between select_keyboard()
+        and select_mouse().'''
         ...
 
     def _find_option_for_number(self, number: int):
         '''If the number given corresponds to an option, 
-        return the string used to describe it on the menu.
-        If it doesn't then play an 'invalid' sfx.'''
+        store the ID used for it on the menu as the _option_id attribute.
+        If there is no corresponding option then play an 'invalid' sfx
+        and raise ValueError.'''
         try:
-            option_id = self._menu.option_for_number(number)
+            self._option_id = self._menu.option_for_number(number)
         except ValueError:
             SFXPlayer.play_sfx('invalid')
-        else:
-            return option_id
-        
+            raise ValueError
+
+    @staticmethod
+    def process_input(self, event):
+        '''In addition to using _process_keyboard_input() to respond to number keys
+        being pressed to select options, allow clicking options to select them
+        or clicking the top area of the menu to change page.'''
+        return self._process_input_with_mouse(self, event, self._menu)
+
     def nextpage(self):
         '''Go to the next page on the menu'''
-        SFXPlayer.play_sfx('move')
         self._menu.next_page()
     
     def prevpage(self):
         '''Go to the previous page on the menu'''
-        SFXPlayer.play_sfx('move')
         self._menu.prev_page()
 
 class ArbitraryOptionsControlWithBackButton(ArbitraryOptionsControl, ABC):
+
+    _STATE_AFTER_BACK = None
+
     def __init__(self, menu_visual_obj, BACK_OPTION_ID: str):
         super().__init__(menu_visual_obj)
-        self._BACK_OPTION = BACK_OPTION_ID
+        self.__BACK_OPTION = BACK_OPTION_ID
         self.__class__._variable_actions[pg.K_BACKSPACE] = ('back',)
         self.__class__._variable_actions[pg.K_ESCAPE] = ('back',)
 
-    def _check_for_back_option(self, number: int):
-        '''If the back option was selected, return True.
-        If another option was selected, return False.
-        If the selection was invalid, raise ValueError.
-        Store option ID for later reference so find_option_for_number
-        doesn't have to be called again.'''
-
-        # Small optimisation: make _find_option_for_number raise ValueError.
-        self._option_id = self._find_option_for_number(number)
-        if self._option_id is None: raise ValueError
-        elif self._option_id == self._BACK_OPTION:
-            SFXPlayer.play_sfx('back')
-            return True
-        return False
+    def select_keyboard(self, number: int):
+        try: back_option_chosen = self._find_option_for_number(number)
+        except ValueError: return
+        if back_option_chosen: return self.back()
+        return self._choose_option()
     
     @staticmethod
-    @abstractmethod
-    def back():
-        ...
+    def _select_mouse(self, _, option_id: str):
+        self._option_id = option_id
+        if self._option_id == self.__BACK_OPTION: return self.back()
+        return self._choose_option()
+    
+    def _find_option_for_number(self, number: int) -> bool:
+        '''Like the base _find_option_for_number but also returns
+        a boolean for whether the back option was chosen.
+        True : back option chosen, False : another option was chosen.
+        Will raise ValueError if there is no corresponding option.'''
 
-class FloorManagementControl(ArbitraryOptionsControlWithBackButton, ABC):
-    @staticmethod
-    def back():
-        return 'EditFloorsState'
+        super()._find_option_for_number(number)
+        return self._option_id == self.__BACK_OPTION
+    
+    @classmethod
+    def back(cls) -> str | int:
+        SFXPlayer.play_sfx('back')
+        return cls._STATE_AFTER_BACK
 
 class VisualHandler:
     '''Has access to the window surface to draw graphics onto,

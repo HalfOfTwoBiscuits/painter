@@ -1,8 +1,8 @@
-import os
 import yaml
 from ..floor_manager import FloorManager
 from ..file_utility import FileUtility
 from .floor_data import FloorData
+from .autofloor_visual import AutoFloorVisual
 
 class EditorFloorManager(FloorManager):
     @classmethod
@@ -11,21 +11,23 @@ class EditorFloorManager(FloorManager):
         containing one floor with the default 3x3 size and 0,0 starting position.
         Select this floorpack as the current one, and the floor as the one being edited.
         Raises FileExistsError if there is already a floorpack with that name.'''
-
         floorpack_dir = FileUtility.path_to_resource_directory('floors')
-        path_for_pack = os.path.normpath(floorpack_dir + os.sep + name + '.yaml')
+        # Call resolve() to ensure it is absolute.
+        path_for_pack = (floorpack_dir / (name + '.yaml')).resolve()
 
-        if os.path.exists(path_for_pack):
+        if path_for_pack.exists():
             # Equivalent check: if name in cls.get_floorpack_names().
             # This is more foolproof however.
             raise FileExistsError
         
         pack = [cls.__default_floor()]
-
+        # Call as_posix() for compatibility with pygbag.
+        path_for_pack = path_for_pack.as_posix()
         # Save one default floor to the file.
         with open(path_for_pack, 'x') as file:
             yaml.dump(pack, file)
 
+        print ('Saved')
         cls._floor_packs[name] = pack
         cls.select_floorpack(name)
         cls.select_floor_to_edit(0)
@@ -34,11 +36,11 @@ class EditorFloorManager(FloorManager):
     def create_floor(cls):
         '''Create a 3x3 floor where the painter starts at 0,0.
         Insert it at the end of the current floorpack,
-        and select it.'''
+        and select it to be edited.'''
         floor = cls.__default_floor()
         pack = cls._floor_packs[cls._current_pack_id]
         pack.append(floor)
-        cls.select_floor(len(pack) - 1)
+        cls.select_floor_to_edit(len(pack) - 1)
     
     @classmethod
     def __default_floor(cls):
@@ -62,6 +64,7 @@ class EditorFloorManager(FloorManager):
         after being changed, that data can be passed to edit_floor()
         to put it at this index.'''
         cls.__floor_index_being_edited = index
+        AutoFloorVisual.update(cls.get_floor_being_edited())
     
     @classmethod
     def get_floor_being_edited(cls):
@@ -75,6 +78,10 @@ class EditorFloorManager(FloorManager):
         previously chosen by select_floor_to_edit().
         Does not actually write the floor data to the floorpack file:
         call save_floorpack() to do that.'''
+        # Remove data about empty cells: it has no effect on gameplay,
+        # and unnecessarily increases the size of the floorpack file.
+        grid = floor_data_obj.get_cell_grid()
+        grid.prune_empty_cells()
         cls._floor_packs[cls._current_pack_id][cls.__floor_index_being_edited] = floor_data_obj
 
     @classmethod
@@ -110,7 +117,7 @@ class EditorFloorManager(FloorManager):
         in order to have selected the floorpack, the file must exist.'''
 
         floorpack_dir = FileUtility.path_to_resource_directory('floors')
-        pack_path = os.path.normpath(floorpack_dir + os.sep + cls._current_pack_id + '.yaml')
+        pack_path = (floorpack_dir / (cls._current_pack_id + '.yaml')).resolve().as_posix()
 
         pack = cls._floor_packs[cls._current_pack_id]
         with open(pack_path, 'w') as file:

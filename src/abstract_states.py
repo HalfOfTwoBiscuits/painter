@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 from .game.menu_visual import MenuVisual
 
 class State(ABC):
@@ -12,16 +12,16 @@ class State(ABC):
         ...
 
     @classmethod
-    def process_input(cls, key_pressed):
-        '''Respond to a key press. Delegates to InputHandler.process_input().
+    def process_input(cls, event):
+        '''Respond to any event other than closing the game.
+        Delegates to InputHandler.process_input().
         Return any string identifier of a new state to change to.'''
         i_handler = cls.get_input_handler()
         # get_input_handler() can return None for no input or True to end the program
-        if i_handler is True: return True
-        elif i_handler is None: return
+        if i_handler is True or i_handler is None: return i_handler
 
         # Input handler may be a class or an instance, so 'self' is passed manually
-        new_state = i_handler.process_input(i_handler, key_pressed)
+        new_state = i_handler.process_input(i_handler, event)
         return new_state
 
     @classmethod
@@ -37,37 +37,48 @@ class State(ABC):
         '''Method that returns the visual handlers used.
         Defaults to the value of the _VISUAL_HANDLERS attribute.'''
         return cls._VISUAL_HANDLERS
-    
-class GameContentSelectState(State, ABC):
-    '''Base class for floor select and floorpack select.'''
-    _menu_input_handler = None
-    _menu_visual = None
-    _TITLE = 'Menu'
 
+class MenuState(State, ABC):
+    '''Base class for all states that use the MenuVisual.'''
+    _TITLE = 'Menu'
+    
     @classmethod
     def _setup_menu_visual(cls, menu_options: list[str]):
         cls._menu_visual = MenuVisual(cls._TITLE, menu_options)
 
-    @classmethod
-    def get_visual_handlers(cls):
-        '''Return a MenuVisual instance with the levels as options,
-        as created when entering this state.'''
-        return (cls._menu_visual,)
+class GameContentSelectState(MenuState, ABC):
+    '''Base class for states where the user selects a floor or floorpack.
+    Has a variable for an input handler instance to be initialised with the MenuVisual.'''
+    _menu_input_handler = None
+    _menu_visual = None
     
     @classmethod
     def get_input_handler(cls):
         return cls._menu_input_handler
     
-class StateWithBespokeInput(State, ABC):
-
     @classmethod
-    @abstractmethod
-    def process_bespoke_input(cls, event):
-        '''Serves the same purpose as process_input, but addresses
-        flexible sorts of input based on the event, rather than
-        just keyboard input using the predefined structure of
-        an input handler.
-        Will not be called for the usual pygame keypress events;
-        it responds to the events from pygame_gui in the editor
-        (and could hypothetically respond to other input)'''
-        ...
+    def get_visual_handlers(cls):
+        '''Currently, all the floor and floorpack selection menus
+        display only the menu, and no other graphics.
+        Since this is the case, to save setting the visual handlers on all of them,
+        just the menu visual is returned.
+
+        If more graphics are added to these menus, I could remove this method
+        and move the _visual_handlers attribute to the parent, or override it
+        on a case-by-case basis.'''
+        return (cls._menu_visual,)
+    
+class FixedOptionsSelectState(MenuState, ABC):
+    '''Base class for pause menu and post-floor menus.
+    The options displayed on the menu are fixed.'''
+    _OPTIONS = None
+    _visual_handlers = None
+    
+    @classmethod
+    def get_visual_handlers(cls):
+        return cls._visual_handlers
+    
+    @classmethod
+    def _setup_menu_visual(cls):
+        '''Create the MenuVisual with fixed menu options.'''
+        return super()._setup_menu_visual(cls._OPTIONS)

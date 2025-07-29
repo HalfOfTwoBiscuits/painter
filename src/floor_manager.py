@@ -1,7 +1,7 @@
-from .file_utility import FileUtility
-import os
 import yaml
 from copy import deepcopy
+from os import walk
+from .file_utility import FileUtility
 
 # FloorData is not used here: the floors to paint are created beforehand.
 # But it must be imported somewhere in the main project for pyinstaller to detect it exists,
@@ -34,11 +34,13 @@ class FloorManager:
         # Iterate over files in the directory
         # (this will also load floorpack files in subdirectories,
         # though this is not used)
-        for rootpath, _, filenames in os.walk(floorpack_dir):
+        for rootpath, _, filenames in walk(floorpack_dir):
 
             for fname in filenames:
-                # Join directory and fname to find the path
-                path = os.path.join(rootpath, fname)
+                # Join directory and fname to find the path.
+                # Call resolve() to ensure it is absolute,
+                # and as_posix() for compatibility with pygbag.
+                path = (floorpack_dir / fname).resolve().as_posix()
                 # Load floorpack file
                 with open(path) as file:
                     floorpack = yaml.load(file, Loader=yaml.Loader)
