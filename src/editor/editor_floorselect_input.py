@@ -1,15 +1,19 @@
+import pygame as pg
+import platform
+
 from ..abstract_handlers import KeyboardInputHandler, ArbitraryOptionsControlWithBackButton
 from ..audio_utility import SFXPlayer
 from .editor_floor_manager import EditorFloorManager
-import pygame as pg
 
 class EditFloorpacksControl(ArbitraryOptionsControlWithBackButton):
     # If the back option is selected, quit the game,
     # or if using both game and editor, go back to game/editor choice.
 
-    def __init__(self, menu_visual_obj, CREATE_OPTION_ID: str, exit_option_id: str):
+    def __init__(self, menu_visual_obj, CREATE_OPTION_ID: str, exit_option_id: str | None, upload_option_id: str | None):
         super().__init__(menu_visual_obj, exit_option_id)
         self.__CREATE_OPTION = CREATE_OPTION_ID
+        self.__can_upload = upload_option_id is not None
+        if self.__can_upload: self.__upload_option = upload_option_id
         self.__class__.__can_go_back = exit_option_id is not None
 
     def _choose_option(self):
@@ -21,6 +25,9 @@ class EditFloorpacksControl(ArbitraryOptionsControlWithBackButton):
             # Create floorpack.
             SFXPlayer.play_sfx('menu')
             return 'CreateFloorpackState'
+        elif self.__can_upload and self._option_id == self.__upload_option:
+            SFXPlayer.play_sfx('menu')
+            return 'UploadFloorpackState'
 
         # Edit floorpack.
         SFXPlayer.play_sfx('start')
@@ -38,18 +45,27 @@ class EditFloorsControl(ArbitraryOptionsControlWithBackButton):
     _STATE_AFTER_BACK = 'EditFloorpacksState'
 
     def __init__(self, menu_visual_obj,
-                CREATE_OPTION_ID: str, MOVE_OPTION_ID: str, DELETE_OPTION_ID: str, BACK_OPTION_ID: str):
+                CREATE_OPTION_ID: str, MOVE_OPTION_ID: str, DELETE_OPTION_ID: str, BACK_OPTION_ID: str,
+                download_option_id: str | None):
         super().__init__(menu_visual_obj, BACK_OPTION_ID)
 
         self.__CREATE_OPTION = CREATE_OPTION_ID
         self.__MOVE_OPTION = MOVE_OPTION_ID
         self.__DELETE_OPTION = DELETE_OPTION_ID
 
+        self.__can_download = download_option_id is not None
+        if self.__can_download: self.__download_option = download_option_id
+
     def _choose_option(self):
         '''If a floor was selected, start editing that floor.
         If the 'Create' option is selected, create a new floor and start editing it.
         If the 'Reorder' option is selected, switch to re-ordering floors.'''
         
+        if self.__can_download and self._option_id == self.__download_option:
+            SFXPlayer.play_sfx('menu')
+            pack_path = EditorFloorManager.save_floorpack()
+            platform.window.MM.download(pack_path)
+            return
         match self._option_id:
             case self.__MOVE_OPTION:
                 # Reorder floors

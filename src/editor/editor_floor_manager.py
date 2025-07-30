@@ -114,7 +114,8 @@ class EditorFloorManager(FloorManager):
     def save_floorpack(cls):
         '''Save the current floorpack into a YAML file in the resources/floors directory.
         Does not check whether the file exists or not, though,
-        in order to have selected the floorpack, the file must exist.'''
+        in order to have selected the floorpack, the file must exist.
+        Returns the absolute path the floorpack was saved to.'''
 
         floorpack_dir = FileUtility.path_to_resource_directory('floors')
         pack_path = (floorpack_dir / (cls._current_pack_id + '.yaml')).resolve().as_posix()
@@ -122,3 +123,4 @@ class EditorFloorManager(FloorManager):
         pack = cls._floor_packs[cls._current_pack_id]
         with open(pack_path, 'w') as file:
             yaml.dump(pack, file)
+        return pack_path

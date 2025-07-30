@@ -21,6 +21,7 @@ class EditFloorpacksState(GameContentSelectState):
     _TITLE = 'Select Pack To Edit'
     __CREATE_OPTION = 'Create New'
     __EXIT_OPTION = 'Exit Editor'
+    __UPLOAD_OPTION = 'Upload Pack'
 
     @classmethod
     def enter(cls):
@@ -30,12 +31,19 @@ class EditFloorpacksState(GameContentSelectState):
         packnames = EditorFloorManager.get_floorpack_names()
         options = packnames
         options.append(cls.__CREATE_OPTION)
+
         exit_option = None
+        upload_option = None
+        if OnlineConfig.is_online():
+            options.append(cls.__UPLOAD_OPTION)
+            upload_option = cls.__UPLOAD_OPTION
+
         if OnlineConfig.can_exit(in_startup_menu=False):
             options.append(cls.__EXIT_OPTION)
             exit_option = cls.__EXIT_OPTION
+
         cls._setup_menu_visual(options)
-        cls._menu_input_handler = EditFloorpacksControl(cls._menu_visual, cls.__CREATE_OPTION, exit_option)
+        cls._menu_input_handler = EditFloorpacksControl(cls._menu_visual, cls.__CREATE_OPTION, exit_option, upload_option)
 
 class EditFloorsState(GameContentSelectState):
     _TITLE = 'Select Floor To Edit'
@@ -43,17 +51,25 @@ class EditFloorsState(GameContentSelectState):
     __MOVE_OPTION = 'Re-order'
     __DELETE_OPTION = 'Delete'
     __BACK_OPTION = 'Back'
+    __DOWNLOAD_OPTION = 'Download All'
 
     @classmethod
     def enter(cls):
         '''Create a menu with the floors, plus a back option, and the options to
         create a new floor or move an existing one.'''
         floornames = EditorFloorManager.get_floor_names()
-
+        
         options = floornames + [cls.__CREATE_OPTION, cls.__MOVE_OPTION, cls.__DELETE_OPTION, cls.__BACK_OPTION]
+
+        download_option = None
+        if OnlineConfig.is_online():
+            options.append(cls.__DOWNLOAD_OPTION)
+            download_option = cls.__DOWNLOAD_OPTION
+
         cls._setup_menu_visual(options)
         cls._menu_input_handler = EditFloorsControl(
-            cls._menu_visual, cls.__CREATE_OPTION, cls.__MOVE_OPTION, cls.__DELETE_OPTION, cls.__BACK_OPTION)
+            cls._menu_visual, cls.__CREATE_OPTION, cls.__MOVE_OPTION, cls.__DELETE_OPTION, cls.__BACK_OPTION,
+            download_option)
         
 class SelectFloorToMoveState(GameContentSelectState):
     _TITLE = 'Select Floor To Move'
