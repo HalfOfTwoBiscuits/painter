@@ -3,6 +3,9 @@ import pygame_gui as gui
 
 from ..file_utility import FileUtility
 class GUIHandler:
+    __NO_BG_ID = gui.core.ObjectID(class_id='@nobg')
+    __CONTAINER_PADDING = 5
+
     @classmethod
     def init(cls, window_size: tuple[int]):
         cls.__gui_theme_path = FileUtility.path_to_resource('gui_theme', 'theme')
@@ -18,9 +21,9 @@ class GUIHandler:
     @classmethod
     def __init_elements(cls):
         cls.__ui = gui.UIManager(cls.__window_size, theme_path=cls.__gui_theme_path)
-        cls.__container = gui.core.UIContainer(pg.Rect(0,0,0,0), manager=cls.__ui)
-        cls.__container_size = (0,0)
-
+        cls.__container_rect = pg.Rect(0,0,0,0)
+        cls.__container = gui.elements.UIPanel(cls.__container_rect, manager=cls.__ui,
+                                               object_id=cls.__NO_BG_ID)
 
     @classmethod
     def process_event(cls, e):
@@ -36,14 +39,16 @@ class GUIHandler:
 
     @classmethod
     def set_container(cls, x: int, y: int, w: int=0, h: int=0):
-        cls.__container_size = (w,h)
-        cls.__container.set_dimensions(cls.__container_size)
+        w += cls.__CONTAINER_PADDING
+        h += cls.__CONTAINER_PADDING
+        cls.__container.set_dimensions((w,h))
         cls.__container.set_position((x,y))
+        cls.__container_rect = pg.Rect(x,y,w,h)
 
     @classmethod
     def add_bg(cls):
-        w, h = cls.__container_size
-        gui.elements.UIPanel(pg.Rect(0,0,w,h), manager=cls.__ui, container=cls.__container)
+        # Remove object ID, causing default background colour to appear
+        cls.__container = gui.elements.UIPanel(cls.__container_rect, manager=cls.__ui, object_id=None)
 
     @classmethod
     def add_button(cls, id: str, location_rect, text: str=None):
