@@ -1,4 +1,5 @@
 import yaml
+from pathlib import Path
 from ..floor_manager import FloorManager
 from ..file_utility import FileUtility
 from .floor_data import FloorData
@@ -124,3 +125,10 @@ class EditorFloorManager(FloorManager):
         with open(pack_path, 'w') as file:
             yaml.dump(pack, file)
         return pack_path
+    
+    @classmethod
+    def upload_floorpack(cls, path_str: str):
+        '''Upload the floorpack at the given path, and select it.'''
+        path = Path(path_str)
+        pack_id = cls._load_floorpack(path)
+        cls.select_floorpack(pack_id)

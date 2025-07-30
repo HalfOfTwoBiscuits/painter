@@ -42,12 +42,26 @@ class FloorManager:
                 # and as_posix() for compatibility with pygbag.
                 path = (floorpack_dir / fname).resolve().as_posix()
                 # Load floorpack file
-                with open(path) as file:
-                    floorpack = yaml.load(file, Loader=yaml.Loader)
-                
-                # Retrieve fname without extention: the floorpack ID used as a key
-                floorpack_id = fname[:fname.index('.')]
-                cls._floor_packs[floorpack_id] = floorpack
+                cls._load_floorpack(path, fname)
+    
+    @classmethod
+    def _load_floorpack(cls, path, fname: str=None) -> str:
+        '''Load the floorpack at the given path into memory.
+        The filename can be passed if it is already known,
+        otherwise it is derived from the path.
+        Returns the ID of the new pack, which is the filename
+        without extention.
+        
+        Called in load_floors() and EditorFloorManager.upload_floorpack().'''
+
+        with open(path) as file:
+            floorpack = yaml.load(file, Loader=yaml.Loader)
+        
+        if fname is None: fname = path.name
+        # Retrieve fname without extention: the floorpack ID used as a key
+        floorpack_id = fname[:fname.index('.')]
+        cls._floor_packs[floorpack_id] = floorpack
+        return floorpack_id
 
     @classmethod
     def floorpack_is_over(cls):
