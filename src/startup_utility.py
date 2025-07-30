@@ -10,9 +10,7 @@ def setup_state(editor: bool=False):
     To ensure all states can access necessary data,
     also load the game levels
     with FloorManager.load_floors()'''
-    initial_state_name = editor and "EditFloorpacksState" or "FloorpackSelectState"
-
-    FloorManager.load_floors()
+    initial_state_name = editor and "EditorStartState" or "GameStartState"
 
     return initial_state_name
 

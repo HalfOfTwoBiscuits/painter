@@ -17,6 +17,12 @@ from .autofloor_visual import AutoFloorVisual
 from .cursor_visual import CursorVisual
 from .playtest_handlers import PlaytestControl, ReturnToEditorButtonVisual
 
+class EditorStartState(State):
+    @classmethod
+    def enter(cls):
+        EditorFloorManager.load_floors()
+        return 'EditFloorpacksState'
+
 class EditFloorpacksState(GameContentSelectState):
     _TITLE = 'Select Pack To Edit'
     __CREATE_OPTION = 'Create New'

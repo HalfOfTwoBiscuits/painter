@@ -10,6 +10,12 @@ from .floor_visual import FloorVisual
 from .menu_button_visual import MenuButtonVisual
 from .floor_player import FloorPlayer
 
+class GameStartState(State):
+    @classmethod
+    def enter(cls):
+        FloorManager.load_floors()
+        return 'FloorpackSelectState'
+
 class NewFloorState(State):
     '''The player has chosen to start a new floor.
     Set it up before moving onto GameplayState.'''
