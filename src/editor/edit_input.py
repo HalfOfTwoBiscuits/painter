@@ -28,6 +28,7 @@ class EditControl(KeyboardInputHandler):
         pg.K_e : ('exit',),
         pg.K_4 : ('exit',),
         pg.K_ESCAPE : ('exit',),
+        pg.K_BACKSPACE : ('exit',),
 
         pg.K_a : ('toggle_autosolve',),
         pg.K_5 : ('toggle_autosolve',),
@@ -39,7 +40,6 @@ class EditControl(KeyboardInputHandler):
         pg.K_UP : ('move_cursor',-2),
 
         pg.K_SPACE : ('paint',),
-        pg.K_BACKSPACE : ('paint',),
         pg.K_RETURN : ('set_initial_pos',),
         pg.K_LSHIFT : ('set_initial_pos',),
         pg.K_RSHIFT : ('set_initial_pos',),
