@@ -28,7 +28,7 @@ You can also make your own floors to paint! In the level editor, you left-click 
 Your floors will be grouped into a floorpack. If you'd like everyone to play your floorpack, consider making a pull request with the corresponding file from your resources/floors directory.
 
 ### To try the game...
-- You can visit [https://halfoftwobiscuits.github.io/painter/]. This doesn't include the level editor yet.
+- You can visit [https://halfoftwobiscuits.github.io/painter/]
 - On Windows, you can download an executable version from the 'releases' area on the right of the page.
 - On any platform, you can clone this repository, and execute run_game.py, run_editor.py, or run_game_or_editor.py with Python.
 
@@ -39,12 +39,12 @@ However, I've tried to make them both accessible with either.
 In the game, you can move by clicking an adjacent square to go to.
 In the editor, you can press the arrow keys to make a cursor appear. You can then move the cursor with the arrow keys, press space to paint the square which the cursor is over, and press shift to move the painter to that square.
 
+A full list of controls is in CONTROLS.md for reference.
+
 Any feedback about the controls, or other accessibility feedback, is welcome.
 
 #### Ideas for future development...
 - On starting a level, display which number it is and how many are left to go.
-
-- Allow using the editor in the web build, and upload/download of level files.
 
 - Aesthetic options when creating levels:
   - Add the ability to change the colour of the paint.
