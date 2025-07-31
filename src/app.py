@@ -16,10 +16,13 @@ class App(ABC):
     # Specified by children.
     _state_module = None
 
+    _TITLE = 'Painter'
+
     def __init__(self, initial_state_name: str, window):
         '''Store window, enter initial state.'''
         self._change_state(initial_state_name)
         self.__window = window
+        pg.display.set_caption(self._TITLE)
 
     def main(self):
         '''Run game loop.
