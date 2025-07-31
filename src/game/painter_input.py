@@ -27,6 +27,7 @@ class PainterControl(KeyboardInputHandler):
     @staticmethod
     def process_input(cls, event):
         if event.type == pg.MOUSEBUTTONUP:
+            if event.button == 3: return cls.undo()
             x, y = event.pos
             clicked_pos = FloorVisual.get_coordinates_of_cell_clicked(x, y)
             if clicked_pos is None:
