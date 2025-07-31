@@ -1,4 +1,5 @@
 import yaml
+from pathlib import Path
 from ..floor_manager import FloorManager
 from ..file_utility import FileUtility
 from .floor_data import FloorData
@@ -114,7 +115,8 @@ class EditorFloorManager(FloorManager):
     def save_floorpack(cls):
         '''Save the current floorpack into a YAML file in the resources/floors directory.
         Does not check whether the file exists or not, though,
-        in order to have selected the floorpack, the file must exist.'''
+        in order to have selected the floorpack, the file must exist.
+        Returns the absolute path the floorpack was saved to.'''
 
         floorpack_dir = FileUtility.path_to_resource_directory('floors')
         pack_path = (floorpack_dir / (cls._current_pack_id + '.yaml')).resolve().as_posix()
@@ -122,3 +124,12 @@ class EditorFloorManager(FloorManager):
         pack = cls._floor_packs[cls._current_pack_id]
         with open(pack_path, 'w') as file:
             yaml.dump(pack, file)
+        return pack_path
+    
+    @classmethod
+    def upload_floorpack(cls, path_str: str, fname: str):
+        '''Upload the floorpack at the given path, and select it.
+        The original filename is also passed, because the name changes on upload.'''
+        path = Path(path_str)
+        pack_id = cls._load_floorpack(path, fname)
+        cls.select_floorpack(pack_id)

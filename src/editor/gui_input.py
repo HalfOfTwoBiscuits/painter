@@ -40,24 +40,21 @@ class FloorpackCreateControl(KeyboardInputHandler):
     
     @staticmethod
     def back():
-        print ('Back')
         SFXPlayer.play_sfx('back')
         return 'EditFloorpacksState'
     
     @classmethod
     def submit(cls):
-        print ('Submit')
         # Get pack name from the form
         field = GUIHandler.get_elem(cls.__FIELD_ID)
         packname = field.get_text()
         EditorFloorManager.create_floorpack(packname)
 
-        SFXPlayer.play_sfx('start')
+        SFXPlayer.play_sfx('destroy')
         return 'EditState'
     
     @classmethod
     def focus(cls):
-        print ('Focus')
         GUIHandler.set_focus(cls.__FIELD_ID)
 
     @classmethod

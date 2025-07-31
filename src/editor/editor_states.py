@@ -1,6 +1,7 @@
 from copy import deepcopy
 
 from ..abstract_states import State, GameContentSelectState
+from ..config import OnlineConfig
 from ..game.menu_visual import MenuVisual
 from ..game.painter_visual import PainterVisual
 from ..game.floor_visual import FloorVisual
@@ -14,12 +15,21 @@ from .edit_input import EditControl
 from .gui_input import FloorpackCreateControl, ResizeFloorControl
 from .autofloor_visual import AutoFloorVisual
 from .cursor_visual import CursorVisual
+from .upload_visual import UploadPromptVisual
+from .upload_input import UploadPromptInput
 from .playtest_handlers import PlaytestControl, ReturnToEditorButtonVisual
+
+class EditorStartState(State):
+    @classmethod
+    def enter(cls):
+        EditorFloorManager.load_floors()
+        return 'EditFloorpacksState'
 
 class EditFloorpacksState(GameContentSelectState):
     _TITLE = 'Select Pack To Edit'
     __CREATE_OPTION = 'Create New'
     __EXIT_OPTION = 'Exit Editor'
+    __UPLOAD_OPTION = 'Upload Pack'
 
     @classmethod
     def enter(cls):
@@ -27,9 +37,21 @@ class EditFloorpacksState(GameContentSelectState):
         # TODO: make this method generic in a parent. Maybe for the ingame floor select too.
         # FLOOR_MANAGER and INPUT_HANDLER_CLASS and OTHER_OPTIONS can be class constants.
         packnames = EditorFloorManager.get_floorpack_names()
-        options = packnames + [cls.__CREATE_OPTION, cls.__EXIT_OPTION]
+        options = packnames
+        options.append(cls.__CREATE_OPTION)
+
+        exit_option = None
+        upload_option = None
+        if OnlineConfig.is_online():
+            options.append(cls.__UPLOAD_OPTION)
+            upload_option = cls.__UPLOAD_OPTION
+
+        if OnlineConfig.can_exit(in_startup_menu=False):
+            options.append(cls.__EXIT_OPTION)
+            exit_option = cls.__EXIT_OPTION
+
         cls._setup_menu_visual(options)
-        cls._menu_input_handler = EditFloorpacksControl(cls._menu_visual, cls.__CREATE_OPTION, cls.__EXIT_OPTION)
+        cls._menu_input_handler = EditFloorpacksControl(cls._menu_visual, cls.__CREATE_OPTION, exit_option, upload_option)
 
 class EditFloorsState(GameContentSelectState):
     _TITLE = 'Select Floor To Edit'
@@ -37,17 +59,25 @@ class EditFloorsState(GameContentSelectState):
     __MOVE_OPTION = 'Re-order'
     __DELETE_OPTION = 'Delete'
     __BACK_OPTION = 'Back'
+    __DOWNLOAD_OPTION = 'Download All'
 
     @classmethod
     def enter(cls):
         '''Create a menu with the floors, plus a back option, and the options to
         create a new floor or move an existing one.'''
         floornames = EditorFloorManager.get_floor_names()
-
+        
         options = floornames + [cls.__CREATE_OPTION, cls.__MOVE_OPTION, cls.__DELETE_OPTION, cls.__BACK_OPTION]
+
+        download_option = None
+        if OnlineConfig.is_online():
+            options.append(cls.__DOWNLOAD_OPTION)
+            download_option = cls.__DOWNLOAD_OPTION
+
         cls._setup_menu_visual(options)
         cls._menu_input_handler = EditFloorsControl(
-            cls._menu_visual, cls.__CREATE_OPTION, cls.__MOVE_OPTION, cls.__DELETE_OPTION, cls.__BACK_OPTION)
+            cls._menu_visual, cls.__CREATE_OPTION, cls.__MOVE_OPTION, cls.__DELETE_OPTION, cls.__BACK_OPTION,
+            download_option)
         
 class SelectFloorToMoveState(GameContentSelectState):
     _TITLE = 'Select Floor To Move'
@@ -153,3 +183,9 @@ class FloorPlaytestState(State):
         FloorPlayer.new_floor(floor)
         cell_dimens = FloorVisual.get_cell_dimens_no_line()
         PainterVisual.new_floor(floor, cell_dimens)
+
+class UploadPromptState(State):
+    _INPUT_HANDLER = UploadPromptInput
+    _VISUAL_HANDLERS = (UploadPromptVisual,)
+    @classmethod
+    def enter(cls): UploadPromptVisual.init()

@@ -1,36 +1,8 @@
-from src.game.game import Game
-from src.editor.editor import Editor
-from src.startup_utility import setup_state, setup_window, StartupMenu
-from src.audio_utility import SFXPlayer
+from src.game_and_editor import GameAndEditor
 
 def main():
-    running = True
-    while running:
-        STATE_NAME = 'StartupUtilityState'
-        game_window = setup_window()
-        s = StartupMenu(STATE_NAME, game_window)
-        exit_code = s.main()
-        match exit_code:
-            case 3 | True:
-                # Exit option or closing the window will exit
-                running = False
-            case 1:
-                # First option opens the game
-                SFXPlayer.play_sfx('menu')
-                initial_state = setup_state()
-                g = Game(initial_state, game_window)
-                exit_code = g.main()
-                # An exit code of 3 means the ingame exit option was chosen.
-                # Continue running only in that case.
-                running = exit_code == 3
-            case 2:
-                # Second option opens the editor
-                SFXPlayer.play_sfx('menu')
-                initial_state = setup_state(editor=True)
-                editor_window = setup_window(True)
-                e = Editor(initial_state, editor_window)
-                exit_code = e.main()
-                running = exit_code == 3
+    a = GameAndEditor()
+    a.main()
 
 if __name__ == '__main__':
     main()

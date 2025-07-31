@@ -46,6 +46,12 @@ class MenuState(State, ABC):
     def _setup_menu_visual(cls, menu_options: list[str]):
         cls._menu_visual = MenuVisual(cls._TITLE, menu_options)
 
+    _visual_handlers = None
+    
+    @classmethod
+    def get_visual_handlers(cls):
+        return cls._visual_handlers
+
 class GameContentSelectState(MenuState, ABC):
     '''Base class for states where the user selects a floor or floorpack.
     Has a variable for an input handler instance to be initialised with the MenuVisual.'''
@@ -64,19 +70,13 @@ class GameContentSelectState(MenuState, ABC):
         just the menu visual is returned.
 
         If more graphics are added to these menus, I could remove this method
-        and move the _visual_handlers attribute to the parent, or override it
-        on a case-by-case basis.'''
+        or override it on a case-by-case basis.'''
         return (cls._menu_visual,)
     
 class FixedOptionsSelectState(MenuState, ABC):
     '''Base class for pause menu and post-floor menus.
     The options displayed on the menu are fixed.'''
     _OPTIONS = None
-    _visual_handlers = None
-    
-    @classmethod
-    def get_visual_handlers(cls):
-        return cls._visual_handlers
     
     @classmethod
     def _setup_menu_visual(cls):

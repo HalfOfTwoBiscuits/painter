@@ -20,15 +20,13 @@
     {
         "colours":
         {
-            "dark_bg": "SlateGray",
-            "normal_text": "White",
-            "selected_bg": "Ivory",
-            "selected_text": "Navy"
+            "dark_bg": "Navy",
+            "normal_text": "White"
         }
     },
-    "panel": {
+    "@nobg": {
         "colours": {
-            "dark_bg": "Black"
+            "dark_bg" : "#0000"
         }
     }
 }
