@@ -127,8 +127,9 @@ class EditorFloorManager(FloorManager):
         return pack_path
     
     @classmethod
-    def upload_floorpack(cls, path_str: str):
-        '''Upload the floorpack at the given path, and select it.'''
+    def upload_floorpack(cls, path_str: str, fname: str):
+        '''Upload the floorpack at the given path, and select it.
+        The original filename is also passed, because the name changes on upload.'''
         path = Path(path_str)
-        pack_id = cls._load_floorpack(path)
+        pack_id = cls._load_floorpack(path, fname)
         cls.select_floorpack(pack_id)

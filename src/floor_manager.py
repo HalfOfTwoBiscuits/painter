@@ -57,9 +57,10 @@ class FloorManager:
         with open(path) as file:
             floorpack = yaml.load(file, Loader=yaml.Loader)
         
-        if fname is None: fname = path.name
-        # Retrieve fname without extention: the floorpack ID used as a key
-        floorpack_id = fname[:fname.index('.')]
+        if fname is None: floorpack_id = path.name
+        else:
+            # Retrieve fname without extention: the floorpack ID used as a key
+            floorpack_id = fname[:fname.index('.')]
         cls._floor_packs[floorpack_id] = floorpack
         return floorpack_id
 

@@ -1,5 +1,7 @@
 from ..app import App
+from ..config import OnlineConfig
 from .gui_handler import GUIHandler
+from .upload import FloorpackUploader
 from . import editor_states
 
 class Editor(App):
@@ -9,9 +11,13 @@ class Editor(App):
         super().__init__(initial_state_name, window)
         size = window.get_size()
         GUIHandler.init(size)
+        if OnlineConfig.is_online(): FloorpackUploader.init()
 
     def _other_event_processing(self, e):
         GUIHandler.process_event(e)
+        if OnlineConfig.is_online() and FloorpackUploader.has_just_uploaded():
+            self._change_state("EditFloorpacksState")
+            FloorpackUploader.disallow_upload()
 
     def _use_delta(self, dt):
         GUIHandler.update(dt)

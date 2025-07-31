@@ -4,6 +4,7 @@ import platform
 from ..abstract_handlers import KeyboardInputHandler, ArbitraryOptionsControlWithBackButton
 from ..audio_utility import SFXPlayer
 from .editor_floor_manager import EditorFloorManager
+from .upload import FloorpackUploader
 
 class EditFloorpacksControl(ArbitraryOptionsControlWithBackButton):
     # If the back option is selected, quit the game,
@@ -27,7 +28,8 @@ class EditFloorpacksControl(ArbitraryOptionsControlWithBackButton):
             return 'CreateFloorpackState'
         elif self.__can_upload and self._option_id == self.__upload_option:
             SFXPlayer.play_sfx('menu')
-            return 'UploadFloorpackState'
+            FloorpackUploader.allow_upload()
+            return
 
         # Edit floorpack.
         SFXPlayer.play_sfx('start')
