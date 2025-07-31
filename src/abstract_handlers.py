@@ -262,7 +262,6 @@ class TextDisplayVisualHandler(VisualHandler, ABC):
         text_h *= num_lines
 
         text_x, text_y = cls._centred_in_dimensions(win_w, win_h, text_w, text_h)
-        print (text_w, text_h, win_w, win_h, text_x, text_y)
         cls.__pos = (text_x, text_y)
         cls.__text_surf = cls.__FONT.render(cls._TEXT, False, cls.__COL)
 
