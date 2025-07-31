@@ -60,10 +60,6 @@ class GUIHandler:
                               object_id=id,
                               manager=cls.__ui,
                               container=cls.__container)
-        
-    @classmethod
-    def create_file_popup(cls, location_rect, title: str):
-        gui.windows.UIFileDialog(rect=location_rect, manager=cls.__ui, window_title=title)
 
     @classmethod
     def add_textinput(cls, id: str, location_rect, label: str=None, placeholder: str=None):
