@@ -1,6 +1,6 @@
 import pygame as pg
 from ..abstract_handlers import VisualHandler
-from ..file_utility import FileUtility
+from ..font_utility import FontManager
 from ..audio_utility import SFXPlayer
 from .floor_auto_player import FloorAutoPlayer
 class AutoFloorVisual(VisualHandler):
@@ -14,13 +14,7 @@ class AutoFloorVisual(VisualHandler):
     __num_solutions = 0
 
     # Font data
-    __FONT_DIRNAME = 'font'
-    __FONT_FILENAME = 'Gorilla_Black'
-
-    __FONT_PATH = FileUtility.path_to_resource(__FONT_DIRNAME, __FONT_FILENAME)
-
-    pg.font.init()
-    __FONT = pg.font.Font(__FONT_PATH, 18)
+    __FONT = FontManager.get_font()
 
     __is_possible = None
     # 1 : checking possibility with heuristic

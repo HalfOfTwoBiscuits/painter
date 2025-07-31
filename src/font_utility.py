@@ -1,5 +1,5 @@
 import pygame as pg
-from ..file_utility import FileUtility
+from .file_utility import FileUtility
 class FontManager:
     # Font data
     __FONT_DIRNAME = 'font'

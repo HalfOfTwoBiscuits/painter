@@ -1,6 +1,6 @@
 import pygame as pg
 from ..abstract_handlers import VisualHandler
-from .font import FontManager
+from ..font_utility import FontManager
 
 class MenuButtonVisual(VisualHandler):
     __BUTTON_RECT = pg.Rect(0,0,55,60)

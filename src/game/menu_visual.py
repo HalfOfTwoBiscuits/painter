@@ -2,7 +2,7 @@ import pygame as pg
 from math import ceil
 from ..abstract_handlers import VisualHandler
 from ..audio_utility import SFXPlayer
-from .font import FontManager
+from ..font_utility import FontManager
 
 class MenuVisual(VisualHandler):
     '''A visual for menus where the player chooses a numbered option.
