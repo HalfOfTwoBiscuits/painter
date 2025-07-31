@@ -50,7 +50,7 @@ class FloorpackCreateControl(KeyboardInputHandler):
         packname = field.get_text()
         EditorFloorManager.create_floorpack(packname)
 
-        SFXPlayer.play_sfx('start')
+        SFXPlayer.play_sfx('destroy')
         return 'EditState'
     
     @classmethod

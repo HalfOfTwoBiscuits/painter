@@ -1,5 +1,6 @@
 import pygame as pg
 from ..abstract_handlers import KeyboardInputHandler
+from ..audio_utility import SFXPlayer
 from .upload import FloorpackUploader
 
 class UploadPromptInput(KeyboardInputHandler):
@@ -17,4 +18,5 @@ class UploadPromptInput(KeyboardInputHandler):
     def back():
         FloorpackUploader.remove_upload_prompt()
         FloorpackUploader.abort_upload()
+        SFXPlayer.play_sfx('back')
         return 'EditFloorpacksState'
