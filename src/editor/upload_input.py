@@ -12,6 +12,8 @@ class UploadPromptInput(KeyboardInputHandler):
         if FloorpackUploader.has_just_uploaded():
             FloorpackUploader.remove_upload_prompt()
             return 'EditFloorpacksState'
+        elif event.type == pg.MOUSEBUTTONDOWN and event.button == 3:
+            return cls.back()
         else: return cls._process_keyboard_input(cls, event)
 
     @staticmethod
