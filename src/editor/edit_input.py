@@ -31,7 +31,6 @@ class EditControl(KeyboardInputHandler):
         pg.K_BACKSPACE : ('exit',),
 
         pg.K_a : ('toggle_autosolve',),
-        pg.K_5 : ('toggle_autosolve',),
         pg.K_TAB : ('toggle_autosolve',),
 
         pg.K_RIGHT : ('move_cursor',1),
