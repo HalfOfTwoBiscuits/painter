@@ -2,6 +2,7 @@ import platform
 from .editor_floor_manager import EditorFloorManager
 class FloorpackUploader:
     __just_uploaded = False
+    __aborting = False
 
     @classmethod
     def init(cls):
@@ -17,25 +18,36 @@ class FloorpackUploader:
         platform.window.dlg_multifile.accept = 'application/yaml'
         platform.window.dlg_multifile.multiple = false
 
-    @staticmethod
-    def allow_upload():
+    @classmethod
+    def allow_upload(cls):
         '''Using JavaScript, make the input element for files on the web version's HTML page appear.'''
         platform.window.dlg.hidden = false
+        cls.__aborting = False
 
     @staticmethod
-    def disallow_upload():
+    def remove_upload_prompt():
         '''Using JavaScript, make the input element for files on the web version's HTML page disappear.'''
         platform.window.dlg.hidden = true
+
+    @classmethod
+    def abort_upload(cls):
+        '''If a file is currently being uploaded, there will be no effect when it finishes uploading.'''
+        cls.__aborting = True
 
     @classmethod
     def __upload(cls, file_data):
         '''Loads the floorpack file with the path that's specified in the file_data namespace.
         Used when a file is uploaded.
-        Does nothing if the file doesn't have .yaml extention.'''
+        Does nothing if the file doesn't have .yaml extention,
+        or abort_upload() was called before this.'''
+        if cls.__aborting:
+            cls.__aborting = False
+            return
+        
         fname = file_data.name
         if fname.endswith('.yaml'):
             EditorFloorManager.upload_floorpack(file_data.text, fname)
-            cls.__just_uploaded = True
+        cls.__just_uploaded = True
 
     @classmethod
     def has_just_uploaded(cls) -> bool:

@@ -1,6 +1,7 @@
 import pygame as pg
 from abc import abstractmethod, ABC
 from .audio_utility import SFXPlayer
+from .font_utility import FontManager
 
 class InputHandler(ABC):
     '''Base for all input processing classes.'''
@@ -236,4 +237,35 @@ class VisualHandler:
     def start_draw(cls):
         '''Fill the surface with a background to prepare for drawing'''
         cls._window.fill(cls.__BG_COL)
-        
+
+    @staticmethod
+    def _centred_in_dimensions(x_dimens: int, y_dimens: int, elem_w: int, elem_h: int):
+        '''Return the x, y position for a GUI element with the given width and height
+        so that it is centred inside an area with the given dimensions.'''
+        return (x_dimens - elem_w) // 2, (y_dimens - elem_h) // 2
+    
+class TextDisplayVisualHandler(VisualHandler, ABC):
+    __FONT = FontManager.get_heading_font()
+    __COL = pg.Color(255,255,255)
+    _TEXT = 'This message should not appear'
+
+    @classmethod
+    def init(cls):
+        win_w, win_h = cls._window_dimensions
+        text_w, text_h = cls.__FONT.size(cls._TEXT)
+
+        # New lines aren't counted in size calculation
+        # so divide width by number of new lines
+        # and multiply height.
+        num_lines = cls._TEXT.count('\n')
+        text_w //= num_lines
+        text_h *= num_lines
+
+        text_x, text_y = cls._centred_in_dimensions(win_w, win_h, text_w, text_h)
+        print (text_w, text_h, win_w, win_h, text_x, text_y)
+        cls.__pos = (text_x, text_y)
+        cls.__text_surf = cls.__FONT.render(cls._TEXT, False, cls.__COL)
+
+    @classmethod
+    def draw(cls):
+        cls._window.blit(cls.__text_surf, cls.__pos)

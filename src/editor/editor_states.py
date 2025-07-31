@@ -15,6 +15,8 @@ from .edit_input import EditControl
 from .gui_input import FloorpackCreateControl, ResizeFloorControl
 from .autofloor_visual import AutoFloorVisual
 from .cursor_visual import CursorVisual
+from .upload_visual import UploadPromptVisual
+from .upload_input import UploadPromptInput
 from .playtest_handlers import PlaytestControl, ReturnToEditorButtonVisual
 
 class EditorStartState(State):
@@ -181,3 +183,9 @@ class FloorPlaytestState(State):
         FloorPlayer.new_floor(floor)
         cell_dimens = FloorVisual.get_cell_dimens_no_line()
         PainterVisual.new_floor(floor, cell_dimens)
+
+class UploadPromptState(State):
+    _INPUT_HANDLER = UploadPromptInput
+    _VISUAL_HANDLERS = (UploadPromptVisual,)
+    @classmethod
+    def enter(cls): UploadPromptVisual.init()

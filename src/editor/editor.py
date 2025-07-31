@@ -15,9 +15,6 @@ class Editor(App):
 
     def _other_event_processing(self, e):
         GUIHandler.process_event(e)
-        if OnlineConfig.is_online() and FloorpackUploader.has_just_uploaded():
-            self._change_state("EditFloorpacksState")
-            FloorpackUploader.disallow_upload()
 
     def _use_delta(self, dt):
         GUIHandler.update(dt)

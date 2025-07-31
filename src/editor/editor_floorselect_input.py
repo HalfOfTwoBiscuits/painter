@@ -29,7 +29,7 @@ class EditFloorpacksControl(ArbitraryOptionsControlWithBackButton):
         elif self.__can_upload and self._option_id == self.__upload_option:
             SFXPlayer.play_sfx('menu')
             FloorpackUploader.allow_upload()
-            return
+            return 'UploadPromptState'
 
         # Edit floorpack.
         SFXPlayer.play_sfx('start')
