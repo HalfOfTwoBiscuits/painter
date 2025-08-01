@@ -247,23 +247,23 @@ class VisualHandler:
 class TextDisplayVisualHandler(VisualHandler, ABC):
     __FONT = FontManager.get_heading_font()
     __COL = pg.Color(255,255,255)
-    _TEXT = 'This message should not appear'
+    _text = 'This message should not appear'
 
     @classmethod
     def init(cls):
         win_w, win_h = cls._window_dimensions
-        text_w, text_h = cls.__FONT.size(cls._TEXT)
+        text_w, text_h = cls.__FONT.size(cls._text)
 
         # New lines aren't counted in size calculation
         # so divide width by number of new lines
         # and multiply height.
-        num_lines = cls._TEXT.count('\n')
+        num_lines = cls._text.count('\n')
         text_w //= num_lines
         text_h *= num_lines
 
         text_x, text_y = cls._centred_in_dimensions(win_w, win_h, text_w, text_h)
         cls.__pos = (text_x, text_y)
-        cls.__text_surf = cls.__FONT.render(cls._TEXT, False, cls.__COL)
+        cls.__text_surf = cls.__FONT.render(cls._text, False, cls.__COL)
 
     @classmethod
     def draw(cls):

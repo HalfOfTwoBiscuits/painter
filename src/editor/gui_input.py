@@ -3,6 +3,7 @@ import pygame as pg
 
 from ..abstract_handlers import KeyboardInputHandler
 from ..audio_utility import SFXPlayer
+from ..error_report import ErrorReportVisual, ErrorReportControl
 from ..game.floor_visual import FloorVisual
 from ..game.painter_visual import PainterVisual
 from .editor_floor_manager import EditorFloorManager
@@ -45,13 +46,24 @@ class FloorpackCreateControl(KeyboardInputHandler):
     
     @classmethod
     def submit(cls):
+        DUPLICATE_MSG = \
+            "There's already a floorpack called\n"\
+            "{}\n"\
+            "Please enter a different name."
+        
         # Get pack name from the form
         field = GUIHandler.get_elem(cls.__FIELD_ID)
         packname = field.get_text()
-        EditorFloorManager.create_floorpack(packname)
-
-        SFXPlayer.play_sfx('destroy')
-        return 'EditState'
+        try:
+            EditorFloorManager.create_floorpack(packname)
+        except FileExistsError:
+            msg = DUPLICATE_MSG.format(packname)
+            ErrorReportVisual.set_message(msg)
+            ErrorReportControl.set_state_after_dismiss('CreateFloorpackState')
+            return 'ErrorState'
+        else:
+            SFXPlayer.play_sfx('destroy')
+            return 'EditState'
     
     @classmethod
     def focus(cls):
