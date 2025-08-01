@@ -4,6 +4,7 @@ class FloorpackUploader:
     __just_uploaded = False
     __aborting = False
     __upload_was_invalid = False
+    __duplicate_name = None
 
     @classmethod
     def init(cls):
@@ -24,7 +25,6 @@ class FloorpackUploader:
         '''Using JavaScript, make the input element for files on the web version's HTML page appear.'''
         platform.window.dlg.hidden = false
         cls.__aborting = False
-        cls.__error = False
 
     @staticmethod
     def remove_upload_prompt():
@@ -50,13 +50,15 @@ class FloorpackUploader:
             EditorFloorManager.upload_floorpack(file_data.text, fname)
         except TypeError:
             cls.__upload_was_invalid = True
+        except FileExistsError:
+            cls.__duplicate_name = EditorFloorManager.get_packname(fname)
         else:
             cls.__just_uploaded = True
 
     @classmethod
     def has_just_uploaded(cls) -> bool:
-        '''Return True if the user uploaded a file since this method was last called,
-        False otherwise.'''
+        '''Return True if the user successfully uploaded a file
+        since this method was last called, False otherwise.'''
         if cls.__just_uploaded:
             cls.__just_uploaded = False
             return True
@@ -64,9 +66,21 @@ class FloorpackUploader:
 
     @classmethod
     def upload_was_invalid(cls) -> bool:
-        '''Return True if the user uploaded an invalid file since this method was last called,
-        False otherwise.'''
+        '''Return True if the user uploaded an invalid file
+        since this method was last called, False otherwise.'''
         if cls.__upload_was_invalid:
             cls.__upload_was_invalid = False
             return True
         else: return False
+
+    @classmethod
+    def duplicate_name(cls) -> str | None:
+        '''If the user uploaded a file with a duplicate name
+        since this method was last called, return the name.
+        Otherwise return None.'''
+        duplicate_name = cls.__duplicate_name
+        if duplicate_name is None:
+            return None
+        else:
+            cls.__duplicate_name = None
+            return duplicate_name

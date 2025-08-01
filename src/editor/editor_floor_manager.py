@@ -134,7 +134,7 @@ class EditorFloorManager(FloorManager):
         Raises FileExistsError if there is already a floorpack with that ID
         and TypeError if the file isn't a floorpack.'''
         path = Path(path_str)
-        pack_id = cls._get_packname(fname)
+        pack_id = cls.get_packname(fname)
         if pack_id in cls._floor_packs:
             raise FileExistsError
         

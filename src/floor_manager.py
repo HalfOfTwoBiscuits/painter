@@ -74,12 +74,12 @@ class FloorManager:
         
         if floorpack_id is None:
             if fname is None: floorpack_id = path.name
-            else: floorpack_id = cls._get_packname(fname)
+            else: floorpack_id = cls.get_packname(fname)
 
         cls._floor_packs[floorpack_id] = floorpack
 
     @classmethod
-    def _get_packname(cls, filename: str):
+    def get_packname(cls, filename: str):
         '''Retrieve fname without extention: the floorpack ID used as a key'''
         return filename[:filename.index('.')]
     
