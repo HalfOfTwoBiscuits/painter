@@ -15,7 +15,7 @@ class ErrorReportVisual(TextDisplayVisualHandler):
     def set_message_from_invalid_packs(cls, invalid_pack_names: list[str]):
         START = 'Some level packs are invalid:\n'
         END = '\nAny valid level packs will still work.'
-        cls.set_message(START + ', '.join(invalid_pack_names) + END)
+        cls.set_message(START + '\n'.join(invalid_pack_names) + END)
 
 class ErrorReportControl(InputHandler):
     # By default, close the game after dismissing the error report
