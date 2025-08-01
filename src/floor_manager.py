@@ -34,9 +34,7 @@ class FloorManager:
 
             for fname in filenames:
                 # Join directory and fname to find the path.
-                # Call resolve() to ensure it is absolute,
-                # and as_posix() for compatibility with pygbag.
-                path = (floorpack_dir / fname).resolve().as_posix()
+                path = (floorpack_dir / fname)
                 # Load floorpack file
                 try:
                     cls._load_floorpack(path, fname)
@@ -47,18 +45,25 @@ class FloorManager:
             raise TypeError
     
     @classmethod
-    def _load_floorpack(cls, path, fname: str=None) -> str:
-        '''Load the floorpack at the given path into memory.
-        The filename can be passed if it is already known,
-        otherwise it is derived from the path.
-        Returns the ID of the new pack, which is the filename
-        without extention.
+    def _load_floorpack(cls, path, fname: str=None, floorpack_id: str=None):
+        '''Load the floorpack at the given pathlib.Path into memory.
+        It will be saved with the given ID.
+        
+        If the ID is not passed, the ID will be the filename without extention.
+        If the filename is not given it will be derived from the path.
+        (This is significant because when uploading, the path is different to the original filename)
+
         If the file doesn't contain a floorpack, raise TypeError.
         
         Called in load_floors() and EditorFloorManager.upload_floorpack().'''
 
+        # Call resolve() to ensure it is absolute,
+        # and as_posix() for compatibility with pygbag.
+        path = path.resolve()
+        posix_path = path.as_posix()
+
         try:
-            with open(path) as file:
+            with open(posix_path) as file:
                 floorpack = yaml.load(file, Loader=yaml.Loader)
         except yaml.YAMLError:
             raise TypeError
@@ -66,14 +71,18 @@ class FloorManager:
         # Check the pack is a list of FloorData
         if not isinstance(floorpack, list) or not all([isinstance(floor, FloorData) for floor in floorpack]):
             raise TypeError
+        
+        if floorpack_id is None:
+            if fname is None: floorpack_id = path.name
+            else: floorpack_id = cls._get_packname(fname)
 
-        if fname is None: floorpack_id = path.name
-        else:
-            # Retrieve fname without extention: the floorpack ID used as a key
-            floorpack_id = fname[:fname.index('.')]
         cls._floor_packs[floorpack_id] = floorpack
-        return floorpack_id
 
+    @classmethod
+    def _get_packname(cls, filename: str):
+        '''Retrieve fname without extention: the floorpack ID used as a key'''
+        return filename[:filename.index('.')]
+    
     @classmethod
     def floorpack_is_over(cls):
         '''Return a boolean indicating whether the floorpack is over.

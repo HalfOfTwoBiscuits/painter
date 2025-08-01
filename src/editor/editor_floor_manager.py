@@ -129,7 +129,14 @@ class EditorFloorManager(FloorManager):
     @classmethod
     def upload_floorpack(cls, path_str: str, fname: str):
         '''Upload the floorpack at the given path, and select it.
-        The original filename is also passed, because the name changes on upload.'''
+        The original filename is also passed, because the name changes on upload and the original filename
+        is to be used as the ID for the pack.
+        Raises FileExistsError if there is already a floorpack with that ID
+        and TypeError if the file isn't a floorpack.'''
         path = Path(path_str)
-        pack_id = cls._load_floorpack(path, fname)
+        pack_id = cls._get_packname(fname)
+        if pack_id in cls._floor_packs:
+            raise FileExistsError
+        
+        cls._load_floorpack(path, floorpack_id=pack_id)
         cls.select_floorpack(pack_id)
