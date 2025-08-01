@@ -65,7 +65,7 @@ class FloorManager:
         try:
             with open(posix_path) as file:
                 floorpack = yaml.load(file, Loader=yaml.Loader)
-        except yaml.YAMLError:
+        except Exception:
             raise TypeError
 
         # Check the pack is a list of FloorData
