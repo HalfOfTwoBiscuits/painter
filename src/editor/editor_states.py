@@ -1,6 +1,7 @@
 from copy import deepcopy
 
 from ..abstract_states import State, GameContentSelectState
+from ..error_report import ErrorState, ErrorReportControl
 from ..config import OnlineConfig
 from ..game.menu_visual import MenuVisual
 from ..game.painter_visual import PainterVisual
@@ -22,8 +23,13 @@ from .playtest_handlers import PlaytestControl, ReturnToEditorButtonVisual
 class EditorStartState(State):
     @classmethod
     def enter(cls):
-        EditorFloorManager.load_floors()
-        return 'EditFloorpacksState'
+        NEXT_STATE = 'EditFloorpacksState'
+        try:
+            EditorFloorManager.load_floors()
+        except TypeError:
+            ErrorReportControl.set_state_after_dismiss(NEXT_STATE)
+            return 'ErrorState'
+        return NEXT_STATE
 
 class EditFloorpacksState(GameContentSelectState):
     _TITLE = 'Select Pack To Edit'

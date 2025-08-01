@@ -1,6 +1,7 @@
 from ..abstract_states import State, GameContentSelectState
 from ..config import OnlineConfig
 from ..abstract_states import State, FixedOptionsSelectState, GameContentSelectState
+from ..error_report import ErrorState, ErrorReportControl
 from ..floor_manager import FloorManager
 from .painter_input import PainterControl
 from .pause_input import PauseMenuControl, RestartExitMenuControl, FloorClearMenuControl
@@ -13,8 +14,13 @@ from .floor_player import FloorPlayer
 class GameStartState(State):
     @classmethod
     def enter(cls):
-        FloorManager.load_floors()
-        return 'FloorpackSelectState'
+        NEXT_STATE = 'FloorpackSelectState'
+        try:
+            FloorManager.load_floors()
+        except TypeError:
+            ErrorReportControl.set_state_after_dismiss(NEXT_STATE)
+            return 'ErrorState'
+        return NEXT_STATE
 
 class NewFloorState(State):
     '''The player has chosen to start a new floor.

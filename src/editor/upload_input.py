@@ -1,5 +1,6 @@
 import pygame as pg
 from ..abstract_handlers import KeyboardInputHandler
+from ..error_report import ErrorReportVisual, ErrorReportControl
 from ..audio_utility import SFXPlayer
 from .upload import FloorpackUploader
 
@@ -9,9 +10,20 @@ class UploadPromptInput(KeyboardInputHandler):
     
     @staticmethod
     def process_input(cls, event):
-        if FloorpackUploader.has_just_uploaded():
+        ERR_MSG = \
+            "That isn't a valid floorpack.\n"\
+            "Please upload a .yaml file that was created by the level editor.\n"\
+            "You can download one that you made in the browser\n"\
+            "by selecting it and choosing Download All,\n"\
+            "or if you downloaded Painter, it will be in the folder resources/floors."
+        NEXT_STATE = 'EditFloorpacksState'
+        if FloorpackUploader.upload_was_invalid():
+            ErrorReportVisual.set_message(ERR_MSG)
+            ErrorReportControl.set_state_after_dismiss(NEXT_STATE)
+            return 'ErrorState'
+        elif FloorpackUploader.has_just_uploaded():
             FloorpackUploader.remove_upload_prompt()
-            return 'EditFloorpacksState'
+            return NEXT_STATE
         elif event.type == pg.MOUSEBUTTONDOWN and event.button == 3:
             return cls.back()
         else: return cls._process_keyboard_input(cls, event)

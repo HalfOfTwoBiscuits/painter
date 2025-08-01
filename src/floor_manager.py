@@ -2,12 +2,7 @@ import yaml
 from copy import deepcopy
 from os import walk
 from .file_utility import FileUtility
-
-# FloorData is not used here: the floors to paint are created beforehand.
-# But it must be imported somewhere in the main project for pyinstaller to detect it exists,
-# so that when we load the floor yaml in the built version of the project,
-# floor_data.py is included in the build.
-# It's imported in this file because the floor yaml is loaded in this file.
+from .error_report import ErrorReportVisual
 from .editor.floor_data import FloorData
 
 class FloorManager:
@@ -25,10 +20,11 @@ class FloorManager:
         '''Iterate through the yaml files in the resources/floors directory,
         deserialising a list of FloorData objects from each.
         These 'floorpacks' will be stored so they can be played later.
-
-        Currently only one floorpack will be used due to the input handler
-        for floor pack selection, and the editor program to create floorpacks,
-        not being done yet.'''
+        
+        If any floorpacks are invalid, call ErrorReportVisual.set_message_from_invalid_packs()
+        to prepare an error message with the names of the invalid packs, and raise TypeError.
+        Valid floorpacks will still be loaded.'''
+        invalid_floorpack_names = []
 
         floorpack_dir = FileUtility.path_to_resource_directory('floors')
         # Iterate over files in the directory
@@ -42,7 +38,13 @@ class FloorManager:
                 # and as_posix() for compatibility with pygbag.
                 path = (floorpack_dir / fname).resolve().as_posix()
                 # Load floorpack file
-                cls._load_floorpack(path, fname)
+                try:
+                    cls._load_floorpack(path, fname)
+                except TypeError:
+                    invalid_floorpack_names.append(fname)
+        if len(invalid_floorpack_names) > 0:
+            ErrorReportVisual.set_message_from_invalid_packs(invalid_floorpack_names)
+            raise TypeError
     
     @classmethod
     def _load_floorpack(cls, path, fname: str=None) -> str:
@@ -51,12 +53,20 @@ class FloorManager:
         otherwise it is derived from the path.
         Returns the ID of the new pack, which is the filename
         without extention.
+        If the file doesn't contain a floorpack, raise TypeError.
         
         Called in load_floors() and EditorFloorManager.upload_floorpack().'''
 
-        with open(path) as file:
-            floorpack = yaml.load(file, Loader=yaml.Loader)
-        
+        try:
+            with open(path) as file:
+                floorpack = yaml.load(file, Loader=yaml.Loader)
+        except yaml.YAMLError:
+            raise TypeError
+
+        # Check the pack is a list of FloorData
+        if not isinstance(floorpack, list) or not all([isinstance(floor, FloorData) for floor in floorpack]):
+            raise TypeError
+
         if fname is None: floorpack_id = path.name
         else:
             # Retrieve fname without extention: the floorpack ID used as a key

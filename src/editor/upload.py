@@ -3,6 +3,7 @@ from .editor_floor_manager import EditorFloorManager
 class FloorpackUploader:
     __just_uploaded = False
     __aborting = False
+    __upload_was_invalid = False
 
     @classmethod
     def init(cls):
@@ -23,6 +24,7 @@ class FloorpackUploader:
         '''Using JavaScript, make the input element for files on the web version's HTML page appear.'''
         platform.window.dlg.hidden = false
         cls.__aborting = False
+        cls.__error = False
 
     @staticmethod
     def remove_upload_prompt():
@@ -38,16 +40,18 @@ class FloorpackUploader:
     def __upload(cls, file_data):
         '''Loads the floorpack file with the path that's specified in the file_data namespace.
         Used when a file is uploaded.
-        Does nothing if the file doesn't have .yaml extention,
-        or abort_upload() was called before this.'''
+        Does nothing if abort_upload() was called before this.'''
         if cls.__aborting:
             cls.__aborting = False
             return
         
         fname = file_data.name
-        if fname.endswith('.yaml'):
+        try:
             EditorFloorManager.upload_floorpack(file_data.text, fname)
-        cls.__just_uploaded = True
+        except TypeError:
+            cls.__upload_was_invalid = True
+        else:
+            cls.__just_uploaded = True
 
     @classmethod
     def has_just_uploaded(cls) -> bool:
@@ -55,5 +59,14 @@ class FloorpackUploader:
         False otherwise.'''
         if cls.__just_uploaded:
             cls.__just_uploaded = False
+            return True
+        else: return False
+
+    @classmethod
+    def upload_was_invalid(cls) -> bool:
+        '''Return True if the user uploaded an invalid file since this method was last called,
+        False otherwise.'''
+        if cls.__upload_was_invalid:
+            cls.__upload_was_invalid = False
             return True
         else: return False
